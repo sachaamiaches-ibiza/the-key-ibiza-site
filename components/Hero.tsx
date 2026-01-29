@@ -23,7 +23,7 @@ const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
       <div className="relative z-10 text-center px-6 w-full max-w-[1920px] mx-auto flex flex-col items-center justify-center">
         {/* Central Logo */}
         <div className="flex flex-col items-center mb-6 md:mb-10 lg:mb-12 animate-slide-up w-full">
-           <LogoTheKey className="w-16 h-24 md:w-28 md:h-36 lg:w-32 lg:h-44 xl:w-40 xl:h-56 text-luxury-gold mb-6 md:mb-8 drop-shadow-[0_0_50px_rgba(196,164,97,0.4)]" />
+           <LogoTheKey className="w-16 h-24 md:w-28 md:h-36 lg:w-32 lg:h-44 xl:w-40 xl:h-56 text-luxury-gold mb-6 md:mb-8" />
            <span className="text-luxury-gold uppercase tracking-[0.6em] md:tracking-[1em] xl:tracking-[1.2em] text-[8px] md:text-[10px] lg:text-xs font-black block">
             {t.nav.tagline}
           </span>

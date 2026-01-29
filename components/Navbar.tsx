@@ -5,13 +5,7 @@ import { translations } from '../translations';
 
 export const LogoTheKey = ({ className = "w-8 h-8", color = "#C4A461" }) => (
   <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <defs>
-      <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="2" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
-      </filter>
-    </defs>
-    <g filter="url(#goldGlow)">
+    <g>
       <circle cx="50" cy="35" r="32" stroke={color} strokeWidth="3.5" />
       <circle cx="50" cy="35" r="18" stroke={color} strokeWidth="2.5" strokeDasharray="80 20" />
       <path d="M50 35V130" stroke={color} strokeWidth="5" strokeLinecap="round" />
