@@ -99,12 +99,12 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
           </div>
         </div>
       ) : (
-        <button 
+        <button
           onClick={() => setIsOpen(true)}
-          className="bg-luxury-blue border border-luxury-gold/40 w-24 h-32 lg:w-28 lg:h-40 rounded-[32px] flex flex-col items-center justify-center shadow-[0_0_50px_rgba(196,164,97,0.3)] hover:shadow-[0_0_80px_rgba(196,164,97,0.5)] transition-all duration-700 group relative overflow-hidden ring-1 ring-white/5"
+          className="bg-luxury-blue border border-luxury-gold/40 w-24 h-32 lg:w-28 lg:h-40 rounded-[32px] flex flex-col items-center justify-center transition-all duration-700 group relative overflow-hidden ring-1 ring-white/5"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-luxury-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <LogoTheKey className="w-12 h-18 lg:w-14 lg:h-22 text-luxury-gold transition-all duration-700 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(196,164,97,0.4)]" />
+          <LogoTheKey className="w-12 h-18 lg:w-14 lg:h-22 text-luxury-gold transition-all duration-700 group-hover:scale-110" />
         </button>
       )}
     </div>
