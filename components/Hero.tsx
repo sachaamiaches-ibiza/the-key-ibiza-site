@@ -36,11 +36,12 @@ const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
           </h1>
           <div className="w-full flex justify-center">
             {/* Reducción ligera del margen negativo para crear el espacio solicitado entre las palabras */}
-            <span className="text-gradient italic text-3xl sm:text-5xl md:text-8xl lg:text-[9.5rem] xl:text-[12rem] font-serif font-extralight 
-                           tracking-[0.3em] md:tracking-[0.5em] lg:tracking-[0.6em] xl:tracking-[0.7em]
-                           pl-[0.3em] md:pl-[0.5em] lg:pl-[0.6em] xl:pl-[0.7em]
-                           -mt-1.5 md:-mt-5 lg:-mt-10 xl:-mt-14 block text-center">
-              IBIZA
+            <span className="text-gradient italic text-3xl sm:text-4xl md:text-5xl
+  tracking-[0.3em] md:tracking-[0.5em] pl-[0.3em] md:pl-[0.5em]
+  lg:pl-[0.6em] -mt-1.5 md:-mt-5 lg:-mt-10 xl:-mt-12"
+  style={{ fontFamily: 'Playfair Display, serif' }}
+>
+              IBIZAs
             </span>
           </div>
         </div>
