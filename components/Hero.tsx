@@ -41,7 +41,7 @@ const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
   lg:pl-[0.6em] -mt-1.5 md:-mt-5 lg:-mt-10 xl:-mt-12"
   style={{ fontFamily: 'Playfair Display, serif' }}
 >
-              IBIZAs
+              IBIZA-123
             </span>
           </div>
         </div>
