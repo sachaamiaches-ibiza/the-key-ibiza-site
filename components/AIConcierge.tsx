@@ -39,37 +39,37 @@ interface CollectedData {
 }
 
 const VILLA_STEPS = [
-  'What dates are you planning to stay?',
-  'How many people are you OR how many bedrooms do you need?',
-  'What is your estimated budget?',
-  'Is there anything specific you are looking for?',
+  'Wonderful choice! May I ask which dates you are considering for your stay in Ibiza?',
+  'Lovely. How many guests will be joining you, or how many bedrooms would you prefer?',
+  'Do you have a budget range in mind for your villa experience?',
+  'Is there anything special you would love us to include or any particular wishes for your stay?',
 ];
 
 const BOAT_STEPS = [
-  'What date would you like to go out?',
-  'How many people will be on board?',
-  'What is your estimated budget?',
+  'How exciting! Which date are you thinking of for your time on the water?',
+  'How many guests will be joining you on board?',
+  'Do you have a budget range in mind for your charter?',
 ];
 
 const SERVICE_STEPS = [
-  'What date do you need the service or event?',
-  'Approximately how many people will be involved?',
-  'What type of service or celebration is it?',
-  'Please write a short description of what you need.',
+  'Wonderful! Which date do you have in mind for your service or event?',
+  'Approximately how many guests will be involved?',
+  'What type of service or celebration are you planning?',
+  'Could you share a brief description of what you have in mind? We would love to know more.',
 ];
 
 const PROPERTY_STEPS = [
-  'Are you looking for a villa, apartment, or land?',
-  'In which area are you interested?',
-  'What is your estimated budget range?',
-  'Is this for personal use or investment?',
-  'Is there anything specific you are looking for?',
+  'How exciting! Are you looking for a villa, an apartment, or perhaps land?',
+  'Which area of Ibiza interests you the most?',
+  'Do you have a budget range in mind for your property search?',
+  'Will this be for your personal enjoyment or as an investment?',
+  'Is there anything special you are looking for in your ideal property?',
 ];
 
 const CONTACT_STEPS = [
-  'Full name',
-  'Phone number',
-  'Email',
+  'May I have your full name, please?',
+  'And the best phone number to reach you?',
+  'Finally, may I have your email address?',
 ];
 
 const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
@@ -77,7 +77,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'How can we help you?' }
+    { role: 'assistant', content: 'Welcome to The Key Ibiza. How may we assist you today?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -105,7 +105,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     setIsComplete(false);
     setCollectedData({ requestType: null });
     setShowOptions(true);
-    setMessages([{ role: 'assistant', content: 'How can we help you?' }]);
+    setMessages([{ role: 'assistant', content: 'Welcome to The Key Ibiza. How may we assist you today?' }]);
   };
 
   const sendEmail = async (data: CollectedData) => {
@@ -114,59 +114,57 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
       : data.requestType === 'service' ? 'Service / Event organization'
       : 'Property purchase';
 
-    let bodyContent = `Selected option: ${typeLabel}\n\n`;
+    let messageContent = `Selected option: ${typeLabel}\n\n`;
 
     if (data.requestType === 'villa') {
-      bodyContent += `Dates: ${data.dates}\n`;
-      bodyContent += `Guests/Bedrooms: ${data.guests}\n`;
-      bodyContent += `Budget: ${data.budget}\n`;
-      bodyContent += `Specific Requirements: ${data.specific}\n`;
+      messageContent += `Dates: ${data.dates}\n`;
+      messageContent += `Guests/Bedrooms: ${data.guests}\n`;
+      messageContent += `Budget: ${data.budget}\n`;
+      messageContent += `Specific Requirements: ${data.specific}\n`;
     } else if (data.requestType === 'boat') {
-      bodyContent += `Date: ${data.boatDate}\n`;
-      bodyContent += `Guests: ${data.boatGuests}\n`;
-      bodyContent += `Budget: ${data.boatBudget}\n`;
+      messageContent += `Date: ${data.boatDate}\n`;
+      messageContent += `Guests: ${data.boatGuests}\n`;
+      messageContent += `Budget: ${data.boatBudget}\n`;
     } else if (data.requestType === 'service') {
-      bodyContent += `Date: ${data.serviceDate}\n`;
-      bodyContent += `Guests: ${data.serviceGuests}\n`;
-      bodyContent += `Type: ${data.serviceType}\n`;
-      bodyContent += `Description: ${data.serviceDescription}\n`;
+      messageContent += `Date: ${data.serviceDate}\n`;
+      messageContent += `Guests: ${data.serviceGuests}\n`;
+      messageContent += `Type: ${data.serviceType}\n`;
+      messageContent += `Description: ${data.serviceDescription}\n`;
     } else if (data.requestType === 'property') {
-      bodyContent += `Property Type: ${data.propertyType}\n`;
-      bodyContent += `Area: ${data.propertyArea}\n`;
-      bodyContent += `Budget Range: ${data.propertyBudget}\n`;
-      bodyContent += `Use: ${data.propertyUse}\n`;
-      bodyContent += `Specific Requirements: ${data.propertySpecific}\n`;
+      messageContent += `Property Type: ${data.propertyType}\n`;
+      messageContent += `Area: ${data.propertyArea}\n`;
+      messageContent += `Budget Range: ${data.propertyBudget}\n`;
+      messageContent += `Use: ${data.propertyUse}\n`;
+      messageContent += `Specific Requirements: ${data.propertySpecific}\n`;
     }
 
-    bodyContent += `\nFull name: ${data.fullName}\n`;
-    bodyContent += `Phone number: ${data.phone}\n`;
-    bodyContent += `Email: ${data.email}\n`;
+    messageContent += `\nFull name: ${data.fullName}\n`;
+    messageContent += `Phone number: ${data.phone}\n`;
+    messageContent += `Email: ${data.email}\n`;
 
-    // Send via EmailJS or backend endpoint
+    // Send via Formsubmit.co (free email service, no registration required)
+    const formData = new FormData();
+    formData.append('name', data.fullName || '');
+    formData.append('email', data.email || '');
+    formData.append('phone', data.phone || '');
+    formData.append('_subject', `New Concierge Request – ${typeLabel}`);
+    formData.append('message', messageContent);
+    formData.append('_captcha', 'false');
+    formData.append('_template', 'table');
+
     try {
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      const response = await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service_id: 'service_thekey',
-          template_id: 'template_concierge',
-          user_id: 'YOUR_EMAILJS_PUBLIC_KEY',
-          template_params: {
-            to_email: 'hello@thekey-ibiza.com',
-            subject: `New Concierge Request – ${typeLabel}`,
-            message: bodyContent,
-            from_name: data.fullName,
-            from_email: data.email,
-            from_phone: data.phone,
-          }
-        })
+        body: formData,
       });
-      console.log('Email sent:', response.ok);
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error('Email failed');
+      }
     } catch (error) {
-      console.error('Email error:', error);
-      // Fallback: open mailto
+      // Fallback: open mailto if fetch fails
       const subject = encodeURIComponent(`New Concierge Request – ${typeLabel}`);
-      const body = encodeURIComponent(bodyContent);
+      const body = encodeURIComponent(messageContent);
       window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
     }
   };
@@ -237,7 +235,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
           // Complete - send email and show thank you
           setIsComplete(true);
           sendEmail(newData);
-          setMessages(prev => [...prev, { role: 'assistant', content: 'Thank you. We will contact you as soon as possible.' }]);
+          setMessages(prev => [...prev, { role: 'assistant', content: 'Thank you very much. Our team will contact you shortly.' }]);
         }
         setIsLoading(false);
       }, 500);

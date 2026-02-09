@@ -52,30 +52,31 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
   };
 
   const sendEmail = async () => {
-    const bodyContent = `New Contact Form Submission\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message || 'No message provided'}`;
+    const messageContent = `New Contact Form Submission\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message || 'No message provided'}`;
+
+    // Send via Formsubmit.co (free email service, no registration required)
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('phone', formData.phone);
+    formDataToSend.append('message', formData.message || 'No message provided');
+    formDataToSend.append('_subject', 'New Contact Form Submission – The Key Ibiza');
+    formDataToSend.append('_captcha', 'false');
+    formDataToSend.append('_template', 'table');
 
     try {
-      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      const response = await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service_id: 'service_thekey',
-          template_id: 'template_contact',
-          user_id: 'YOUR_EMAILJS_PUBLIC_KEY',
-          template_params: {
-            to_email: 'hello@thekey-ibiza.com',
-            subject: 'New Contact Form Submission',
-            message: bodyContent,
-            from_name: formData.name,
-            from_email: formData.email,
-            from_phone: formData.phone,
-          }
-        })
+        body: formDataToSend,
       });
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error('Email failed');
+      }
     } catch (error) {
       // Fallback: open mailto
       const subject = encodeURIComponent('New Contact Form Submission');
-      const body = encodeURIComponent(bodyContent);
+      const body = encodeURIComponent(messageContent);
       window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
     }
   };
