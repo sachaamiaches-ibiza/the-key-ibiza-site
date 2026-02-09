@@ -12,21 +12,20 @@ interface VillaListingPageProps {
   lang: Language;
 }
 
-const AMENITIES = ["Sea View", "Tennis Court", "Sea Access", "Jacuzzi", "Gym", "Staff included"];
-
 const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang }) => {
   const VILLAS = getVillas(lang);
 
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchFilters, setSearchFilters] = useState({
-    category: 'All',
+    checkIn: '',
+    checkOut: '',
     minBedrooms: 0,
-    minGuests: 0,
-    location: 'All',
     minPrice: 0,
     maxPrice: 200000,
+    location: 'All',
+    searchText: '',
     selectedAmenities: [] as string[]
   });
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const listingType = useMemo(() => {
     if (category === 'villas-holiday') return 'holiday';
@@ -41,6 +40,15 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
   const uniqueLocations = useMemo(() => {
     return ['All', ...Array.from(new Set(villasOfType.map(v => v.location)))];
+  }, [villasOfType]);
+
+  // Get all unique amenities from villas automatically
+  const allAmenities = useMemo(() => {
+    const amenitiesSet = new Set<string>();
+    villasOfType.forEach(villa => {
+      villa.features?.forEach((feature: string) => amenitiesSet.add(feature));
+    });
+    return Array.from(amenitiesSet).sort();
   }, [villasOfType]);
 
   useEffect(() => {
@@ -58,17 +66,28 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
   const filteredVillas = useMemo(() => {
     return villasOfType.filter(v => {
-      const matchCat = searchFilters.category === 'All' || v.category === searchFilters.category;
       const matchBeds = v.bedrooms >= searchFilters.minBedrooms;
-      const matchGuests = (v.maxGuests || 0) >= searchFilters.minGuests;
       const matchLoc = searchFilters.location === 'All' || v.location === searchFilters.location;
-      const matchPrice = (v.numericPrice || 0) >= searchFilters.minPrice && (v.numericPrice || 0) <= searchFilters.maxPrice;
-      
-      const matchAmenities = searchFilters.selectedAmenities.every(amenity => 
-        v.features?.some(f => f.toLowerCase() === amenity.toLowerCase())
-      );
-      
-      return matchCat && matchBeds && matchGuests && matchLoc && matchPrice && matchAmenities;
+      const matchPrice = (v.numericPrice || 0) >= searchFilters.minPrice &&
+        (searchFilters.maxPrice === 0 || (v.numericPrice || 0) <= searchFilters.maxPrice);
+
+      // Text/name search
+      const searchLower = searchFilters.searchText.toLowerCase();
+      const matchSearch = !searchFilters.searchText ||
+        v.name.toLowerCase().includes(searchLower) ||
+        v.location.toLowerCase().includes(searchLower) ||
+        v.shortDescription?.toLowerCase().includes(searchLower);
+
+      // Amenities filter
+      const matchAmenities = searchFilters.selectedAmenities.length === 0 ||
+        searchFilters.selectedAmenities.every(amenity =>
+          v.features?.some((f: string) => f.toLowerCase() === amenity.toLowerCase())
+        );
+
+      // Availability check will be implemented with calendar integration
+      const matchAvailability = true; // TODO: Connect to calendar availability
+
+      return matchBeds && matchLoc && matchPrice && matchSearch && matchAmenities && matchAvailability;
     });
   }, [searchFilters, villasOfType]);
 
@@ -81,95 +100,162 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
     }));
   };
 
+  const clearFilters = () => {
+    setSearchFilters({
+      checkIn: '',
+      checkOut: '',
+      minBedrooms: 0,
+      minPrice: 0,
+      maxPrice: 200000,
+      location: 'All',
+      searchText: '',
+      selectedAmenities: []
+    });
+    setIsFiltersOpen(false);
+  };
+
   return (
-    <div className="pt-40 pb-24">
+    <div className="pt-40 pb-4" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-20 gap-10 animate-slide-up">
-          <div className="space-y-6">
-            <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block italic">Privilege Portfolio</span>
-            <h1 className="text-6xl md:text-9xl font-serif text-white leading-none">{getTitle()}</h1>
-          </div>
-          
-          <button 
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className={`flex items-center space-x-4 px-10 py-5 rounded-full border transition-all uppercase tracking-widest text-[10px] font-bold ${isFilterOpen ? 'bg-luxury-gold text-luxury-blue border-luxury-gold shadow-[0_0_30px_rgba(196,164,97,0.3)]' : 'border-white/10 text-white/60 hover:border-white/30'}`}
-          >
-            <span>{isFilterOpen ? (lang === 'en' ? 'Close Filters' : (lang === 'es' ? 'Cerrar Filtros' : 'Fermer')) : (lang === 'en' ? 'Search & Filter' : (lang === 'es' ? 'Buscar y Filtrar' : 'Filtrer'))}</span>
-            <svg className={`w-4 h-4 transition-transform duration-500 ${isFilterOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
+        <div className="text-center mb-16 animate-slide-up">
+          <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block italic mb-6">Privilege Portfolio</span>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-none">{getTitle()}</h1>
         </div>
 
-        {/* Advanced Filter Panel */}
-        <div className={`overflow-hidden transition-all duration-700 ease-in-out ${isFilterOpen ? 'max-h-[1000px] mb-24 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="luxury-card p-12 md:p-16 rounded-[60px] border border-white/5 space-y-12 bg-luxury-blue/40">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-              <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-widest text-white/30 font-bold ml-1">Architectural Style</label>
-                <select 
-                  value={searchFilters.category}
-                  onChange={(e) => setSearchFilters({...searchFilters, category: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
-                >
-                  {['All', 'Modern', 'Traditional', 'Cliffs', 'Beachfront'].map((c: string) => <option key={c} value={c} className="bg-luxury-blue">{c}</option>)}
-                </select>
+        {/* Search Filter Panel */}
+        <div className="mb-14 relative z-[1000]">
+          <div className="luxury-card p-6 rounded-[24px] border border-white/5 bg-luxury-blue/40">
+            {/* Row 1 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-4">
+              <div className="relative">
+                <input
+                  type="date"
+                  value={searchFilters.checkIn}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkIn: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                  style={{ colorScheme: 'dark' }}
+                />
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-in</span>
               </div>
-              <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-widest text-white/30 font-bold ml-1">Island Region</label>
-                <select 
+              <div className="relative">
+                <input
+                  type="date"
+                  value={searchFilters.checkOut}
+                  min={searchFilters.checkIn}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                  style={{ colorScheme: 'dark' }}
+                />
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-out</span>
+              </div>
+              <div className="relative">
+                <select
+                  value={searchFilters.minBedrooms}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSearchFilters({...searchFilters, minBedrooms: parseInt(e.target.value) || 0})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                >
+                  <option value={0} className="bg-luxury-blue">Any</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                    <option key={n} value={n} className="bg-luxury-blue">{n}+</option>
+                  ))}
+                </select>
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Bedrooms</span>
+              </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={searchFilters.minPrice || ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, minPrice: parseInt(e.target.value) || 0})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                />
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Price From</span>
+              </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={searchFilters.maxPrice === 200000 ? '' : searchFilters.maxPrice}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, maxPrice: parseInt(e.target.value) || 200000})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                />
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Price Till</span>
+              </div>
+              <div className="relative">
+                <select
                   value={searchFilters.location}
-                  onChange={(e) => setSearchFilters({...searchFilters, location: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSearchFilters({...searchFilters, location: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                 >
-                  {uniqueLocations.map((l: string) => <option key={l} value={l} className="bg-luxury-blue">{l}</option>)}
+                  {uniqueLocations.map((l: string) => <option key={l} value={l} className="bg-luxury-blue">{l === 'All' ? 'All Locations' : l}</option>)}
                 </select>
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Location</span>
               </div>
-              <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-widest text-white/30 font-bold ml-1">Capacity</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <input 
-                    type="number"
-                    placeholder="Beds+"
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
-                    onChange={(e) => setSearchFilters({...searchFilters, minBedrooms: parseInt(e.target.value) || 0})}
-                  />
-                  <input 
-                    type="number"
-                    placeholder="Guests+"
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
-                    onChange={(e) => setSearchFilters({...searchFilters, minGuests: parseInt(e.target.value) || 0})}
-                  />
-                </div>
-              </div>
-              <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-widest text-white/30 font-bold ml-1">Weekly Budget</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <input 
-                    type="number"
-                    placeholder="Min €"
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
-                    onChange={(e) => setSearchFilters({...searchFilters, minPrice: parseInt(e.target.value) || 0})}
-                  />
-                  <input 
-                    type="number"
-                    placeholder="Max €"
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
-                    onChange={(e) => setSearchFilters({...searchFilters, maxPrice: parseInt(e.target.value) || 1000000})}
-                  />
-                </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Villa name..."
+                  value={searchFilters.searchText}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, searchText: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                />
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Search</span>
               </div>
             </div>
-            <div className="space-y-6 pt-8 border-t border-white/5">
-              <label className="text-[10px] uppercase tracking-widest text-white/30 font-bold block mb-4">Exclusive Features</label>
-              <div className="flex flex-wrap gap-4">
-                {AMENITIES.map(amenity => (
-                  <button
-                    key={amenity}
-                    onClick={() => toggleAmenity(amenity)}
-                    className={`px-6 py-3 rounded-full text-[10px] uppercase tracking-widest font-bold transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold shadow-lg shadow-luxury-gold/20' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
-                  >
-                    {amenity}
-                  </button>
-                ))}
+            {/* Row 2 - Buttons */}
+            <div className="flex justify-between items-start gap-3">
+              {/* Left - Filters Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border ${isFiltersOpen || searchFilters.selectedAmenities.length > 0 ? 'border-luxury-gold/50 text-luxury-gold' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                  <span>Filters</span>
+                  {searchFilters.selectedAmenities.length > 0 && (
+                    <span className="bg-luxury-gold text-luxury-blue text-[8px] px-1.5 py-0.5 rounded-full font-bold">{searchFilters.selectedAmenities.length}</span>
+                  )}
+                  <svg className={`w-3 h-3 transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isFiltersOpen && (
+                  <div className="absolute top-full left-0 mt-2 z-[999] min-w-[280px] bg-luxury-blue/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl">
+                    <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold mb-3">Amenities</p>
+                    <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto">
+                      {allAmenities.map((amenity: string) => (
+                        <button
+                          key={amenity}
+                          onClick={() => toggleAmenity(amenity)}
+                          className={`flex items-center justify-between w-full px-3 py-1.5 rounded-lg text-[10px] transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/10 text-white/50 hover:text-white hover:border-white/30'}`}
+                        >
+                          <span>{amenity}</span>
+                          {searchFilters.selectedAmenities.includes(amenity) && (
+                            <svg className="w-3 h-3 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    {allAmenities.length === 0 && (
+                      <p className="text-white/30 text-xs italic">No amenities available</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Right - Clear & Search */}
+              <div className="flex gap-3">
+                <button
+                  onClick={clearFilters}
+                  className="px-6 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border border-white/10 text-white/40 hover:text-white hover:border-white/30"
+                >
+                  Clear
+                </button>
+                <button
+                  className="px-8 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all bg-luxury-gold text-luxury-blue hover:bg-white"
+                >
+                  Search
+                </button>
               </div>
             </div>
           </div>

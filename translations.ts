@@ -35,8 +35,8 @@ export const translations = {
       philosophyDesc: "Surpassing expectations with a human touch. Every client is unique, every experience is orchestrated with absolute precision to create timeless memories.",
       readStory: "Read Our Story",
       signatureResidences: "Signature Residences",
-      selectedCollection: "Selected Collection",
-      residencesDesc: "Handpicked sanctuaries where privacy meets architectural mastery."
+      selectedCollection: "Master Collection",
+      residencesDesc: "Handpicked sanctuaries where privacy meets architectural mastery"
     },
     contact: {
       title: "Bespoke Inquiry",

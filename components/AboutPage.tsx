@@ -10,81 +10,164 @@ interface AboutPageProps {
 
 const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
   return (
-    <div className="pt-40 pb-24">
+    <div className="pt-40 pb-12" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
-        <button 
-          onClick={() => onNavigate('home')}
-          className="flex items-center space-x-3 text-white/40 hover:text-luxury-gold transition-colors mb-20 uppercase tracking-widest text-[10px] font-bold"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-          <span>Back to Home</span>
-        </button>
-
-        <div className="max-w-4xl mb-24 animate-slide-up">
-          <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block mb-6">Our Identity</span>
-          <h1 className="text-5xl md:text-8xl font-serif text-white leading-tight mb-8">
-            Who We Are — <br/> <span className="italic text-white/50">The Soul Behind The Key Ibiza.</span>
+        {/* Header */}
+        <div className="text-center mb-20 animate-slide-up">
+          <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block italic mb-6">
+            Our Identity
+          </span>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-none mb-6">
+            About Us
           </h1>
-          <p className="text-xl md:text-2xl text-white/60 font-light leading-relaxed text-justify">
-            At The Key Ibiza, we are more than a concierge service — we are a passionate collective of Ibiza residents, deeply connected to the island’s soul and committed to curating extraordinary experiences.
+          <p className="text-white/40 text-sm md:text-base font-light tracking-wide max-w-2xl mx-auto">
+            The soul behind The Key Ibiza
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-32 items-center animate-fade-in">
-          <div className="space-y-8 text-lg font-light leading-relaxed text-white/70 text-justify">
-            <h3 className="text-3xl font-serif text-white mb-6">The Legacy of La Villa</h3>
-            <p>
-              Before bringing The Key Ibiza to life, we were proud to be part of <span className="text-white font-medium italic">La Villa</span>, a cherished family-run business renowned across multiple regions for its expertise in high-end interior and exterior design.
-            </p>
-            <p>
-              This foundational experience taught us the true value of craftsmanship, personalized service, and design excellence.
-            </p>
+        {/* Section 1 - Who We Are (Image Left) */}
+        <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-center mb-24 md:mb-32">
+          <div className="w-full md:w-1/2">
+            <div className="relative overflow-hidden rounded-[32px] group">
+              <img
+                src="https://images.unsplash.com/photo-1558384216-3694038a8341?auto=format&fit=crop&q=80&w=1200"
+                alt="Ibiza Sunset"
+                className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
+            </div>
           </div>
-          <div className="relative aspect-[4/5] rounded-[60px] overflow-hidden shadow-2xl border border-white/5 group">
-            <img 
-              src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200" 
-              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-              alt="Ibiza Heritage"
-            />
+          <div className="w-full md:w-1/2 md:pl-8">
+            <span className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.4em] font-medium block mb-4">
+              Our Philosophy
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-6 italic">
+              Who We Are
+            </h2>
+            <div className="w-12 h-px bg-luxury-gold/30 mb-6"></div>
+            <p className="text-white/50 text-sm md:text-base font-light leading-relaxed mb-4">
+              At The Key Ibiza, we are more than a concierge service — we are a passionate collective of Ibiza residents, deeply connected to the island's soul and committed to curating extraordinary experiences.
+            </p>
+            <p className="text-white/50 text-sm md:text-base font-light leading-relaxed">
+              Our intimate knowledge of the island, combined with an unwavering commitment to excellence, allows us to unlock doors that remain closed to others.
+            </p>
           </div>
         </div>
 
-        <div className="mb-32">
+        {/* Section 2 - Legacy (Image Right) */}
+        <div className="flex flex-col md:flex-row-reverse gap-10 md:gap-16 items-center mb-24 md:mb-32">
+          <div className="w-full md:w-1/2">
+            <div className="relative overflow-hidden rounded-[32px] group">
+              <img
+                src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200"
+                alt="Interior Design"
+                className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 md:pr-8">
+            <span className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.4em] font-medium block mb-4">
+              Our Heritage
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-6 italic">
+              The Legacy of La Villa
+            </h2>
+            <div className="w-12 h-px bg-luxury-gold/30 mb-6"></div>
+            <p className="text-white/50 text-sm md:text-base font-light leading-relaxed mb-4">
+              Before bringing The Key Ibiza to life, we were proud to be part of <span className="text-white italic">La Villa</span>, a cherished family-run business renowned across multiple regions for its expertise in high-end interior and exterior design.
+            </p>
+            <p className="text-white/50 text-sm md:text-base font-light leading-relaxed">
+              This foundational experience taught us the true value of craftsmanship, personalized service, and design excellence that we now bring to every client relationship.
+            </p>
+          </div>
+        </div>
+
+        {/* Section 3 - Vision (Image Left) */}
+        <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-center mb-24 md:mb-32">
+          <div className="w-full md:w-1/2">
+            <div className="relative overflow-hidden rounded-[32px] group">
+              <img
+                src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200"
+                alt="Luxury Villa"
+                className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 md:pl-8">
+            <span className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.4em] font-medium block mb-4">
+              Our Promise
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-6 italic">
+              Excellence & Discretion
+            </h2>
+            <div className="w-12 h-px bg-luxury-gold/30 mb-6"></div>
+            <p className="text-white/50 text-sm md:text-base font-light leading-relaxed mb-4">
+              We understand that true luxury lies in the details — the anticipation of needs before they arise, the seamless orchestration of complex requests, and the preservation of privacy at every turn.
+            </p>
+            <p className="text-white/50 text-sm md:text-base font-light leading-relaxed">
+              Our commitment to discretion and excellence ensures that every experience we curate reflects the highest standards of sophisticated living.
+            </p>
+          </div>
+        </div>
+
+        {/* Founders Section */}
+        <div className="mb-24 md:mb-32">
           <div className="text-center mb-16">
-            <span className="text-luxury-gold uppercase tracking-[0.5em] text-[10px] font-bold block mb-4">Leadership</span>
-            <h2 className="text-4xl md:text-6xl font-serif text-white">The Founders</h2>
+            <span className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.4em] font-medium block mb-4">
+              Leadership
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white italic">The Founders</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <div className="luxury-card p-12 rounded-[60px] text-center space-y-6 hover:border-luxury-gold/40 transition-all group">
-               <div className="w-32 h-32 mx-auto rounded-full bg-luxury-slate flex items-center justify-center text-luxury-gold text-3xl font-serif italic border-2 border-luxury-gold/20 group-hover:border-luxury-gold transition-all">SA</div>
-               <div>
-                  <h4 className="text-2xl font-serif text-white mb-1">Sacha Amiach</h4>
-                  <p className="text-luxury-gold uppercase tracking-widest text-[10px] font-bold">Founder</p>
-               </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto">
+            {/* Founder 1 */}
+            <div
+              className="group cursor-pointer"
+              onClick={() => onNavigate('valerie-detail')}
+            >
+              <div className="relative overflow-hidden rounded-[32px] mb-6">
+                <div className="w-full h-[350px] md:h-[400px] bg-gradient-to-br from-luxury-slate to-luxury-blue flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+                  <span className="text-luxury-gold text-6xl md:text-7xl font-serif italic opacity-30 group-hover:opacity-50 transition-opacity">SA</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue via-transparent to-transparent"></div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2 group-hover:text-luxury-gold transition-colors">Sacha Amiach</h3>
+                <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.3em] font-medium">Founder</p>
+              </div>
             </div>
-            <div className="luxury-card p-12 rounded-[60px] text-center space-y-6 hover:border-luxury-gold/40 transition-all group">
-               <div className="w-32 h-32 mx-auto rounded-full bg-luxury-slate flex items-center justify-center text-luxury-gold text-3xl font-serif italic border-2 border-luxury-gold/20 group-hover:border-luxury-gold transition-all">AS</div>
-               <div>
-                  <h4 className="text-2xl font-serif text-white mb-1">Angelina Stoycheva</h4>
-                  <p className="text-luxury-gold uppercase tracking-widest text-[10px] font-bold">Co-founder</p>
-               </div>
+
+            {/* Founder 2 */}
+            <div
+              className="group cursor-pointer"
+              onClick={() => onNavigate('francesca-detail')}
+            >
+              <div className="relative overflow-hidden rounded-[32px] mb-6">
+                <div className="w-full h-[350px] md:h-[400px] bg-gradient-to-br from-luxury-slate to-luxury-blue flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+                  <span className="text-luxury-gold text-6xl md:text-7xl font-serif italic opacity-30 group-hover:opacity-50 transition-opacity">AS</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue via-transparent to-transparent"></div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2 group-hover:text-luxury-gold transition-colors">Angelina Stoycheva</h3>
+                <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.3em] font-medium">Co-founder</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <FooterSEO 
-          onNavigate={onNavigate} 
+        <FooterSEO
+          onNavigate={onNavigate}
           lang={lang}
-          title={lang === 'es' ? "Nuestra Identidad y Visión: La Esencia de The Key Ibiza" : "Our Identity & Vision: The Essence of The Key Ibiza"}
-          description={lang === 'es' ? 
-            "La esencia de The Key Ibiza reside en nuestra herencia profunda de diseño mediterráneo y una atención meticulosa al detalle que solo años de experiencia pueden otorgar. Con una trayectoria consolidada en el sector del lujo tras nuestra etapa fundacional en 'La Villa', hemos forjado una red de contactos inigualable en las Islas Baleares, lo que nos permite ofrecer un acceso privilegiado a lo inalcanzable. Nuestra historia no es solo sobre servicios de conserjería; es una promesa de autenticidad humana, excelencia operativa y discreción absoluta. Entendemos el lujo como la intersección perfecta entre el confort absoluto y el respeto profundo por la cultura local de Ibiza. Como curadores de experiencias y gestores de estilo de vida, seleccionamos personalmente cada villa, yate y proveedor para garantizar que cada estancia sea una obra maestra del estilo de vida contemporáneo. Respaldados por décadas de conocimiento experto sobre el terreno y una pasión inquebrantable por la hospitalidad VIP, somos su socio de confianza para descubrir la Ibiza más secreta y exclusiva." : 
-            "The essence of The Key Ibiza lies in our deep Mediterranean design heritage and a meticulous attention to detail that only years of experience can provide. With a consolidated track record in the luxury sector following our foundational stage at 'La Villa', we have forged an unparalleled network of contacts in the Balearic Islands, allowing us to offer privileged access to the unattainable. Our story is not just about concierge services; it is a promise of human authenticity, operational excellence, and absolute discretion. We understand luxury as the perfect intersection between absolute comfort and deep respect for Ibiza's local culture. As experience curators and lifestyle managers, we personally select every villa, yacht, and provider to ensure that each stay is a masterpiece of contemporary lifestyle. Backed by decades of expert on-the-ground knowledge and an unwavering passion for VIP hospitality, we are your trusted partner for discovering the most secret and exclusive Ibiza."}
+          title="Our Identity & Vision"
+          description="The essence of The Key Ibiza lies in our deep Mediterranean design heritage and meticulous attention to detail. With decades of experience in the luxury sector, we have forged an unparalleled network across the Balearic Islands. Our story is a promise of human authenticity, operational excellence, and absolute discretion. We are your trusted partner for discovering the most exclusive Ibiza."
           links={[
-            { label: "Our VIP Services", view: 'services' },
-            { label: "Luxury Villa Collection", view: 'villas-holiday' },
-            { label: "Wellness Visionary", view: 'service-wellness' },
-            { label: "Insights Blog", view: 'blog' },
-            { label: "Ibiza Real Estate Market", view: 'villas-sale' }
+            { label: "Our Services", view: 'services' },
+            { label: "Luxury Villas", view: 'service-villas' },
+            { label: "Yacht Charters", view: 'service-yacht' },
+            { label: "Back to Home", view: 'home' }
           ]}
         />
       </div>

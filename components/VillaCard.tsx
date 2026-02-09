@@ -2,6 +2,7 @@
 import React from 'react';
 import { Villa, Language } from '../types';
 import { translations } from '../translations';
+import { IconBed, IconBath, IconGuests } from './ServiceIcons';
 
 interface VillaCardProps {
   villa: Villa;
@@ -28,8 +29,8 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
         
         {/* Badge */}
-        <div className="absolute top-6 left-6 px-4 py-1.5 bg-luxury-blue/60 backdrop-blur-md border border-white/10 rounded-full">
-          <span className="text-[8px] uppercase tracking-[0.2em] font-bold text-luxury-gold italic">{villa.category}</span>
+        <div className="absolute top-6 right-6 px-4 py-1.5 bg-luxury-blue/60 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center">
+          <span className="text-[8px] uppercase tracking-[0.2em] font-bold text-luxury-gold italic text-center">{villa.category}</span>
         </div>
       </div>
       
@@ -50,17 +51,17 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang }) => {
           {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-4 py-6 border-y border-white/5 mb-6">
             <div className="flex flex-col items-center text-center">
-              <span className="text-luxury-gold text-lg mb-1">🛌</span>
+              <IconBed className="w-6 h-6 mb-2" />
               <span className="text-white text-xs font-bold">{villa.bedrooms}</span>
               <span className="text-[8px] uppercase tracking-widest text-white/30">{t.beds}</span>
             </div>
             <div className="flex flex-col items-center text-center border-x border-white/5">
-              <span className="text-luxury-gold text-lg mb-1">🚿</span>
+              <IconBath className="w-6 h-6 mb-2" />
               <span className="text-white text-xs font-bold">{villa.bathrooms}</span>
               <span className="text-[8px] uppercase tracking-widest text-white/30">{t.baths}</span>
             </div>
             <div className="flex flex-col items-center text-center">
-              <span className="text-luxury-gold text-lg mb-1">👥</span>
+              <IconGuests className="w-6 h-6 mb-2" />
               <span className="text-white text-xs font-bold">{villa.maxGuests}</span>
               <span className="text-[8px] uppercase tracking-widest text-white/30">{lang === 'en' ? 'Guests' : (lang === 'es' ? 'Personas' : 'Invités')}</span>
             </div>

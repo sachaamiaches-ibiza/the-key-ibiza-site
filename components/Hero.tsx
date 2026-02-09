@@ -1,8 +1,7 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LogoTheKey } from './Navbar';
 import { Language } from '../types';
-import { translations } from '../translations';
 
 interface HeroProps {
   onNavigate: (view: any) => void;
@@ -10,78 +9,217 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
-  const t = translations[lang];
-  return (
-    <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-luxury-blue pt-20 lg:pt-32">
-      {/* Ambient Matte Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-luxury-slate via-luxury-blue to-luxury-blue opacity-80"></div>
-        <div className="absolute top-1/4 left-1/4 w-[300px] md:w-[600px] xl:w-[900px] h-[300px] md:h-[600px] xl:h-[900px] bg-luxury-gold/5 rounded-full blur-[120px] animate-pulse-glow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[250px] md:w-[500px] xl:w-[800px] h-[250px] md:h-[500px] xl:h-[800px] bg-luxury-gold/5 rounded-full blur-[100px] animate-pulse-glow" style={{ animationDelay: '1.5s' }}></div>
-      </div>
+  const [circleTopVisible, setCircleTopVisible] = useState(false);
+  const [logoVisible, setLogoVisible] = useState(false);
+  const [claimVisible, setClaimVisible] = useState(false);
+  const [theKeyVisible, setTheKeyVisible] = useState(false);
+  const [ibizaVisible, setIbizaVisible] = useState(false);
+  const [secondaryVisible, setSecondaryVisible] = useState(false);
+  const [buttonsVisible, setButtonsVisible] = useState(false);
+  const [circleBottomVisible, setCircleBottomVisible] = useState(false);
 
-      <div className="relative z-10 text-center px-6 w-full max-w-[1920px] mx-auto flex flex-col items-center justify-center">
-        {/* Central Logo */}
-        <div className="flex flex-col items-center mb-6 md:mb-10 lg:mb-12 animate-slide-up w-full">
-           <LogoTheKey className="w-16 h-24 md:w-28 md:h-36 lg:w-32 lg:h-44 xl:w-40 xl:h-56 text-luxury-gold mb-6 md:mb-8" />
-           <span className="text-luxury-gold uppercase tracking-[0.6em] md:tracking-[1em] xl:tracking-[1.2em] text-[8px] md:text-[10px] lg:text-xs font-black block">
-            {t.nav.tagline}
-          </span>
-        </div>
-        
-        {/* Main Title - Responsive scaling and Optical Centering */}
-        <div className="flex flex-col items-center mb-10 md:mb-14 lg:mb-20 xl:mb-28 animate-slide-up w-full" style={{animationDelay: '100ms'}}>
-          <h1 className="text-5xl sm:text-7xl md:text-9xl lg:text-[13rem] xl:text-[16rem] font-serif leading-[0.85] text-white tracking-tighter uppercase whitespace-nowrap">
-            THE KEY
-          </h1>
-          <div className="w-full flex justify-center">
-            {/* Reducción ligera del margen negativo para crear el espacio solicitado entre las palabras */}
-            <span className="text-gradient italic text-3xl sm:text-4xl md:text-5xl
-  tracking-[0.3em] md:tracking-[0.5em] pl-[0.3em] md:pl-[0.5em]
-  lg:pl-[0.6em] -mt-1.5 md:-mt-5 lg:-mt-10 xl:-mt-12"
-  style={{ fontFamily: 'Playfair Display, serif' }}
->
-              IBIZA
+  useEffect(() => {
+    setTimeout(() => setCircleTopVisible(true), 300);
+    setTimeout(() => setLogoVisible(true), 700);
+    setTimeout(() => setClaimVisible(true), 1200);
+    setTimeout(() => setTheKeyVisible(true), 1700);
+    setTimeout(() => setIbizaVisible(true), 2200);
+    setTimeout(() => setSecondaryVisible(true), 2700);
+    setTimeout(() => setButtonsVisible(true), 3200);
+    setTimeout(() => setCircleBottomVisible(true), 3700);
+  }, []);
+
+  return (
+    <>
+      <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden" style={{ backgroundColor: '#0B1C26', paddingTop: '100px' }}>
+
+        <div className="absolute inset-0 z-0" style={{ backgroundColor: '#0B1C26' }}></div>
+
+        <div
+          className="absolute z-10 left-1/2 -translate-x-1/2 w-[700px] md:w-[900px] lg:w-[1100px] h-[700px] md:h-[900px] lg:h-[1100px] rounded-full pointer-events-none"
+          style={{
+            top: '-35%',
+            background: 'radial-gradient(circle, rgba(201,178,124,0.18) 0%, rgba(201,178,124,0.12) 35%, rgba(201,178,124,0.05) 55%, transparent 65%)',
+            filter: 'blur(60px)',
+            opacity: circleTopVisible ? 1 : 0,
+            transition: 'opacity 3s ease-out',
+          }}
+        ></div>
+
+        <div
+          className="absolute z-10 left-1/2 -translate-x-1/2 w-[700px] md:w-[900px] lg:w-[1100px] h-[700px] md:h-[900px] lg:h-[1100px] rounded-full pointer-events-none"
+          style={{
+            bottom: '-35%',
+            background: 'radial-gradient(circle, rgba(201,178,124,0.18) 0%, rgba(201,178,124,0.12) 35%, rgba(201,178,124,0.05) 55%, transparent 65%)',
+            filter: 'blur(60px)',
+            opacity: circleBottomVisible ? 1 : 0,
+            transition: 'opacity 3s ease-out',
+          }}
+        ></div>
+
+        <div className="relative z-20 flex flex-col items-center justify-center px-6 w-full max-w-4xl mx-auto">
+
+          <div
+            className="mb-6"
+            style={{
+              opacity: logoVisible ? 1 : 0,
+              transform: logoVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'opacity 2s ease-out, transform 2s ease-out',
+            }}
+          >
+            <LogoTheKey className="w-8 h-12 md:w-10 md:h-14" color="#C9B27C" />
+          </div>
+
+          <div
+            className="mb-8"
+            style={{
+              opacity: claimVisible ? 1 : 0,
+              transform: claimVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'opacity 2s ease-out, transform 2s ease-out',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontSize: '10px',
+                letterSpacing: '0.4em',
+                color: '#C9B27C',
+                textTransform: 'uppercase',
+                fontWeight: 500,
+              }}
+            >
+              The Ultimate Privilege Ibiza
             </span>
           </div>
-        </div>
-        
-        <p className="max-w-3xl xl:max-w-5xl mx-auto text-base md:text-xl lg:text-2xl xl:text-3xl text-white/60 font-light mb-12 md:mb-16 lg:mb-24 tracking-wide leading-relaxed animate-slide-up" style={{animationDelay: '200ms'}}>
-          {t.hero.subtitle} <br className="hidden md:block"/>
-          <span className="text-luxury-gold/50 text-sm md:text-lg lg:text-xl xl:text-2xl block mt-4 italic tracking-[0.15em] lg:tracking-[0.25em] xl:tracking-[0.35em] font-medium">
-            {t.hero.keyline}
-          </span>
-        </p>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 xl:gap-14 animate-slide-up w-full" style={{animationDelay: '300ms'}}>
-          <button 
-            onClick={() => onNavigate('services')}
-            className="group px-10 md:px-14 lg:px-20 py-5 md:py-6 bg-luxury-gold text-luxury-blue font-bold rounded-full hover:bg-white transition-all transform hover:-translate-y-1 duration-500 w-full md:w-auto shadow-2xl flex items-center justify-center space-x-6"
-          >
-            <span className="uppercase tracking-[0.25em] lg:tracking-[0.4em] text-[10px] lg:text-[11px] xl:text-[12px]">{t.hero.explore}</span>
-            <LogoTheKey className="w-4 h-6 lg:w-5 lg:h-8 text-luxury-blue transition-transform group-hover:rotate-12" />
-          </button>
-          <button 
-            onClick={() => {
-              const el = document.getElementById('contact');
-              el?.scrollIntoView({ behavior: 'smooth' });
+          <div
+            style={{
+              opacity: theKeyVisible ? 1 : 0,
+              transform: theKeyVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'opacity 2s ease-out, transform 2s ease-out',
             }}
-            className="px-10 md:px-14 lg:px-20 py-5 md:py-6 border border-luxury-gold/30 backdrop-blur-3xl rounded-full hover:border-luxury-gold hover:bg-white/5 transition-all font-bold text-white w-full md:w-auto uppercase tracking-[0.25em] lg:tracking-[0.4em] text-[10px] lg:text-[11px] xl:text-[12px]"
           >
-            {t.hero.request}
-          </button>
-        </div>
-      </div>
+            <h1
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl leading-none text-center"
+              style={{
+                fontFamily: 'Playfair Display, serif',
+                fontWeight: 400,
+                color: '#F5F3EE',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              THE KEY
+            </h1>
+          </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-20 cursor-pointer hidden md:block" onClick={() => {
-         const el = document.getElementById('explore-world');
-         el?.scrollIntoView({ behavior: 'smooth' });
-      }}>
-        <svg className="w-6 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-      </div>
-    </section>
+          <div
+            className="mt-2"
+            style={{
+              opacity: ibizaVisible ? 1 : 0,
+              transform: ibizaVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'opacity 2s ease-out, transform 2s ease-out',
+            }}
+          >
+            <span
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl"
+              style={{
+                fontFamily: 'Playfair Display, serif',
+                fontWeight: 400,
+                fontStyle: 'italic',
+                color: '#C9B27C',
+                letterSpacing: '0.15em',
+              }}
+            >
+              Ibiza
+            </span>
+          </div>
+
+          <div
+            className="mt-12 max-w-lg text-center"
+            style={{
+              opacity: secondaryVisible ? 1 : 0,
+              transform: secondaryVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'opacity 2s ease-out, transform 2s ease-out',
+            }}
+          >
+            <p
+              className="text-sm md:text-base leading-relaxed"
+              style={{
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                color: 'rgba(255,255,255,0.55)',
+                fontWeight: 300,
+                letterSpacing: '0.02em',
+              }}
+            >
+              Architects of bespoke stays and tailored experiences.<br />
+              Your key to the hidden and the exceptional.
+            </p>
+          </div>
+
+          <div
+            className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
+            style={{
+              opacity: buttonsVisible ? 1 : 0,
+              transform: buttonsVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'opacity 2s ease-out, transform 2s ease-out',
+            }}
+          >
+            <button
+              onClick={() => onNavigate('services')}
+              className="px-8 py-3.5 rounded-full"
+              style={{
+                backgroundColor: '#C9B27C',
+                color: '#0B1C26',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontSize: '10px',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+                transition: 'background-color 0.4s ease',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F3EE'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#C9B27C'}
+            >
+              Explore Our World
+            </button>
+            <button
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-8 py-3.5 rounded-full"
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid rgba(201,178,124,0.4)',
+                color: '#C9B27C',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontSize: '10px',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                fontWeight: 500,
+                transition: 'border-color 0.4s ease, background-color 0.4s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C9B27C'; e.currentTarget.style.backgroundColor = 'rgba(201,178,124,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(201,178,124,0.4)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              Request A Service
+            </button>
+          </div>
+
+        </div>
+
+        <div
+          className="absolute z-30 bottom-8 left-1/2 -translate-x-1/2 cursor-pointer"
+          style={{
+            opacity: buttonsVisible ? 0.35 : 0,
+            transition: 'opacity 2s ease-out',
+          }}
+          onClick={() => document.getElementById('explore-world')?.scrollIntoView({ behavior: 'smooth' })}
+        >
+          <svg className="w-5 h-5 text-white/40 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ animationDuration: '2.5s' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M19 14l-7 7m0 0l-7-7"></path>
+          </svg>
+        </div>
+
+      </section>
+    </>
   );
 };
 

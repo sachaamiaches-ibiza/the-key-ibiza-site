@@ -101,10 +101,10 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-luxury-blue border border-luxury-gold/40 w-24 h-32 lg:w-28 lg:h-40 rounded-[32px] flex flex-col items-center justify-center transition-all duration-700 group relative overflow-hidden ring-1 ring-white/5"
+          className="w-16 h-16 lg:w-20 lg:h-20 rounded-lg flex items-center justify-center transition-all duration-500 group border border-luxury-gold/30 hover:border-luxury-gold/60"
+          style={{ backgroundColor: 'rgba(8, 20, 28, 1)' }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-luxury-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <LogoTheKey className="w-12 h-18 lg:w-14 lg:h-22 text-luxury-gold transition-all duration-700 group-hover:scale-110" />
+          <LogoTheKey className="w-8 h-12 lg:w-10 lg:h-14 text-luxury-gold transition-all duration-500 group-hover:scale-110" />
         </button>
       )}
     </div>

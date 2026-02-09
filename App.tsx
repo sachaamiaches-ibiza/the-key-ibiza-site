@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import VillaCard from './components/VillaCard';
 import AIConcierge from './components/AIConcierge';
-import ServicesPage from './components/ServicesPage';
+import ServicesPageNew from './components/ServicesPageNew';
 import PhotographerPage from './components/PhotographerPage';
 import AboutPage from './components/AboutPage';
 import ServiceDetail from './components/ServiceDetail';
@@ -14,6 +14,11 @@ import ValerieDetail from './components/ValerieDetail';
 import FrancescaDetail from './components/FrancescaDetail';
 import BlogPage from './components/BlogPage';
 import FooterSEO from './components/FooterSEO';
+import VipLogin from './components/VipLogin';
+import ComingSoon from './components/ComingSoon';
+import BoatsPage from './components/BoatsPage';
+import VillasPage from './components/VillasPage';
+import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
 import { getVillas, getServices } from './constants';
 import { translations } from './translations';
 import { Language } from './types';
@@ -63,13 +68,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
 
   if (status === 'success') {
     return (
-      <div className="luxury-card p-12 md:p-20 rounded-[60px] text-center animate-fade-in flex flex-col items-center justify-center">
-        <div className="w-20 h-20 bg-luxury-gold/20 rounded-full flex items-center justify-center mb-8">
-          <svg className="w-10 h-10 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+      <div className="text-center py-8">
+        <div className="w-12 h-12 bg-luxury-gold/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+          <svg className="w-6 h-6 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
         </div>
-        <h3 className="text-3xl font-serif text-white mb-4">{t.success}</h3>
-        <p className="text-white/50 mb-8 font-light">{t.successDesc}</p>
-        <button onClick={() => setStatus('idle')} className="text-luxury-gold uppercase tracking-widest text-[10px] font-bold border-b border-luxury-gold pb-1">
+        <h3 className="text-lg font-serif text-white mb-2">{t.success}</h3>
+        <p className="text-white/40 text-sm mb-4">{t.successDesc}</p>
+        <button onClick={() => setStatus('idle')} className="text-luxury-gold text-[9px] uppercase tracking-widest">
           {t.another}
         </button>
       </div>
@@ -77,85 +82,63 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
   }
 
   return (
-    <div className="luxury-card p-8 md:p-16 rounded-[60px] relative overflow-hidden group">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-luxury-gold/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
-      <h3 className="text-2xl md:text-4xl lg:text-5xl font-serif text-white mb-10 text-center lg:text-left">{t.title}</h3>
-      
-      <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-4">{t.name}</label>
-            <input 
-              type="text" 
-              required
-              className={`w-full bg-white/5 border ${errors.name ? 'border-red-500/50' : 'border-white/10'} rounded-full px-8 py-5 text-white focus:outline-none focus:border-luxury-gold transition-colors`}
-              placeholder="e.g. John Doe"
-              value={formData.name}
-              onChange={(e) => {
-                setFormData({...formData, name: e.target.value});
-                if(errors.name) setErrors({...errors, name: ''});
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-4">{t.email}</label>
-            <input 
-              type="email" 
-              required
-              className={`w-full bg-white/5 border ${errors.email ? 'border-red-500/50' : 'border-white/10'} rounded-full px-8 py-5 text-white focus:outline-none focus:border-luxury-gold transition-colors`}
-              placeholder="e.g. john@luxury.com"
-              value={formData.email}
-              onChange={(e) => {
-                setFormData({...formData, email: e.target.value});
-                if(errors.email) setErrors({...errors, email: ''});
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-4">{t.phone}</label>
-          <input 
-            type="tel" 
-            required
-            className={`w-full bg-white/5 border ${errors.phone ? 'border-red-500/50' : 'border-white/10'} rounded-full px-8 py-5 text-white focus:outline-none focus:border-luxury-gold transition-colors`}
-            placeholder="+34 ..."
-            value={formData.phone}
-            onChange={(e) => {
-              setFormData({...formData, phone: e.target.value});
-              if(errors.phone) setErrors({...errors, phone: ''});
-            }}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-4">{t.message}</label>
-          <textarea 
-            rows={4}
-            className="w-full bg-white/5 border border-white/10 rounded-[40px] px-8 py-6 text-white focus:outline-none focus:border-luxury-gold transition-colors resize-none"
-            placeholder="..."
-            value={formData.message}
-            onChange={(e) => setFormData({...formData, message: e.target.value})}
-          />
-        </div>
-
-        <div className="pt-6">
-          <button 
-            type="submit"
-            disabled={status === 'submitting'}
-            className="w-full bg-luxury-gold text-luxury-blue py-6 rounded-full font-bold uppercase tracking-[0.4em] text-[11px] lg:text-[12px] hover:bg-white hover:shadow-[0_0_50px_rgba(196,164,97,0.5)] transition-all flex items-center justify-center space-x-4"
-          >
-            {status === 'submitting' ? <span className="animate-pulse">...</span> : <span>{t.send}</span>}
-          </button>
-        </div>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <input
+        type="text"
+        required
+        className={`w-full bg-transparent border-b ${errors.name ? 'border-red-500/50' : 'border-white/20'} px-0 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors placeholder:text-white/30`}
+        placeholder={t.name}
+        value={formData.name}
+        onChange={(e) => {
+          setFormData({...formData, name: e.target.value});
+          if(errors.name) setErrors({...errors, name: ''});
+        }}
+      />
+      <input
+        type="email"
+        required
+        className={`w-full bg-transparent border-b ${errors.email ? 'border-red-500/50' : 'border-white/20'} px-0 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors placeholder:text-white/30`}
+        placeholder={t.email}
+        value={formData.email}
+        onChange={(e) => {
+          setFormData({...formData, email: e.target.value});
+          if(errors.email) setErrors({...errors, email: ''});
+        }}
+      />
+      <input
+        type="tel"
+        required
+        className={`w-full bg-transparent border-b ${errors.phone ? 'border-red-500/50' : 'border-white/20'} px-0 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors placeholder:text-white/30`}
+        placeholder={t.phone}
+        value={formData.phone}
+        onChange={(e) => {
+          setFormData({...formData, phone: e.target.value});
+          if(errors.phone) setErrors({...errors, phone: ''});
+        }}
+      />
+      <textarea
+        rows={3}
+        className="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors resize-none placeholder:text-white/30"
+        placeholder={t.message}
+        value={formData.message}
+        onChange={(e) => setFormData({...formData, message: e.target.value})}
+      />
+      <button
+        type="submit"
+        disabled={status === 'submitting'}
+        className="w-full bg-luxury-gold text-luxury-blue py-3 rounded-full text-[10px] uppercase tracking-[0.3em] font-semibold hover:bg-white transition-all mt-4"
+      >
+        {status === 'submitting' ? '...' : t.send}
+      </button>
+    </form>
   );
 };
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>('home');
   const [lang, setLang] = useState<Language>('en');
+  const [serviceIndex, setServiceIndex] = useState(0);
+  const [serviceVisible, setServiceVisible] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -163,6 +146,19 @@ const App: React.FC = () => {
 
   const VILLAS = getVillas(lang);
   const SERVICES = getServices(lang);
+
+  // Auto-transition slideshow
+  useEffect(() => {
+    if (view !== 'home') return;
+    const interval = setInterval(() => {
+      setServiceVisible(false);
+      setTimeout(() => {
+        setServiceIndex((prev) => (prev + 1) % servicesWithIcons.length);
+        setServiceVisible(true);
+      }, 800);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [view]);
   const t = translations[lang].home;
 
   const renderView = () => {
@@ -173,17 +169,23 @@ const App: React.FC = () => {
     }
 
     switch (view) {
-      case 'services': return <ServicesPage onNavigate={setView} lang={lang} />;
+      case 'services': return <ServicesPageNew onNavigate={setView} lang={lang} />;
       case 'photographer': return <PhotographerPage onNavigate={setView} lang={lang} />;
       case 'about': return <AboutPage onNavigate={setView} lang={lang} />;
-      case 'blog': return <BlogPage onNavigate={setView} lang={lang} />;
+      case 'blog': return <ComingSoon title="Blog" onNavigate={setView} lang={lang} />;
       case 'valerie-detail': return <ValerieDetail onNavigate={setView} lang={lang} />;
       case 'francesca-detail': return <FrancescaDetail onNavigate={setView} lang={lang} />;
       case 'villas-holiday':
-      case 'villas-longterm':
-      case 'villas-sale':
         return <VillaListingPage category={view} onNavigate={setView} lang={lang} />;
-      case 'service-villas': return <ServiceDetail serviceId="villas" onNavigate={setView} lang={lang} />;
+      case 'villas-longterm':
+        return <ComingSoon title="Long Term Rentals" onNavigate={setView} lang={lang} />;
+      case 'villas-sale':
+        return <ComingSoon title="Properties for Sale" onNavigate={setView} lang={lang} />;
+      case 'service-yacht':
+      case 'boats-yachts':
+      case 'boats-catamarans':
+        return <BoatsPage onNavigate={setView} lang={lang} />;
+      case 'service-villas': return <VillasPage onNavigate={setView} lang={lang} />;
       default:
         if (view.startsWith('service-')) {
           const id = view.replace('service-', '');
@@ -193,64 +195,144 @@ const App: React.FC = () => {
           <>
             <Hero onNavigate={setView} lang={lang} />
             
-            <section id="explore-world" className="py-24 md:py-40 lg:py-60 xl:py-80 container mx-auto px-6 lg:px-12 scroll-mt-24">
-              <div className="text-center max-w-5xl mx-auto mb-20 md:mb-32">
-                <span className="text-luxury-gold uppercase tracking-[0.6em] text-[10px] md:text-xs font-bold block mb-8">{t.exploreTitle}</span>
-                <h2 className="text-4xl md:text-7xl lg:text-8xl xl:text-9xl font-serif text-white mb-10 leading-tight">{t.premiumTitle} <span className="italic text-gradient">{t.concierge}</span></h2>
-                <p className="text-white/50 text-xl lg:text-2xl font-light leading-relaxed max-w-4xl mx-auto">
-                  {t.exploreDesc}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-10">
-                {SERVICES.map((s, idx) => (
-                  <div 
-                    key={s.id}
-                    onClick={() => setView(s.id === 'photographer' ? 'photographer' : `service-${s.id}`)}
-                    className="group relative h-[500px] lg:h-[600px] rounded-[60px] lg:rounded-[80px] overflow-hidden cursor-pointer border border-white/5 transition-all duration-1000 hover:scale-[1.03] animate-slide-up"
-                    style={{ animationDelay: `${idx * 150}ms` }}
-                  >
-                    <img src={s.imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-110" alt={s.title} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue via-luxury-blue/40 to-transparent"></div>
-                    <div className="absolute bottom-12 left-12 right-12">
-                      <span className="text-5xl lg:text-6xl mb-6 block transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-700">{s.icon}</span>
-                      <h3 className="text-3xl lg:text-4xl font-serif text-white mb-4 group-hover:text-luxury-gold transition-colors">{s.title}</h3>
-                      <p className="text-white/60 text-base lg:text-lg font-light mb-8 leading-relaxed opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700">{s.description}</p>
-                      <button className="text-[10px] lg:text-[11px] uppercase tracking-[0.5em] font-bold text-luxury-gold border-b border-luxury-gold/40 pb-2 group-hover:border-luxury-gold">{t.discoverMore}</button>
+            <section id="explore-world" className="w-full overflow-hidden scroll-mt-24" style={{ height: '240px', backgroundColor: '#0B1C26' }}>
+              <div className="relative w-full h-full flex items-center justify-center">
+                {servicesWithIcons.map((s, idx) => {
+                  const IconComponent = s.icon;
+                  return (
+                    <div
+                      key={s.id}
+                      onClick={() => setView(s.id === 'photographer' ? 'photographer' : `service-${s.id}`)}
+                      className="absolute inset-0 w-full h-full cursor-pointer flex flex-col items-center justify-center"
+                      style={{
+                        opacity: idx === serviceIndex ? (serviceVisible ? 1 : 0) : 0,
+                        transform: idx === serviceIndex
+                          ? (serviceVisible ? 'translateX(0)' : 'translateX(40px)')
+                          : 'translateX(-40px)',
+                        transition: 'opacity 1.2s ease-out, transform 1.2s ease-out',
+                        pointerEvents: idx === serviceIndex ? 'auto' : 'none',
+                      }}
+                    >
+                      {/* Service Icon */}
+                      <IconComponent className="w-20 h-20 md:w-24 md:h-24 mb-4" />
+                      {/* Service Title */}
+                      <span
+                        style={{
+                          color: '#C9B27C',
+                          letterSpacing: '0.3em',
+                          fontSize: '13px',
+                          textTransform: 'uppercase',
+                          fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          fontWeight: 400,
+                        }}
+                      >
+                        {s.title}
+                      </span>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+                {/* Minimal dots */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                  {servicesWithIcons.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setServiceVisible(false);
+                        setTimeout(() => {
+                          setServiceIndex(idx);
+                          setServiceVisible(true);
+                        }, 400);
+                      }}
+                      style={{
+                        width: idx === serviceIndex ? '20px' : '6px',
+                        height: '2px',
+                        backgroundColor: idx === serviceIndex ? '#C9B27C' : 'rgba(201,178,124,0.3)',
+                        transition: 'all 0.5s ease',
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </section>
 
-            <section id="vision" className="py-24 md:py-40 lg:py-60 xl:py-80 bg-luxury-slate/20">
-              <div className="container mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32 xl:gap-48 items-center">
-                <div className="space-y-16">
-                  <div className="space-y-8">
-                    <span className="text-luxury-gold uppercase tracking-[0.6em] text-xs font-bold block">{t.philosophy}</span>
-                    <h2 className="text-4xl md:text-7xl lg:text-9xl xl:text-[10rem] font-serif leading-[1] text-white">{t.bespoke} <br/> <span className="italic text-gradient">{t.excellence}</span>.</h2>
-                    <p className="text-white/70 text-lg md:text-xl lg:text-2xl font-light leading-relaxed text-justify max-w-xl">
-                      {t.philosophyDesc}
-                    </p>
-                  </div>
-                  <button onClick={() => setView('about')} className="group flex items-center space-x-6 text-luxury-gold uppercase tracking-[0.4em] text-xs font-bold">
-                    <span>{t.readStory}</span>
-                    <div className="w-12 h-px bg-luxury-gold group-hover:w-24 transition-all duration-700"></div>
-                  </button>
-                </div>
-                <div className="relative aspect-[4/5] rounded-[80px] overflow-hidden shadow-2xl border border-white/5 transform lg:rotate-2 xl:rotate-3 transition-transform duration-1000 hover:rotate-0">
-                  <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover" alt="Luxury" />
-                  <div className="absolute inset-0 bg-luxury-gold/5 mix-blend-overlay"></div>
-                </div>
-              </div>
-            </section>
-
-            <section id="villas" className="py-24 md:py-40 lg:py-60 xl:py-80 border-y border-white/5 scroll-mt-24">
+            <section id="services-grid" className="py-16 md:py-20 lg:py-24" style={{ backgroundColor: '#0B1C26' }}>
               <div className="container mx-auto px-6 lg:px-12">
-                <div className="max-w-4xl mb-24 lg:mb-32">
-                  <span className="text-luxury-gold uppercase tracking-[0.6em] text-xs font-bold block mb-8">{t.selectedCollection}</span>
-                  <h2 className="text-4xl md:text-6xl lg:text-8xl xl:text-9xl font-serif mb-10 text-white">{t.signatureResidences}.</h2>
-                  <p className="text-white/60 text-xl lg:text-2xl font-light">{t.residencesDesc}</p>
+                {/* Section Title */}
+                <div className="text-center mb-16 md:mb-20">
+                  <span
+                    className="block mb-4"
+                    style={{
+                      fontFamily: 'Plus Jakarta Sans, sans-serif',
+                      fontSize: '10px',
+                      letterSpacing: '0.5em',
+                      color: 'rgba(201,178,124,0.6)',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Our Services
+                  </span>
+                  <h2
+                    className="text-3xl md:text-5xl lg:text-6xl"
+                    style={{
+                      fontFamily: 'Playfair Display, serif',
+                      fontWeight: 400,
+                      color: '#F5F3EE',
+                    }}
+                  >
+                    {t.bespoke} <span className="italic" style={{ color: '#C9B27C' }}>{t.excellence}</span>
+                  </h2>
+                </div>
+
+                {/* Icons Grid - 2 rows of 6 */}
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-8 md:gap-6 lg:gap-10 max-w-5xl mx-auto">
+                  {allServicesGrid.map((service) => {
+                    const IconComponent = service.icon;
+                    return (
+                      <div
+                        key={service.id}
+                        onClick={() => setView(service.id === 'photographer' ? 'photographer' : `service-${service.id}`)}
+                        className="flex flex-col items-center cursor-pointer group"
+                      >
+                        {/* Circular Icon Container */}
+                        <div
+                          className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110"
+                          style={{
+                            border: '1px solid rgba(201,178,124,0.3)',
+                            backgroundColor: 'transparent',
+                          }}
+                        >
+                          <IconComponent className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14" />
+                        </div>
+                        {/* Service Title */}
+                        <span
+                          className="text-center transition-colors duration-300 group-hover:text-[#C9B27C]"
+                          style={{
+                            fontFamily: 'Plus Jakarta Sans, sans-serif',
+                            fontSize: '10px',
+                            letterSpacing: '0.15em',
+                            color: 'rgba(255,255,255,0.6)',
+                            textTransform: 'uppercase',
+                            fontWeight: 400,
+                            lineHeight: '1.4',
+                          }}
+                        >
+                          {service.title}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+
+            <section id="villas" className="py-16 md:py-20 lg:py-24 scroll-mt-24" style={{ backgroundColor: '#0B1C26' }}>
+              <div className="container mx-auto px-6 lg:px-12">
+                <div className="text-center mb-16 md:mb-20">
+                  <span className="text-luxury-gold uppercase tracking-[0.6em] text-[10px] font-medium block mb-6">{t.selectedCollection}</span>
+                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-4 text-white">{t.signatureResidences}</h2>
+                  <p className="text-white/40 text-sm md:text-base font-light tracking-wide">{t.residencesDesc}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 lg:gap-14">
                   {VILLAS.slice(0, 3).map(villa => <VillaCard key={villa.id} villa={villa} onNavigate={setView} lang={lang} />)}
@@ -281,34 +363,109 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen selection:bg-luxury-gold selection:text-white overflow-x-hidden">
+      {/* Golden Top Bar - visible on all pages */}
+      <div
+        className="fixed top-0 left-0 right-0 z-[100]"
+        style={{ backgroundColor: '#C9B27C' }}
+      >
+        <div className="container mx-auto px-6 py-1.5 flex justify-between items-center">
+          <span
+            style={{
+              fontFamily: 'Plus Jakarta Sans, sans-serif',
+              fontSize: '8px',
+              letterSpacing: '0.18em',
+              color: '#0B1C26',
+              textTransform: 'uppercase',
+              fontWeight: 500,
+              marginLeft: '8px',
+            }}
+          >
+            The Key that opens all the doors to an unforgettable experience.
+          </span>
+          <div className="flex items-center gap-5" style={{ marginRight: '14px' }}>
+            <a
+              href="https://wa.me/34660153207"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontSize: '8px',
+                letterSpacing: '0.12em',
+                color: '#0B1C26',
+                fontWeight: 500,
+              }}
+            >
+              +34 660 153 207
+            </a>
+            <a
+              href="mailto:hello@thekey-ibiza.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontSize: '8px',
+                letterSpacing: '0.06em',
+                color: '#0B1C26',
+                fontWeight: 500,
+              }}
+            >
+              hello@thekey-ibiza.com
+            </a>
+          </div>
+        </div>
+      </div>
       <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} />
       <main className="animate-fade-in">{renderView()}</main>
-      <section id="contact" className="py-32 md:py-52 xl:py-64 bg-luxury-blue relative overflow-hidden border-t border-white/5">
-        <div className="container mx-auto px-6 lg:px-12 xl:max-w-[1600px] relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-24 lg:gap-40 items-start">
-          <div className="space-y-16">
-            <h2 className="text-6xl md:text-8xl lg:text-[9rem] xl:text-[11rem] font-serif text-white leading-none tracking-tighter">THE KEY <br/><span className="text-luxury-gold">IBIZA</span></h2>
-            <div className="space-y-8">
-              <p className="text-[10px] lg:text-xs uppercase tracking-[0.8em] text-white/30 font-black">{translations[lang].contact.direct}</p>
-              <a href="tel:+34660153207" className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-light text-white hover:text-luxury-gold transition-colors block tracking-tighter">+34 660 153 207</a>
-              <a href="mailto:hello@thekey-ibiza.com" className="text-xl lg:text-2xl xl:text-3xl text-white/60 hover:text-white transition-colors block font-light tracking-widest">hello@thekey-ibiza.com</a>
+      <section id="contact" className="py-20 md:py-28 lg:py-32 relative overflow-hidden" style={{ backgroundColor: '#0B1C26' }}>
+        <div className="container mx-auto px-6 lg:px-12 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 items-center">
+
+          {/* LEFT - Logo + Contact Info */}
+          <div className="text-center md:text-left">
+            {/* Logo */}
+            <div className="flex flex-col items-center md:items-start mb-8">
+              <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-14 mb-4">
+                <circle cx="50" cy="35" r="32" stroke="#C9B27C" strokeWidth="3.5" />
+                <circle cx="50" cy="35" r="18" stroke="#C9B27C" strokeWidth="2.5" strokeDasharray="80 20" />
+                <path d="M50 35V130" stroke="#C9B27C" strokeWidth="5" strokeLinecap="round" />
+                <path d="M50 65H70" stroke="#C9B27C" strokeWidth="5" strokeLinecap="round" />
+                <path d="M50 82H82" stroke="#C9B27C" strokeWidth="5" strokeLinecap="round" />
+                <path d="M50 99H75" stroke="#C9B27C" strokeWidth="5" strokeLinecap="round" />
+                <path d="M50 116H88" stroke="#C9B27C" strokeWidth="5" strokeLinecap="round" />
+                <path d="M50 130H65" stroke="#C9B27C" strokeWidth="5" strokeLinecap="round" />
+              </svg>
+              <span className="text-xl tracking-[0.25em]" style={{ fontFamily: 'Playfair Display, serif', color: '#C9B27C' }}>THE KEY</span>
+              <span className="text-sm tracking-[0.3em] italic" style={{ fontFamily: 'Playfair Display, serif', color: 'rgba(201,178,124,0.7)' }}>Ibiza</span>
             </div>
-            
-            <div className="flex space-x-12 pt-10">
-               {['Instagram', 'WhatsApp', 'LinkedIn'].map(social => (
-                 <a key={social} href="#" className="text-[10px] uppercase tracking-[0.4em] text-white/40 hover:text-luxury-gold transition-colors font-bold border-b border-transparent hover:border-luxury-gold pb-2">{social}</a>
-               ))}
+            {/* Contact Info */}
+            <div className="space-y-3 mb-6">
+              <a href="tel:+34660153207" className="text-white text-base font-light hover:text-luxury-gold transition-colors block">+34 660 153 207</a>
+              <a href="mailto:hello@thekey-ibiza.com" className="text-white/50 text-sm hover:text-white transition-colors block">hello@thekey-ibiza.com</a>
+            </div>
+            <div className="flex justify-center md:justify-start space-x-5">
+              {['Instagram', 'WhatsApp', 'LinkedIn'].map(social => (
+                <a key={social} href="#" className="text-[9px] uppercase tracking-[0.15em] text-white/30 hover:text-luxury-gold transition-colors">{social}</a>
+              ))}
             </div>
           </div>
-          <ContactForm lang={lang} />
+
+          {/* MIDDLE - VIP Access */}
+          <VipLogin />
+
+          {/* RIGHT - Contact Form */}
+          <div className="text-center md:text-left">
+            <h3 className="text-luxury-gold text-[10px] uppercase tracking-[0.4em] font-semibold mb-6">Bespoke Inquiry</h3>
+            <ContactForm lang={lang} />
+          </div>
+
         </div>
-        {/* Abstract background detail */}
-        <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-luxury-gold/5 rounded-full blur-[150px]"></div>
       </section>
-      <footer className="py-24 bg-luxury-blue/90 border-t border-white/5">
-        <div className="container mx-auto px-6 text-center">
-           <div className="w-16 h-px bg-white/10 mx-auto mb-12"></div>
-           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.6em] text-white/20 font-bold">
-             &copy; {new Date().getFullYear()} THE KEY IBIZA. EXCELLENCE & DISCRETION. ALL RIGHTS RESERVED.
+      <footer className="py-12" style={{ backgroundColor: '#0B1C26' }}>
+        <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
+           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
+             &copy; {new Date().getFullYear()} THE KEY IBIZA
+           </p>
+           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
+             Excellence & Discretion — All Rights Reserved
            </p>
         </div>
       </footer>

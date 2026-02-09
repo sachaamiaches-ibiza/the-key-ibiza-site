@@ -71,7 +71,16 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
         { label: t.sale, target: 'villas-sale' }
       ]
     },
-    { label: t.boats, target: 'service-yacht', isView: true, img: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200' },
+    {
+      label: t.boats,
+      target: 'service-yacht',
+      isView: true,
+      img: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
+      subItems: [
+        { label: 'Yates', target: 'boats-yachts' },
+        { label: 'Catamaranes', target: 'boats-catamarans' }
+      ]
+    },
     { 
       label: t.services, 
       target: 'services', 
@@ -99,24 +108,35 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 w-full z-[60] transition-all duration-500 ${isScrolled ? 'py-3 md:py-4 glass-nav border-b border-white/5 shadow-2xl' : 'py-6 md:py-8 bg-transparent'}`}>
-        <div className="container mx-auto px-6 flex justify-between items-center">
-          <div 
-            className="flex items-center space-x-4 md:space-x-5 cursor-pointer group" 
-            onClick={() => handleNavClick('home', true)}
-          >
-            <LogoTheKey className="w-12 h-20 md:w-16 md:h-24 transition-all group-hover:scale-105 duration-700" />
+      {/* Navbar Wrapper - positioned below top gold bar */}
+      <div className="fixed left-0 w-full z-[60]" style={{ top: '23px' }}>
+        {/* Navbar Content + Golden Line Container */}
+        <div
+          className={`w-full transition-all duration-500`}
+          style={{
+            backgroundColor: isScrolled ? 'rgba(8, 20, 28, 1)' : 'transparent',
+            backdropFilter: isScrolled ? 'blur(12px)' : 'none',
+            borderBottom: isScrolled ? '1px solid rgba(201,178,124,0.3)' : 'none',
+          }}
+        >
+          <nav className={`w-full ${isScrolled ? 'py-3 md:py-4' : 'py-6 md:py-8'}`}>
+          <div className="container mx-auto px-6 flex justify-between items-center">
+            <div
+              className="flex items-center space-x-4 md:space-x-5 cursor-pointer group"
+              onClick={() => handleNavClick('home', true)}
+            >
+            <LogoTheKey className="w-10 h-16 md:w-12 md:h-20 transition-all group-hover:scale-105 duration-700" color="#C9B27C" />
             <div className="flex flex-col">
-              <span className="text-xl md:text-3xl font-serif tracking-[0.35em] text-luxury-gold font-semibold leading-tight">
+              <span className="text-lg md:text-2xl tracking-[0.25em] leading-tight" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400, color: '#C9B27C' }}>
                 THE KEY
               </span>
-              <span className="text-[10px] md:text-xs tracking-[0.9em] text-luxury-gold/70 font-light uppercase mt-1">
-                IBIZA
+              <span className="text-xs md:text-sm tracking-[0.3em] mt-0.5" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400, fontStyle: 'italic', color: 'rgba(201,178,124,0.7)' }}>
+                Ibiza
               </span>
             </div>
           </div>
           
-          <div className="hidden lg:flex space-x-6 items-center text-[10px] uppercase tracking-[0.4em] font-bold text-white/40">
+          <div className="hidden lg:flex space-x-6 items-center text-xs uppercase tracking-[0.3em] font-semibold text-white/40">
             {menuItems.slice(0, 6).map((item) => (
               <div key={item.label} className="relative group/item">
                 <button 
@@ -137,7 +157,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                           <button 
                             key={sub.label}
                             onClick={() => handleNavClick(sub.target, true)}
-                            className="text-left hover:text-luxury-gold transition-colors whitespace-nowrap text-white/60 hover:text-white text-[11px] tracking-wider"
+                            className="text-left hover:text-luxury-gold transition-colors whitespace-nowrap text-white/60 hover:text-white text-xs tracking-wider"
                           >
                             {sub.label}
                           </button>
@@ -162,9 +182,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
               ))}
             </div>
 
-            <button 
-              onClick={() => handleNavClick('contact')} 
-              className="bg-luxury-gold/90 text-luxury-blue px-8 py-2.5 rounded-full hover:bg-white transition-all font-bold shadow-xl tracking-[0.3em] uppercase ml-2"
+            <button
+              onClick={() => handleNavClick('contact')}
+              className="border border-luxury-gold/40 text-luxury-gold px-5 py-1.5 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all font-normal tracking-[0.2em] uppercase text-[9px] ml-2"
             >
               {t.contact}
             </button>
@@ -175,8 +195,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 8h16M4 16h16"></path>
             </svg>
           </button>
+          </div>
+        </nav>
         </div>
-      </nav>
+      </div>
 
       {/* Full screen menu */}
       <div className={`fixed inset-0 z-[100] transition-all duration-700 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>

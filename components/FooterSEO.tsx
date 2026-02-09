@@ -12,19 +12,17 @@ interface FooterSEOProps {
 
 const FooterSEO: React.FC<FooterSEOProps> = ({ onNavigate, lang, title, description, links }) => {
   return (
-    <div className="mt-40 pt-20 border-t border-white/5 opacity-40 hover:opacity-100 transition-opacity duration-1000 group/seo">
-      <div className="max-w-5xl mx-auto px-6">
-        <div className="text-center mb-10">
-          <h4 className="text-luxury-gold text-[10px] md:text-[11px] uppercase tracking-[0.5em] font-black mb-10 inline-block border-b border-luxury-gold/20 pb-4">
-            {title}
-          </h4>
-          <p className="text-white/40 text-[13px] md:text-sm font-light leading-relaxed mb-12 text-justify md:text-center max-w-4xl mx-auto transition-colors group-hover/seo:text-white/60">
-            {description}
-          </p>
-        </div>
-        
-        <div className="flex flex-wrap justify-center gap-x-10 gap-y-6">
-          {links.map((link, idx) => (
+    <div className="pt-24 pb-16 md:pt-32 md:pb-20" style={{ backgroundColor: '#0B1C26' }}>
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        <h4 className="text-luxury-gold text-[10px] md:text-[11px] uppercase tracking-[0.5em] font-black mb-6 inline-block border-b border-luxury-gold/20 pb-4">
+          {title}
+        </h4>
+        <p className="text-white/50 text-[13px] md:text-sm font-light leading-relaxed mb-10 text-center max-w-3xl mx-auto">
+          {description}
+        </p>
+
+        <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-6">
+          {links.slice(0, -1).map((link, idx) => (
             <button
               key={idx}
               onClick={() => onNavigate(link.view)}
@@ -33,6 +31,14 @@ const FooterSEO: React.FC<FooterSEOProps> = ({ onNavigate, lang, title, descript
               {link.label}
             </button>
           ))}
+        </div>
+        <div className="flex justify-center">
+          <button
+            onClick={() => onNavigate(links[links.length - 1].view)}
+            className="text-[10px] uppercase tracking-[0.3em] text-luxury-gold/40 hover:text-luxury-gold border-b border-transparent hover:border-luxury-gold/40 pb-1.5 transition-all font-bold"
+          >
+            {links[links.length - 1].label}
+          </button>
         </div>
       </div>
     </div>
