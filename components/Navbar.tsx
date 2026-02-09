@@ -105,10 +105,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             className="flex items-center space-x-4 md:space-x-5 cursor-pointer group" 
             onClick={() => handleNavClick('home', true)}
           >
-            <LogoTheKey className="w-8 h-12 md:w-12 md:h-16 transition-all group-hover:scale-105 duration-700" />
+            <LogoTheKey className="w-12 h-20 md:w-16 md:h-24 transition-all group-hover:scale-105 duration-700" />
             <div className="flex flex-col">
-              <span className="text-lg md:text-2xl font-serif tracking-[0.2em] md:tracking-[0.25em] text-luxury-gold font-bold leading-tight transition-colors group-hover:text-white">THE KEY</span>
-              <span className="text-[8px] md:text-[10px] tracking-[0.6em] md:tracking-[0.8em] text-luxury-gold/40 font-extralight uppercase -mt-1 ml-1">IBIZA</span>
+              <span className="text-xl md:text-3xl font-serif tracking-[0.35em] text-luxury-gold font-semibold leading-tight">
+                THE KEY
+              </span>
+              <span className="text-[10px] md:text-xs tracking-[0.9em] text-luxury-gold/70 font-light uppercase mt-1">
+                IBIZA
+              </span>
             </div>
           </div>
           
