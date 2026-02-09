@@ -325,8 +325,8 @@ const App: React.FC = () => {
                   </h2>
                 </div>
 
-                {/* Icons Grid - 2 rows of 6 */}
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-8 md:gap-6 lg:gap-10 max-w-5xl mx-auto">
+                {/* Icons Grid - 2 rows of 7 */}
+                <div className="grid grid-cols-3 md:grid-cols-7 gap-8 md:gap-5 lg:gap-8 max-w-6xl mx-auto">
                   {allServicesGrid.map((service) => {
                     const IconComponent = service.icon;
                     return (

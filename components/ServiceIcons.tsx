@@ -288,16 +288,18 @@ export const servicesWithIcons = [
   { id: 'events', title: 'Personalized Events', icon: IconPersonalizedEvents },
 ];
 
-// For grid section (all 12 services)
+// For grid section (14 services - 2 rows of 7)
 export const allServicesGrid = [
   // Row 1
+  { id: 'villas', title: 'Villa rental', icon: IconVillas },
+  { id: 'yacht', title: 'Boat charter', icon: IconYachts },
   { id: 'events', title: 'Personalized Events', icon: IconPersonalizedEvents },
   { id: 'nightlife', title: 'Night Life', icon: IconNightLife },
   { id: 'catering', title: 'Catering & Bottle Service', icon: IconCatering },
   { id: 'furniture', title: 'Furniture', icon: IconFurniture },
   { id: 'health', title: 'Health & Beauty Program', icon: IconHealthBeauty },
-  { id: 'yoga', title: 'Yoga & Personal Growth', icon: IconYoga },
   // Row 2
+  { id: 'yoga', title: 'Yoga & Personal Growth', icon: IconYoga },
   { id: 'photographer', title: 'Professional Photographer', icon: IconPhotographer },
   { id: 'security', title: 'Security Services', icon: IconSecurity },
   { id: 'cleaning', title: 'Cleaning Services', icon: IconCleaning },
