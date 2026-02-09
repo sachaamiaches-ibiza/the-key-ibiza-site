@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 import { translations } from '../translations';
+import LanguageSelector from './LanguageSelector';
 
 export const LogoTheKey = ({ className = "w-8 h-8", color = "#C4A461" }) => (
   <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -169,17 +170,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
               </div>
             ))}
             
-            {/* Language Switcher Mini */}
-            <div className="flex items-center border-l border-white/10 pl-6 space-x-3">
-              {(['en', 'es', 'fr'] as Language[]).map(l => (
-                <button 
-                  key={l}
-                  onClick={() => onLanguageChange(l)}
-                  className={`transition-colors ${lang === l ? 'text-luxury-gold' : 'hover:text-white'}`}
-                >
-                  {l.toUpperCase()}
-                </button>
-              ))}
+            {/* Language Selector */}
+            <div className="border-l border-white/10 pl-6">
+              <LanguageSelector
+                currentLang={lang}
+                onLanguageChange={onLanguageChange}
+                variant="navbar"
+              />
             </div>
 
             <button
@@ -220,18 +217,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
           
           {/* Header of Full Screen Menu */}
           <div className="w-full flex justify-between items-center mb-10 max-w-7xl mx-auto">
-             {/* New Higher Language Selection */}
-            <div className="flex space-x-6 md:space-x-10 text-[10px] md:text-xs tracking-[0.3em] font-black text-white/30">
-               {(['en', 'es', 'fr'] as Language[]).map(l => (
-                 <button 
-                   key={l}
-                   onClick={() => onLanguageChange(l)}
-                   className={`hover:text-luxury-gold transition-all duration-300 ${lang === l ? 'text-luxury-gold border-b border-luxury-gold pb-1' : ''}`}
-                 >
-                   {l === 'en' ? 'ENGLISH' : l === 'es' ? 'ESPAÑOL' : 'FRANÇAIS'}
-                 </button>
-               ))}
-            </div>
+             {/* Language Selection - All 10 languages */}
+            <LanguageSelector
+              currentLang={lang}
+              onLanguageChange={onLanguageChange}
+              variant="fullscreen"
+            />
 
             <button onClick={() => setIsMenuOpen(false)} className="text-white/40 hover:text-luxury-gold transition-colors p-2 focus:outline-none">
               <svg className="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="1"></path></svg>

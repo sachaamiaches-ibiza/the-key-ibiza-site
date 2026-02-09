@@ -51,19 +51,47 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendEmail = async () => {
+    const bodyContent = `New Contact Form Submission\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message || 'No message provided'}`;
+
+    try {
+      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: 'service_thekey',
+          template_id: 'template_contact',
+          user_id: 'YOUR_EMAILJS_PUBLIC_KEY',
+          template_params: {
+            to_email: 'hello@thekey-ibiza.com',
+            subject: 'New Contact Form Submission',
+            message: bodyContent,
+            from_name: formData.name,
+            from_email: formData.email,
+            from_phone: formData.phone,
+          }
+        })
+      });
+    } catch (error) {
+      // Fallback: open mailto
+      const subject = encodeURIComponent('New Contact Form Submission');
+      const body = encodeURIComponent(bodyContent);
+      window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     setStatus('submitting');
-    setTimeout(() => {
-      setStatus('success');
-      setFormData({ name: '', email: '', phone: '', message: '' });
-    }, 1500);
+    await sendEmail();
+    setStatus('success');
+    setFormData({ name: '', email: '', phone: '', message: '' });
   };
 
   if (status === 'success') {
@@ -136,9 +164,21 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>('home');
-  const [lang, setLang] = useState<Language>('en');
+  const [lang, setLang] = useState<Language>(() => {
+    // Load language from localStorage on initial render
+    const savedLang = localStorage.getItem('thekey-language');
+    if (savedLang && ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh', 'ar', 'hi', 'ru'].includes(savedLang)) {
+      return savedLang as Language;
+    }
+    return 'en';
+  });
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
+
+  // Save language to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('thekey-language', lang);
+  }, [lang]);
 
   useEffect(() => {
     window.scrollTo(0, 0);

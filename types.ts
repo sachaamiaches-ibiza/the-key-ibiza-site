@@ -1,5 +1,18 @@
 
-export type Language = 'en' | 'es' | 'fr';
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'zh' | 'ar' | 'hi' | 'ru';
+
+export const languages: { code: Language; label: string; native: string }[] = [
+  { code: 'en', label: 'English', native: 'English' },
+  { code: 'es', label: 'Spanish', native: 'Español' },
+  { code: 'fr', label: 'French', native: 'Français' },
+  { code: 'de', label: 'German', native: 'Deutsch' },
+  { code: 'it', label: 'Italian', native: 'Italiano' },
+  { code: 'pt', label: 'Portuguese', native: 'Português' },
+  { code: 'zh', label: 'Chinese', native: '中文' },
+  { code: 'ar', label: 'Arabic', native: 'العربية' },
+  { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
+  { code: 'ru', label: 'Russian', native: 'Русский' },
+];
 
 export interface SeasonalPrice {
   month: string;
