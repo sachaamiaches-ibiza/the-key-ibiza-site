@@ -9,6 +9,9 @@ interface VillaDetailPageProps {
   villa: Villa;
   onNavigate: (view: any) => void;
   lang: Language;
+  initialCheckIn?: string;
+  initialCheckOut?: string;
+  onDatesChange?: (checkIn: string, checkOut: string) => void;
 }
 
 /**
@@ -44,20 +47,34 @@ const renderFormattedText = (text: string) => {
   });
 };
 
-const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, lang }) => {
+const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange }) => {
   const t = translations[lang].villa;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
   const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
-  const [checkIn, setCheckIn] = useState<string>('');
-  const [checkOut, setCheckOut] = useState<string>('');
+  const [checkIn, setCheckIn] = useState<string>(initialCheckIn);
+  const [checkOut, setCheckOut] = useState<string>(initialCheckOut);
   const [reviewIndex, setReviewIndex] = useState(0);
+
+  // Booking modal state
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [bookingForm, setBookingForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [bookingStatus, setBookingStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [bookingErrors, setBookingErrors] = useState<Record<string, string>>({});
 
   // Touch/swipe refs
   const calendarRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
+  const checkOutInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync dates to parent when they change
+  useEffect(() => {
+    if (onDatesChange) {
+      onDatesChange(checkIn, checkOut);
+    }
+  }, [checkIn, checkOut, onDatesChange]);
   const touchStartX = useRef(0);
 
   const slideshowImages = (villa.headerImages && villa.headerImages.length > 0
@@ -223,6 +240,63 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     }
   };
 
+  // Booking form validation
+  const validateBookingForm = () => {
+    const errors: Record<string, string> = {};
+    if (!bookingForm.name.trim()) errors.name = 'Name is required';
+    if (!bookingForm.email.trim()) errors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(bookingForm.email)) errors.email = 'Invalid email';
+    if (!bookingForm.phone.trim()) errors.phone = 'Phone is required';
+    return errors;
+  };
+
+  // Handle booking form submission
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors = validateBookingForm();
+    if (Object.keys(errors).length > 0) {
+      setBookingErrors(errors);
+      return;
+    }
+
+    setBookingStatus('submitting');
+    const calculatedTotal = calculatePriceBreakdown()?.total || 0;
+
+    // Prepare form data for email
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', bookingForm.name);
+    formDataToSend.append('email', bookingForm.email);
+    formDataToSend.append('phone', bookingForm.phone);
+    formDataToSend.append('message', bookingForm.message || 'No additional message');
+    formDataToSend.append('villa', villa.name);
+    formDataToSend.append('check_in', checkIn);
+    formDataToSend.append('check_out', checkOut);
+    formDataToSend.append('total_price', `€${calculatedTotal.toLocaleString()}`);
+    formDataToSend.append('_subject', `Booking Request: ${villa.name} – The Key Ibiza`);
+    formDataToSend.append('_captcha', 'false');
+    formDataToSend.append('_template', 'table');
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+      const result = await response.json();
+      if (result.success) {
+        setBookingStatus('success');
+        setBookingForm({ name: '', email: '', phone: '', message: '' });
+      } else {
+        throw new Error('Email failed');
+      }
+    } catch (error) {
+      // Fallback: open mailto
+      const subject = encodeURIComponent(`Booking Request: ${villa.name}`);
+      const body = encodeURIComponent(`Booking Request\n\nVilla: ${villa.name}\nCheck-in: ${checkIn}\nCheck-out: ${checkOut}\nTotal: €${calculatedTotal.toLocaleString()}\n\nName: ${bookingForm.name}\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nMessage: ${bookingForm.message || 'No additional message'}`);
+      window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
+      setBookingStatus('success');
+    }
+  };
+
   // Date Picker Component (reusable for mobile/desktop positioning)
   // NOTE: Text content can be refined via Google Docs workflow - export texts, refine wording externally, then update translations.ts
   const DatePickerSection = ({ compact = false }: { compact?: boolean }) => (
@@ -238,7 +312,11 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             type="date"
             value={checkIn}
             min={getTodayString()}
-            onChange={(e) => setCheckIn(e.target.value)}
+            onChange={(e) => {
+              setCheckIn(e.target.value);
+              // Auto-open checkout calendar after selecting check-in
+              setTimeout(() => checkOutInputRef.current?.showPicker?.(), 100);
+            }}
             onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
             className="w-full bg-white/4 border border-white/8 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-center"
             style={{ colorScheme: 'dark' }}
@@ -247,6 +325,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         <div className="flex-1 max-w-[140px]">
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/35 mb-2 block font-medium text-center">Check-out</label>
           <input
+            ref={checkOutInputRef}
             type="date"
             value={checkOut}
             min={checkIn || getTodayString()}
@@ -279,6 +358,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             <span className="text-lg font-serif text-luxury-gold">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
           </div>
           <button
+            onClick={() => setBookingModalOpen(true)}
             className="w-full py-3 rounded-xl font-semibold uppercase tracking-[0.15em] text-[10px] transition-all duration-300 hover:opacity-90"
             style={{ backgroundColor: '#C4A461', color: '#0B1C26' }}
           >
@@ -703,6 +783,169 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         </div>
 
       </div>
+
+      {/* ===== BOOKING MODAL ===== */}
+      {bookingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => {
+              if (bookingStatus !== 'submitting') {
+                setBookingModalOpen(false);
+                setBookingStatus('idle');
+                setBookingErrors({});
+              }
+            }}
+          />
+
+          {/* Modal Content */}
+          <div className="relative w-full max-w-lg bg-[#0B1C26] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            {/* Header */}
+            <div className="p-6 border-b border-white/10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-xl font-serif text-white mb-1">Request Booking</h3>
+                  <p className="text-white/50 text-sm">{villa.name}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    if (bookingStatus !== 'submitting') {
+                      setBookingModalOpen(false);
+                      setBookingStatus('idle');
+                      setBookingErrors({});
+                    }
+                  }}
+                  className="text-white/50 hover:text-white transition-colors p-1"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {bookingStatus === 'success' ? (
+              /* Success State */
+              <div className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-luxury-gold/20 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-serif text-white mb-2">Request Sent</h4>
+                <p className="text-white/60 text-sm mb-6">
+                  Thank you for your interest. Our team will contact you within 24 hours to confirm your booking.
+                </p>
+                <button
+                  onClick={() => {
+                    setBookingModalOpen(false);
+                    setBookingStatus('idle');
+                    setBookingForm({ name: '', email: '', phone: '', message: '' });
+                  }}
+                  className="px-8 py-3 rounded-xl font-semibold uppercase tracking-[0.15em] text-[10px] transition-all duration-300 hover:opacity-90"
+                  style={{ backgroundColor: '#C4A461', color: '#0B1C26' }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              /* Form */
+              <form onSubmit={handleBookingSubmit}>
+                {/* Booking Summary */}
+                <div className="p-6 bg-white/5">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-white/40 text-xs uppercase tracking-wider block mb-1">Check-in</span>
+                      <span className="text-white">{checkIn || 'Not selected'}</span>
+                    </div>
+                    <div>
+                      <span className="text-white/40 text-xs uppercase tracking-wider block mb-1">Check-out</span>
+                      <span className="text-white">{checkOut || 'Not selected'}</span>
+                    </div>
+                  </div>
+                  {calculatePriceBreakdown() && (
+                    <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+                      <span className="text-white/60 text-sm">Estimated Total</span>
+                      <span className="text-luxury-gold font-serif text-lg">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Form Fields */}
+                <div className="p-6 space-y-4">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Your Name *"
+                      value={bookingForm.name}
+                      onChange={(e) => setBookingForm({ ...bookingForm, name: e.target.value })}
+                      className={`w-full px-4 py-3 bg-white/5 border ${bookingErrors.name ? 'border-red-500' : 'border-white/10'} rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-luxury-gold/50 transition-colors text-base`}
+                    />
+                    {bookingErrors.name && <p className="text-red-400 text-xs mt-1">{bookingErrors.name}</p>}
+                  </div>
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Email Address *"
+                      value={bookingForm.email}
+                      onChange={(e) => setBookingForm({ ...bookingForm, email: e.target.value })}
+                      className={`w-full px-4 py-3 bg-white/5 border ${bookingErrors.email ? 'border-red-500' : 'border-white/10'} rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-luxury-gold/50 transition-colors text-base`}
+                    />
+                    {bookingErrors.email && <p className="text-red-400 text-xs mt-1">{bookingErrors.email}</p>}
+                  </div>
+                  <div>
+                    <input
+                      type="tel"
+                      placeholder="Phone Number *"
+                      value={bookingForm.phone}
+                      onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })}
+                      className={`w-full px-4 py-3 bg-white/5 border ${bookingErrors.phone ? 'border-red-500' : 'border-white/10'} rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-luxury-gold/50 transition-colors text-base`}
+                    />
+                    {bookingErrors.phone && <p className="text-red-400 text-xs mt-1">{bookingErrors.phone}</p>}
+                  </div>
+                  <div>
+                    <textarea
+                      placeholder="Additional Message (optional)"
+                      value={bookingForm.message}
+                      onChange={(e) => setBookingForm({ ...bookingForm, message: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-luxury-gold/50 transition-colors resize-none text-base"
+                    />
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="p-6 pt-0">
+                  <button
+                    type="submit"
+                    disabled={bookingStatus === 'submitting'}
+                    className="w-full py-4 rounded-xl font-semibold uppercase tracking-[0.15em] text-[10px] transition-all duration-300 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    style={{ backgroundColor: '#C4A461', color: '#0B1C26' }}
+                  >
+                    {bookingStatus === 'submitting' ? (
+                      <>
+                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Sending...
+                      </>
+                    ) : (
+                      'Send Booking Request'
+                    )}
+                  </button>
+                  {bookingStatus === 'error' && (
+                    <p className="text-red-400 text-xs text-center mt-3">
+                      Failed to send request. Please try again or contact us directly.
+                    </p>
+                  )}
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

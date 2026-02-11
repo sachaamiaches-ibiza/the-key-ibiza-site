@@ -9,6 +9,9 @@ interface VillaListingPageProps {
   onNavigate: (view: any) => void;
   lang: Language;
   villas?: Villa[];
+  initialCheckIn?: string;
+  initialCheckOut?: string;
+  onDatesChange?: (checkIn: string, checkOut: string) => void;
 }
 
 // Calculate price for a specific period based on seasonal prices
@@ -47,14 +50,14 @@ const calculatePriceForPeriod = (villa: Villa, checkIn: string, checkOut: string
   return Math.round(total);
 };
 
-const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, villas = [] }) => {
+const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, villas = [], initialCheckIn = '', initialCheckOut = '', onDatesChange }) => {
   const VILLAS = villas;
   const checkOutRef = useRef<HTMLInputElement>(null);
   const checkOutMobileRef = useRef<HTMLInputElement>(null);
 
   const [searchFilters, setSearchFilters] = useState({
-    checkIn: '',
-    checkOut: '',
+    checkIn: initialCheckIn,
+    checkOut: initialCheckOut,
     minBedrooms: 0,
     minPrice: 0,
     maxPrice: 200000,
@@ -63,6 +66,13 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
     selectedAmenities: [] as string[]
   });
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Sync dates to parent when they change
+  useEffect(() => {
+    if (onDatesChange) {
+      onDatesChange(searchFilters.checkIn, searchFilters.checkOut);
+    }
+  }, [searchFilters.checkIn, searchFilters.checkOut, onDatesChange]);
 
   const listingType = useMemo(() => {
     if (category === 'villas-holiday') return 'holiday';

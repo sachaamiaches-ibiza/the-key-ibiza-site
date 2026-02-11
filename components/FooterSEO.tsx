@@ -21,8 +21,8 @@ const FooterSEO: React.FC<FooterSEOProps> = ({ onNavigate, lang, title, descript
           {description}
         </p>
 
-        <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-6">
-          {links.slice(0, -1).map((link, idx) => (
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+          {links.map((link, idx) => (
             <button
               key={idx}
               onClick={() => onNavigate(link.view)}
@@ -31,14 +31,6 @@ const FooterSEO: React.FC<FooterSEOProps> = ({ onNavigate, lang, title, descript
               {link.label}
             </button>
           ))}
-        </div>
-        <div className="flex justify-center">
-          <button
-            onClick={() => onNavigate(links[links.length - 1].view)}
-            className="text-[10px] uppercase tracking-[0.3em] text-luxury-gold/40 hover:text-luxury-gold border-b border-transparent hover:border-luxury-gold/40 pb-1.5 transition-all font-bold"
-          >
-            {links[links.length - 1].label}
-          </button>
         </div>
       </div>
     </div>

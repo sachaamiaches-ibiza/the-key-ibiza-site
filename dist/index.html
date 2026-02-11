@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Key Ibiza | Luxury Concierge & Villas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@200..800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        luxury: {
+                            gold: '#C4A461', 
+                            blue: '#0A0E14', // Encore plus profond
+                            slate: '#141B24', 
+                            cream: '#F9F7F2',
+                            gray: '#2C2C2C'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 2s ease-out forwards',
+                        'slide-up': 'slideUp 1s ease-out forwards',
+                        'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { filter: 'drop-shadow(0 0 5px rgba(196, 164, 97, 0.3))' },
+                            '50%': { filter: 'drop-shadow(0 0 20px rgba(196, 164, 97, 0.6))' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0A0E14;
+            background: radial-gradient(circle at top right, #141B24 0%, #0A0E14 100%);
+            background-attachment: fixed;
+        }
+        .glass-nav {
+            background: rgba(10, 14, 20, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #C4A461, #E5D5B3, #C4A461);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .luxury-card {
+            background: rgba(20, 27, 36, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(196, 164, 97, 0.08);
+            transition: all 0.5s ease;
+        }
+        .luxury-card:hover {
+            border-color: rgba(196, 164, 97, 0.3);
+            box-shadow: 0 0 30px rgba(196, 164, 97, 0.05);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0E14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C4A461;
+            border-radius: 10px;
+        }
+    </style>
+
+<link rel="stylesheet" href="/index.css">
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0"
+  }
+}
+</script>
+  <script type="module" crossorigin src="/assets/index-D9DWgAKS.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CIGW-MKW.css">
+</head>
+<body class="text-white font-sans overflow-x-hidden selection:bg-luxury-gold selection:text-luxury-blue">
+    <div id="root"></div>
+</body>
+</html>

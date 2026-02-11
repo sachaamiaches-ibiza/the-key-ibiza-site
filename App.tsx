@@ -185,6 +185,10 @@ const App: React.FC = () => {
   const [isVip, setIsVip] = useState(vipAuth.isAuthenticated());
   const [villasLoading, setVillasLoading] = useState(true);
 
+  // Global date state for persistence between listing and villa detail
+  const [globalCheckIn, setGlobalCheckIn] = useState('');
+  const [globalCheckOut, setGlobalCheckOut] = useState('');
+
   // Fetch villas from Google Sheets CSV
   useEffect(() => {
     const loadVillas = async () => {
@@ -251,7 +255,14 @@ const App: React.FC = () => {
     if (view.startsWith('villa-')) {
       const villaId = view.replace('villa-', '');
       const villa = VILLAS.find(v => v.id === villaId);
-      if (villa) return <VillaDetailPage villa={villa} onNavigate={setView} lang={lang} />;
+      if (villa) return <VillaDetailPage
+        villa={villa}
+        onNavigate={setView}
+        lang={lang}
+        initialCheckIn={globalCheckIn}
+        initialCheckOut={globalCheckOut}
+        onDatesChange={(checkIn, checkOut) => { setGlobalCheckIn(checkIn); setGlobalCheckOut(checkOut); }}
+      />;
     }
 
     switch (view) {
@@ -262,7 +273,15 @@ const App: React.FC = () => {
       case 'valerie-detail': return <ValerieDetail onNavigate={setView} lang={lang} />;
       case 'francesca-detail': return <FrancescaDetail onNavigate={setView} lang={lang} />;
       case 'villas-holiday':
-        return <VillaListingPage category={view} onNavigate={setView} lang={lang} villas={VILLAS} />;
+        return <VillaListingPage
+          category={view}
+          onNavigate={setView}
+          lang={lang}
+          villas={VILLAS}
+          initialCheckIn={globalCheckIn}
+          initialCheckOut={globalCheckOut}
+          onDatesChange={(checkIn, checkOut) => { setGlobalCheckIn(checkIn); setGlobalCheckOut(checkOut); }}
+        />;
       case 'villas-longterm':
         return <ComingSoon title="Long Term Rentals" onNavigate={setView} lang={lang} />;
       case 'villas-sale':
@@ -415,14 +434,14 @@ const App: React.FC = () => {
 
             <section id="villas" className="py-16 md:py-20 lg:py-24 scroll-mt-24" style={{ backgroundColor: '#0B1C26' }}>
               <div className="container mx-auto px-6 lg:px-12">
-                <div className="text-center mb-16 md:mb-20">
+                <div className="text-center mb-8 md:mb-10">
                   <span className="text-luxury-gold uppercase tracking-[0.6em] text-[10px] font-medium block mb-6">{t.selectedCollection}</span>
                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-4 text-white">{t.signatureResidences}</h2>
                   <p className="text-white/40 text-sm md:text-base font-light tracking-wide">{t.residencesDesc}</p>
                 </div>
 
                 {/* Villa Slideshow - shows one villa at a time */}
-                <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto px-4 sm:px-0" style={{ minHeight: '420px' }}>
+                <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-sm lg:max-w-sm mx-auto px-4 sm:px-0" style={{ minHeight: '380px' }}>
                   {VILLAS.slice(0, 5).map((villa, idx) => (
                     <div
                       key={villa.id}
@@ -466,7 +485,7 @@ const App: React.FC = () => {
                 </div>
 
                 {/* View All Button */}
-                <div className="text-center mt-16 md:mt-20">
+                <div className="text-center mt-16 md:mt-20 mb-12 md:mb-16">
                   <button
                     onClick={() => setView('villas-holiday')}
                     className="border border-luxury-gold/40 text-luxury-gold px-8 py-3 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all text-[10px] uppercase tracking-[0.3em]"
@@ -485,12 +504,11 @@ const App: React.FC = () => {
                 "The Key Ibiza es la agencia líder de conserjería de lujo y gestión de estilo de vida en la isla. Nuestra especialización estratégica abarca desde el alquiler de villas exclusivas de alta gama en ubicaciones privilegiadas como Cala Jondal, Es Cubells, Porroig y Santa Eulalia, hasta la inversión inmobiliaria premium. Como expertos locales en el mercado de Real Estate de Ibiza, ofrecemos acceso directo a propiedades 'off-market' y residencias minimalistas de diseño icónico que no se encuentran en portales convencionales. Nuestra misión es orquestar experiencias VIP personalizadas bajo demanda, incluyendo el alquiler de yates de lujo y superyates, servicios de seguridad privada discreta con escoltas cualificados, transporte VIP con chófer, chefs privados de estrella Michelin y programas integrales de bienestar holístico. Conectamos a una clientela internacional exigente con el alma más auténtica y privada del Mediterráneo, garantizando una estancia impecable y discreta bajo los más altos estándares de excelencia humana y profesional en las Islas Baleares." : 
                 "The Key Ibiza stands as the premier luxury concierge and lifestyle management agency on the island. We specialize in strategic high-end villa rentals in coveted locations like Cala Jondal, Es Cubells, Porroig, and Santa Eulalia, as well as premium real estate investment. As local experts in the Ibiza property market, we provide direct access to off-market properties and iconic designer minimalist residences not found on conventional portals. Our mission is to orchestrate bespoke VIP experiences on demand, including luxury yacht and superyacht charters, discreet private security services with qualified escorts, VIP chauffeur transportation, Michelin-starred private chefs, and comprehensive holistic wellness programs. We connect a demanding international clientele with the most authentic and private soul of the Mediterranean, ensuring a flawless and discreet stay governed by the highest standards of human and professional excellence in the Balearic Islands."}
               links={[
-                { label: translations[lang].nav.villas, view: 'villas-holiday' },
-                { label: translations[lang].nav.services, view: 'services' },
-                { label: translations[lang].nav.about, view: 'about' },
-                { label: translations[lang].nav.blog, view: 'blog' },
-                { label: "Villa Sales", view: 'villas-sale' },
-                { label: "Yacht Charter Ibiza", view: 'service-yacht' }
+                { label: "Villa Rental", view: 'villas-holiday' },
+                { label: "Yacht Charters", view: 'service-yacht' },
+                { label: "Services", view: 'services' },
+                { label: "Blog", view: 'blog' },
+                { label: "About Us", view: 'about' }
               ]}
             />
           </>
