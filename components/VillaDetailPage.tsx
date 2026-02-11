@@ -419,7 +419,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
             style={{ opacity: currentSlide === index ? 1 : 0 }}
           >
-            <WatermarkedImage src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" watermarkSize="medium" />
+            <WatermarkedImage src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-[#0B1C26]/60 via-transparent to-[#0B1C26]"></div>
           </div>
         ))}
@@ -567,7 +567,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
                 onClick={() => { setGalleryIndex(i); setGalleryOpen(true); }}
                 className="aspect-[4/3] rounded-[16px] md:rounded-[24px] overflow-hidden cursor-pointer relative group"
               >
-                <WatermarkedImage src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" watermarkSize="small" />
+                <WatermarkedImage src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 {i === 3 && allGalleryImages.length > 4 && (
                   <div className="absolute inset-0 bg-[#0B1C26]/60 flex items-center justify-center backdrop-blur-sm">
@@ -583,8 +583,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         {galleryOpen && (
           <div
             ref={galleryRef}
-            className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
-            style={{ backgroundColor: 'rgba(11,28,38,0.97)' }}
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
+            style={{ backgroundColor: 'rgba(11,28,38,0.97)', touchAction: 'none' }}
             onTouchStart={handleGalleryTouchStart}
             onTouchEnd={handleGalleryTouchEnd}
           >
@@ -596,30 +596,32 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
+            {/* Counter - top center */}
+            <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 text-luxury-gold text-sm md:text-base tracking-widest font-medium z-10">
+              {galleryIndex + 1} / {allGalleryImages.length}
+            </div>
+
             {/* Navigation arrows (hidden on mobile) */}
-            <button onClick={() => setGalleryIndex((galleryIndex - 1 + allGalleryImages.length) % allGalleryImages.length)} className="hidden md:flex absolute left-6 md:left-12 text-white/40 hover:text-luxury-gold transition-colors">
+            <button onClick={() => setGalleryIndex((galleryIndex - 1 + allGalleryImages.length) % allGalleryImages.length)} className="hidden md:flex absolute left-6 md:left-12 text-white/40 hover:text-luxury-gold transition-colors z-10">
               <svg className="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M15 19l-7-7 7-7"></path></svg>
             </button>
 
-            {/* Main image */}
-            <div className="relative max-h-[70vh] md:max-h-[80vh] max-w-[90vw] md:max-w-[85vw]">
-              <WatermarkedImage src={allGalleryImages[galleryIndex]} className="max-h-[70vh] md:max-h-[80vh] max-w-[90vw] md:max-w-[85vw] object-contain rounded-xl md:rounded-2xl shadow-2xl" alt="" watermarkSize="large" />
+            {/* Main image container */}
+            <div className="relative w-full h-full flex items-center justify-center px-4 md:px-24 py-20 md:py-28">
+              <WatermarkedImage src={allGalleryImages[galleryIndex]} className="max-h-[60vh] md:max-h-[65vh] max-w-full object-contain rounded-xl md:rounded-2xl shadow-2xl" alt="" />
             </div>
 
-            <button onClick={() => setGalleryIndex((galleryIndex + 1) % allGalleryImages.length)} className="hidden md:flex absolute right-6 md:right-12 text-white/40 hover:text-luxury-gold transition-colors">
+            <button onClick={() => setGalleryIndex((galleryIndex + 1) % allGalleryImages.length)} className="hidden md:flex absolute right-6 md:right-12 text-white/40 hover:text-luxury-gold transition-colors z-10">
               <svg className="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 5l7 7-7 7"></path></svg>
             </button>
 
-            {/* Counter */}
-            <div className="absolute bottom-20 md:bottom-24 text-white/30 text-sm tracking-widest">{galleryIndex + 1} / {allGalleryImages.length}</div>
-
-            {/* Thumbnail strip in modal */}
-            <div className="absolute bottom-4 md:bottom-8 flex gap-2 overflow-x-auto max-w-[90vw] pb-2">
+            {/* Thumbnail strip in modal - more separation */}
+            <div className="absolute bottom-4 md:bottom-6 flex gap-2 md:gap-3 overflow-x-auto max-w-[90vw] pb-2 px-2" style={{ touchAction: 'pan-x' }}>
               {allGalleryImages.map((img, i) => (
                 <div
                   key={i}
                   onClick={() => setGalleryIndex(i)}
-                  className={`flex-shrink-0 w-12 h-9 md:w-16 md:h-12 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${galleryIndex === i ? 'border-luxury-gold' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                  className={`flex-shrink-0 w-14 h-10 md:w-20 md:h-14 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${galleryIndex === i ? 'border-luxury-gold scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
                 >
                   <img src={img} className="w-full h-full object-cover" alt="" />
                 </div>
