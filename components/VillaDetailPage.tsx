@@ -305,25 +305,24 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)' }}
     >
       <h3 className={`${compact ? 'text-base' : 'text-lg'} font-serif text-white mb-5 tracking-wide text-center`}>Select Your Dates</h3>
-      <div className="flex gap-3 mb-5 justify-center">
-        <div className="flex-1 max-w-[140px]">
-          <label className="text-[8px] uppercase tracking-[0.15em] text-white/35 mb-2 block font-medium text-center">Check-in</label>
+      <div className="grid grid-cols-2 gap-4 mb-5">
+        <div>
+          <label className="text-[9px] uppercase tracking-[0.15em] text-white/50 mb-2 block font-medium text-center">Check-in</label>
           <input
             type="date"
             value={checkIn}
             min={getTodayString()}
             onChange={(e) => {
               setCheckIn(e.target.value);
-              // Auto-open checkout calendar after selecting check-in
               setTimeout(() => checkOutInputRef.current?.showPicker?.(), 100);
             }}
             onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/4 border border-white/8 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-center"
+            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-base focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
             style={{ colorScheme: 'dark' }}
           />
         </div>
-        <div className="flex-1 max-w-[140px]">
-          <label className="text-[8px] uppercase tracking-[0.15em] text-white/35 mb-2 block font-medium text-center">Check-out</label>
+        <div>
+          <label className="text-[9px] uppercase tracking-[0.15em] text-white/50 mb-2 block font-medium text-center">Check-out</label>
           <input
             ref={checkOutInputRef}
             type="date"
@@ -331,7 +330,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             min={checkIn || getTodayString()}
             onChange={(e) => setCheckOut(e.target.value)}
             onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/4 border border-white/8 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-center"
+            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-base focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
             style={{ colorScheme: 'dark' }}
           />
         </div>
