@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import VillaCard from './VillaCard';
 import FooterSEO from './FooterSEO';
 import { Language, Villa } from '../types';
@@ -11,8 +11,46 @@ interface VillaListingPageProps {
   villas?: Villa[];
 }
 
+// Calculate price for a specific period based on seasonal prices
+const calculatePriceForPeriod = (villa: Villa, checkIn: string, checkOut: string): number | null => {
+  if (!checkIn || !checkOut) return null;
+
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const totalNights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (totalNights <= 0) return null;
+
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthlyPrices: { [monthIndex: number]: number } = {};
+
+  // Build monthly prices map from seasonal prices
+  villa.seasonalPrices?.forEach(sp => {
+    const monthKey = monthNames.find(m => sp.month.includes(m));
+    if (monthKey) {
+      const monthIdx = monthNames.indexOf(monthKey);
+      const price = parseInt(sp.price.replace(/[^\d]/g, '')) || villa.numericPrice || 15000;
+      monthlyPrices[monthIdx] = price;
+    }
+  });
+
+  const defaultWeeklyPrice = villa.numericPrice || 15000;
+  let total = 0;
+
+  // Calculate price per night based on month
+  for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+    const monthIdx = d.getMonth();
+    const weeklyRate = monthlyPrices[monthIdx] || defaultWeeklyPrice;
+    total += weeklyRate / 7; // Daily rate
+  }
+
+  return Math.round(total);
+};
+
 const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, villas = [] }) => {
   const VILLAS = villas;
+  const checkOutRef = useRef<HTMLInputElement>(null);
+  const checkOutMobileRef = useRef<HTMLInputElement>(null);
 
   const [searchFilters, setSearchFilters] = useState({
     checkIn: '',
@@ -64,7 +102,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
   };
 
   const filteredVillas = useMemo(() => {
-    return villasOfType.filter(v => {
+    const filtered = villasOfType.filter(v => {
       const matchBeds = v.bedrooms >= searchFilters.minBedrooms;
       const matchLoc = searchFilters.location === 'All' || v.location === searchFilters.location;
       const matchPrice = (v.numericPrice || 0) >= searchFilters.minPrice &&
@@ -88,6 +126,17 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
       return matchBeds && matchLoc && matchPrice && matchSearch && matchAmenities && matchAvailability;
     });
+
+    // Sort by calculated price when dates are selected
+    if (searchFilters.checkIn && searchFilters.checkOut) {
+      filtered.sort((a, b) => {
+        const priceA = calculatePriceForPeriod(a, searchFilters.checkIn, searchFilters.checkOut) || 0;
+        const priceB = calculatePriceForPeriod(b, searchFilters.checkIn, searchFilters.checkOut) || 0;
+        return priceA - priceB;
+      });
+    }
+
+    return filtered;
   }, [searchFilters, villasOfType]);
 
   const toggleAmenity = (amenity: string) => {
@@ -133,7 +182,11 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   <input
                     type="date"
                     value={searchFilters.checkIn}
-                    onChange={(e) => setSearchFilters({...searchFilters, checkIn: e.target.value})}
+                    onChange={(e) => {
+                      setSearchFilters({...searchFilters, checkIn: e.target.value});
+                      // Auto-open checkout calendar after selecting check-in
+                      setTimeout(() => checkOutMobileRef.current?.showPicker?.(), 100);
+                    }}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
@@ -142,6 +195,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                 </div>
                 <div className="relative">
                   <input
+                    ref={checkOutMobileRef}
                     type="date"
                     value={searchFilters.checkOut}
                     min={searchFilters.checkIn}
@@ -285,7 +339,11 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   <input
                     type="date"
                     value={searchFilters.checkIn}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkIn: e.target.value})}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setSearchFilters({...searchFilters, checkIn: e.target.value});
+                      // Auto-open checkout calendar after selecting check-in
+                      setTimeout(() => checkOutRef.current?.showPicker?.(), 100);
+                    }}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
@@ -294,6 +352,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                 </div>
                 <div className="relative">
                   <input
+                    ref={checkOutRef}
                     type="date"
                     value={searchFilters.checkOut}
                     min={searchFilters.checkIn}
@@ -436,7 +495,14 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 animate-fade-in">
           {filteredVillas.map(villa => (
-            <VillaCard key={villa.id} villa={villa} onNavigate={onNavigate} lang={lang} />
+            <VillaCard
+              key={villa.id}
+              villa={villa}
+              onNavigate={onNavigate}
+              lang={lang}
+              calculatedPrice={calculatePriceForPeriod(villa, searchFilters.checkIn, searchFilters.checkOut)}
+              hasDateRange={!!(searchFilters.checkIn && searchFilters.checkOut)}
+            />
           ))}
         </div>
 

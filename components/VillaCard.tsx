@@ -8,9 +8,11 @@ interface VillaCardProps {
   villa: Villa;
   onNavigate?: (view: any) => void;
   lang: Language;
+  calculatedPrice?: number | null;
+  hasDateRange?: boolean;
 }
 
-const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang }) => {
+const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculatedPrice, hasDateRange }) => {
   const t = translations[lang].villa;
   const btnText = lang === 'en' ? 'Discover Property' : (lang === 'es' ? 'Descubrir Propiedad' : 'Découvrir la Propriété');
 
@@ -70,10 +72,21 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang }) => {
 
         <div className="space-y-4 md:space-y-6">
           <div className="flex flex-col items-center text-center">
-            <span className="text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-white/30 font-bold mb-1">Weekly Price Range</span>
-            <span className="text-xs md:text-sm font-medium text-white/90 tracking-widest font-serif italic">
-              {villa.priceRange || villa.price}
-            </span>
+            {hasDateRange && calculatedPrice ? (
+              <>
+                <span className="text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-luxury-gold/60 font-bold mb-1">Total for Selected Period</span>
+                <span className="text-base md:text-lg font-bold text-white tracking-wide">
+                  {calculatedPrice.toLocaleString()} €
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-white/30 font-bold mb-1">Weekly Price Range</span>
+                <span className="text-xs md:text-sm font-medium text-white/90 tracking-widest font-serif italic">
+                  {villa.priceRange || villa.price}
+                </span>
+              </>
+            )}
           </div>
 
           <button className="w-full py-3 md:py-4 rounded-full border border-luxury-gold/30 text-luxury-gold text-[9px] md:text-[10px] uppercase tracking-[0.25em] md:tracking-[0.3em] font-bold transition-all duration-500 group-hover:bg-luxury-gold group-hover:text-luxury-blue group-hover:border-luxury-gold">
