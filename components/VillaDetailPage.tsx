@@ -6,6 +6,7 @@ import { LogoTheKey } from './Navbar';
 import VillaMap from './VillaMap';
 import { useIsMobile } from './useIsMobile';
 import MobileDatePickerModal from './MobileDatePickerModal';
+import WatermarkedImage from './WatermarkedImage';
 
 interface VillaDetailPageProps {
   villa: Villa;
@@ -418,7 +419,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
             style={{ opacity: currentSlide === index ? 1 : 0 }}
           >
-            <img src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" />
+            <WatermarkedImage src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" watermarkSize="medium" />
             <div className="absolute inset-0 bg-gradient-to-b from-[#0B1C26]/60 via-transparent to-[#0B1C26]"></div>
           </div>
         ))}
@@ -566,7 +567,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
                 onClick={() => { setGalleryIndex(i); setGalleryOpen(true); }}
                 className="aspect-[4/3] rounded-[16px] md:rounded-[24px] overflow-hidden cursor-pointer relative group"
               >
-                <img src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
+                <WatermarkedImage src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" watermarkSize="small" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 {i === 3 && allGalleryImages.length > 4 && (
                   <div className="absolute inset-0 bg-[#0B1C26]/60 flex items-center justify-center backdrop-blur-sm">
@@ -601,7 +602,9 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             </button>
 
             {/* Main image */}
-            <img src={allGalleryImages[galleryIndex]} className="max-h-[70vh] md:max-h-[80vh] max-w-[90vw] md:max-w-[85vw] object-contain rounded-xl md:rounded-2xl shadow-2xl" alt="" />
+            <div className="relative max-h-[70vh] md:max-h-[80vh] max-w-[90vw] md:max-w-[85vw]">
+              <WatermarkedImage src={allGalleryImages[galleryIndex]} className="max-h-[70vh] md:max-h-[80vh] max-w-[90vw] md:max-w-[85vw] object-contain rounded-xl md:rounded-2xl shadow-2xl" alt="" watermarkSize="large" />
+            </div>
 
             <button onClick={() => setGalleryIndex((galleryIndex + 1) % allGalleryImages.length)} className="hidden md:flex absolute right-6 md:right-12 text-white/40 hover:text-luxury-gold transition-colors">
               <svg className="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 5l7 7-7 7"></path></svg>

@@ -85,6 +85,12 @@
             background: #C4A461;
             border-radius: 10px;
         }
+        /* Prevent auto-zoom on input focus for mobile devices - only for text inputs */
+        @media screen and (max-width: 767px) {
+            input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea {
+                font-size: 16px !important;
+            }
+        }
     </style>
 
 <link rel="stylesheet" href="/index.css">
@@ -98,8 +104,8 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-D9DWgAKS.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CIGW-MKW.css">
+  <script type="module" crossorigin src="/assets/index-BwxQp0pg.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DxfisAhC.css">
 </head>
 <body class="text-white font-sans overflow-x-hidden selection:bg-luxury-gold selection:text-luxury-blue">
     <div id="root"></div>
