@@ -24,9 +24,11 @@ interface NavbarProps {
   onNavigate: (view: any) => void;
   lang: Language;
   onLanguageChange: (lang: Language) => void;
+  onGoBack?: () => void;
+  canGoBack?: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLanguageChange }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLanguageChange, onGoBack, canGoBack }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -133,22 +135,36 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
         >
           <nav className={`w-full ${isScrolled ? 'py-3 md:py-4' : 'py-6 md:py-8'}`}>
           <div className="container mx-auto px-6 flex justify-between items-center">
-            <div
-              className="flex items-center space-x-4 md:space-x-5 cursor-pointer group"
-              onClick={() => handleNavClick('home', true)}
-            >
+            {/* Back Button + Logo */}
+            <div className="flex items-center gap-3">
+              {canGoBack && currentView !== 'home' && (
+                <button
+                  onClick={onGoBack}
+                  className="flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-luxury-gold hover:border-luxury-gold/30 transition-all"
+                  title="Go back"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              )}
+              <div
+                className="flex items-center space-x-4 md:space-x-5 cursor-pointer group"
+                onClick={() => handleNavClick('home', true)}
+              >
             <LogoTheKey className="w-10 h-16 md:w-12 md:h-20 transition-all group-hover:scale-105 duration-700" color="#C9B27C" />
-            <div className="flex flex-col">
-              <span className="text-lg md:text-2xl tracking-[0.25em] leading-tight" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400, color: '#C9B27C' }}>
-                THE KEY
-              </span>
-              <span className="text-xs md:text-sm tracking-[0.3em] mt-0.5" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400, fontStyle: 'italic', color: 'rgba(201,178,124,0.7)' }}>
-                Ibiza
-              </span>
+              <div className="flex flex-col">
+                <span className="text-lg md:text-2xl tracking-[0.25em] leading-tight" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400, color: '#C9B27C' }}>
+                  THE KEY
+                </span>
+                <span className="text-xs md:text-sm tracking-[0.3em] mt-0.5" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400, fontStyle: 'italic', color: 'rgba(201,178,124,0.7)' }}>
+                  Ibiza
+                </span>
+              </div>
+              </div>
             </div>
-          </div>
-          
-          <div className="hidden lg:flex space-x-6 items-center text-xs uppercase tracking-[0.3em] font-semibold text-white/40">
+
+            <div className="hidden lg:flex space-x-6 items-center text-xs uppercase tracking-[0.3em] font-semibold text-white/40">
             {menuItems.slice(0, 6).map((item) => (
               <div key={item.label} className="relative group/item">
                 <button 

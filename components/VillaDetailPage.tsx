@@ -304,10 +304,10 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       className={`${compact ? 'p-5' : 'p-6 lg:p-8'} rounded-[20px] md:rounded-[24px] border border-white/8 shadow-xl mx-auto w-full ${compact ? 'max-w-sm' : 'max-w-xs lg:max-w-sm'}`}
       style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)' }}
     >
-      <h3 className={`${compact ? 'text-base' : 'text-lg'} font-serif text-white mb-5 tracking-wide text-center`}>Select Your Dates</h3>
-      <div className="grid grid-cols-2 gap-4 mb-5">
+      <h3 className={`${compact ? 'text-base' : 'text-lg'} font-serif text-white mb-4 tracking-wide text-center`}>Select Your Dates</h3>
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <div>
-          <label className="text-[9px] uppercase tracking-[0.15em] text-white/50 mb-2 block font-medium text-center">Check-in</label>
+          <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-in</label>
           <input
             type="date"
             value={checkIn}
@@ -317,12 +317,12 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
               setTimeout(() => checkOutInputRef.current?.showPicker?.(), 100);
             }}
             onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-base focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-            style={{ colorScheme: 'dark' }}
+            className="w-full bg-white/8 border border-white/15 rounded-lg px-2 py-2 text-white focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+            style={{ colorScheme: 'dark', fontSize: '14px' }}
           />
         </div>
         <div>
-          <label className="text-[9px] uppercase tracking-[0.15em] text-white/50 mb-2 block font-medium text-center">Check-out</label>
+          <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-out</label>
           <input
             ref={checkOutInputRef}
             type="date"
@@ -330,8 +330,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             min={checkIn || getTodayString()}
             onChange={(e) => setCheckOut(e.target.value)}
             onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-base focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-            style={{ colorScheme: 'dark' }}
+            className="w-full bg-white/8 border border-white/15 rounded-lg px-2 py-2 text-white focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+            style={{ colorScheme: 'dark', fontSize: '14px' }}
           />
         </div>
       </div>
@@ -395,7 +395,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         )}
       </div>
 
-      <div className="container mx-auto px-6 lg:px-16 xl:px-24 pb-24">
+      <div className="container mx-auto px-6 lg:px-16 xl:px-24 pb-8 md:pb-16">
 
         {/* ===== NAME + PRICE ===== */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between py-8 md:py-10 border-b border-white/5">
@@ -701,7 +701,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         )}
 
         {/* ===== GUEST REVIEWS ===== */}
-        <div className="py-10 md:py-12">
+        <div className="pt-10 pb-4 md:pt-12 md:pb-8">
           <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide text-center">Guest Reviews</h3>
 
           {/* Desktop: grid */}

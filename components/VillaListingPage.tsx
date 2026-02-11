@@ -187,21 +187,20 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
             {/* === MOBILE LAYOUT (< md) === */}
             <div className="md:hidden space-y-3">
               {/* Row 1: Date From | Date To */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <div className="relative">
                   <input
                     type="date"
                     value={searchFilters.checkIn}
                     onChange={(e) => {
                       setSearchFilters({...searchFilters, checkIn: e.target.value});
-                      // Auto-open checkout calendar after selecting check-in
                       setTimeout(() => checkOutMobileRef.current?.showPicker?.(), 100);
                     }}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
-                    style={{ colorScheme: 'dark' }}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    style={{ colorScheme: 'dark', fontSize: '14px' }}
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Date From</span>
+                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-in</span>
                 </div>
                 <div className="relative">
                   <input
@@ -211,10 +210,10 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     min={searchFilters.checkIn}
                     onChange={(e) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
-                    style={{ colorScheme: 'dark' }}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    style={{ colorScheme: 'dark', fontSize: '14px' }}
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Date To</span>
+                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-out</span>
                 </div>
               </div>
 

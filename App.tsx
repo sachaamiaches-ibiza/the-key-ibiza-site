@@ -166,7 +166,30 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
 };
 
 const App: React.FC = () => {
-  const [view, setView] = useState<View>('home');
+  const [view, setViewState] = useState<View>('home');
+  const [viewHistory, setViewHistory] = useState<View[]>(['home']);
+
+  // Custom setView that tracks history
+  const setView = (newView: View) => {
+    if (newView !== view) {
+      setViewHistory(prev => [...prev, newView]);
+      setViewState(newView);
+    }
+  };
+
+  // Go back function
+  const goBack = () => {
+    if (viewHistory.length > 1) {
+      const newHistory = [...viewHistory];
+      newHistory.pop(); // Remove current view
+      const previousView = newHistory[newHistory.length - 1];
+      setViewHistory(newHistory);
+      setViewState(previousView);
+    }
+  };
+
+  const canGoBack = viewHistory.length > 1;
+
   const [lang, setLang] = useState<Language>(() => {
     // Load language from localStorage on initial render
     const savedLang = localStorage.getItem('thekey-language');
@@ -589,7 +612,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </div>
-      <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} />
+      <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} onGoBack={goBack} canGoBack={canGoBack} />
       <main className="animate-fade-in">{renderView()}</main>
       <section id="contact" className="py-20 md:py-28 lg:py-32 relative overflow-hidden" style={{ backgroundColor: '#0B1C26' }}>
         <div className="container mx-auto px-6 lg:px-12 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 items-center">
