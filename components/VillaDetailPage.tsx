@@ -591,48 +591,54 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
           </div>
         </div>
 
-        {/* Gallery Modal */}
+        {/* Gallery Modal - Full screen with scroll prevention */}
         {galleryOpen && (
           <div
             ref={galleryRef}
-            className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
-            style={{ backgroundColor: 'rgba(11,28,38,0.97)', touchAction: 'none' }}
+            className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
+            style={{ backgroundColor: 'rgba(11,28,38,0.98)', touchAction: 'none' }}
             onTouchStart={handleGalleryTouchStart}
             onTouchEnd={handleGalleryTouchEnd}
           >
             {/* Close button - prominent X */}
             <button
               onClick={() => setGalleryOpen(false)}
-              className="absolute top-4 right-4 md:top-8 md:right-8 z-10 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-luxury-gold hover:text-luxury-blue transition-all"
+              className="absolute top-4 right-4 md:top-8 md:right-8 z-20 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-luxury-gold hover:text-luxury-blue transition-all"
             >
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
             {/* Counter - top center */}
-            <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 text-luxury-gold text-sm md:text-base tracking-widest font-medium z-10">
+            <div className="absolute top-5 md:top-8 left-1/2 -translate-x-1/2 text-luxury-gold text-sm md:text-base tracking-widest font-medium z-20">
               {galleryIndex + 1} / {allGalleryImages.length}
             </div>
 
-            {/* Navigation arrows (hidden on mobile) */}
-            <button onClick={() => setGalleryIndex((galleryIndex - 1 + allGalleryImages.length) % allGalleryImages.length)} className="hidden md:flex absolute left-6 md:left-12 text-white/40 hover:text-luxury-gold transition-colors z-10">
-              <svg className="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M15 19l-7-7 7-7"></path></svg>
+            {/* Navigation arrows - always visible */}
+            <button
+              onClick={() => setGalleryIndex((galleryIndex - 1 + allGalleryImages.length) % allGalleryImages.length)}
+              className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-luxury-gold hover:bg-white/20 transition-all"
+            >
+              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7"></path></svg>
             </button>
 
-            {/* Main image container - centered with proper spacing */}
-            <div className="absolute inset-0 flex items-center justify-center py-16 md:py-24 pb-24 md:pb-28 px-4 md:px-28">
+            {/* Main image container - perfectly centered with proper spacing */}
+            <div className="absolute top-20 md:top-24 bottom-28 md:bottom-32 left-14 right-14 md:left-28 md:right-28 flex items-center justify-center">
               <WatermarkedImage
                 src={allGalleryImages[galleryIndex]}
-                className="max-h-full w-auto max-w-full object-contain rounded-xl md:rounded-2xl shadow-2xl"
+                className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl md:rounded-2xl shadow-2xl"
                 alt=""
               />
             </div>
 
-            <button onClick={() => setGalleryIndex((galleryIndex + 1) % allGalleryImages.length)} className="hidden md:flex absolute right-6 md:right-12 text-white/40 hover:text-luxury-gold transition-colors z-10">
-              <svg className="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 5l7 7-7 7"></path></svg>
+            <button
+              onClick={() => setGalleryIndex((galleryIndex + 1) % allGalleryImages.length)}
+              className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-luxury-gold hover:bg-white/20 transition-all"
+            >
+              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7"></path></svg>
             </button>
 
-            {/* Thumbnail strip in modal - more separation */}
-            <div className="absolute bottom-4 md:bottom-6 flex gap-2 md:gap-3 overflow-x-auto max-w-[90vw] pb-2 px-2" style={{ touchAction: 'pan-x' }}>
+            {/* Thumbnail strip - better separation from main image */}
+            <div className="absolute bottom-4 md:bottom-8 flex gap-2 md:gap-3 overflow-x-auto max-w-[90vw] pb-2 px-4" style={{ touchAction: 'pan-x' }}>
               {allGalleryImages.map((img, i) => (
                 <div
                   key={i}

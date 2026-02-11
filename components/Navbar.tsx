@@ -61,15 +61,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
     setExpandedSection(null);
   };
 
-  // Real images from the website portfolio
+  // Using real villa photos from the website portfolio (same images used in villa listings)
   const menuImages = {
-    home: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=1200', // Luxury villa exterior
-    villas: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200', // Modern villa pool
-    boats: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&q=80&w=1200', // Luxury yacht
-    services: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&q=80&w=1200', // Luxury dining/catering service
-    blog: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200', // Ibiza sunset villa
-    about: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=1200', // Minimalist villa
-    contact: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=1200', // Traditional Ibiza villa
+    home: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=1200', // Can Kef - villa from portfolio
+    villas: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=1200', // Casa Cigala - villa from portfolio
+    boats: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200', // Yacht from services
+    services: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=1200', // Private Chef from services
+    blog: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80&w=1200', // Nui Blau - villa from portfolio
+    about: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200', // Luxury property from portfolio
+    contact: 'https://images.unsplash.com/photo-1551135049-8a33b5883817?auto=format&fit=crop&q=80&w=1200', // Spa/wellness from services
   };
 
   const menuItems = [

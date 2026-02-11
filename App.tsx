@@ -465,12 +465,40 @@ const App: React.FC = () => {
                   <p className="text-white/40 text-sm md:text-base font-light tracking-wide">{t.residencesDesc}</p>
                 </div>
 
-                {/* Villa Slideshow - shows one villa at a time */}
-                <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-sm lg:max-w-sm mx-auto px-4 sm:px-0" style={{ minHeight: '380px' }}>
+                {/* Villa Slideshow with arrows and thumbnails */}
+                <div className="relative w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto px-12 md:px-16" style={{ minHeight: '420px' }}>
+                  {/* Left Arrow */}
+                  <button
+                    onClick={() => {
+                      setVillaVisible(false);
+                      setTimeout(() => {
+                        setVillaIndex((villaIndex - 1 + Math.min(VILLAS.length, 5)) % Math.min(VILLAS.length, 5));
+                        setVillaVisible(true);
+                      }, 300);
+                    }}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-luxury-gold hover:bg-white/10 transition-all"
+                  >
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7"></path></svg>
+                  </button>
+
+                  {/* Right Arrow */}
+                  <button
+                    onClick={() => {
+                      setVillaVisible(false);
+                      setTimeout(() => {
+                        setVillaIndex((villaIndex + 1) % Math.min(VILLAS.length, 5));
+                        setVillaVisible(true);
+                      }, 300);
+                    }}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-luxury-gold hover:bg-white/10 transition-all"
+                  >
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7"></path></svg>
+                  </button>
+
                   {VILLAS.slice(0, 5).map((villa, idx) => (
                     <div
                       key={villa.id}
-                      className="absolute inset-x-4 sm:inset-x-0 top-0"
+                      className="absolute inset-x-0 top-0"
                       style={{
                         opacity: idx === villaIndex ? (villaVisible ? 1 : 0) : 0,
                         transform: idx === villaIndex
@@ -485,11 +513,11 @@ const App: React.FC = () => {
                     </div>
                   ))}
 
-                  {/* Navigation dots */}
-                  <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-                    {VILLAS.slice(0, 5).map((_, idx) => (
+                  {/* Thumbnails strip */}
+                  <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 flex gap-2 md:gap-3 z-20">
+                    {VILLAS.slice(0, 5).map((villa, idx) => (
                       <button
-                        key={idx}
+                        key={villa.id}
                         onClick={() => {
                           setVillaVisible(false);
                           setTimeout(() => {
@@ -497,20 +525,16 @@ const App: React.FC = () => {
                             setVillaVisible(true);
                           }, 300);
                         }}
-                        className="transition-all duration-500"
-                        style={{
-                          width: idx === villaIndex ? '24px' : '8px',
-                          height: '3px',
-                          backgroundColor: idx === villaIndex ? '#C9B27C' : 'rgba(201,178,124,0.3)',
-                          borderRadius: '2px',
-                        }}
-                      />
+                        className={`w-12 h-9 md:w-16 md:h-12 rounded-lg overflow-hidden border-2 transition-all ${idx === villaIndex ? 'border-luxury-gold scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                      >
+                        <img src={villa.imageUrl} alt={villa.name} className="w-full h-full object-cover" />
+                      </button>
                     ))}
                   </div>
                 </div>
 
                 {/* View All Button */}
-                <div className="text-center mt-16 md:mt-20 mb-12 md:mb-16">
+                <div className="text-center mt-28 md:mt-32 mb-12 md:mb-16">
                   <button
                     onClick={() => setView('villas-holiday')}
                     className="border border-luxury-gold/40 text-luxury-gold px-8 py-3 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all text-[10px] uppercase tracking-[0.3em]"

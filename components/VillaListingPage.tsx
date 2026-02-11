@@ -276,51 +276,55 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                 <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Search</span>
               </div>
 
-              {/* Row 5: Filters + Numbering */}
+              {/* Row 5: Filters + Clear + Numbering */}
               <div className="flex items-center justify-between gap-2">
-                {/* Filters dropdown button */}
-                <div className="relative flex-shrink-0">
-                  <button
-                    onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border ${isFiltersOpen || searchFilters.selectedAmenities.length > 0 ? 'border-luxury-gold/50 text-luxury-gold' : 'border-white/10 text-white/40'}`}
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    <span>Filters</span>
-                    {searchFilters.selectedAmenities.length > 0 && (
-                      <>
+                {/* Filters and Clear buttons */}
+                <div className="flex items-center gap-2">
+                  {/* Filters dropdown button */}
+                  <div className="relative flex-shrink-0">
+                    <button
+                      onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border ${isFiltersOpen || searchFilters.selectedAmenities.length > 0 ? 'border-luxury-gold/50 text-luxury-gold' : 'border-white/10 text-white/40'}`}
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                      <span>Filters</span>
+                      {searchFilters.selectedAmenities.length > 0 && (
                         <span className="bg-luxury-gold text-luxury-blue text-[8px] px-1.5 py-0.5 rounded-full font-bold">{searchFilters.selectedAmenities.length}</span>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setSearchFilters({...searchFilters, selectedAmenities: []}); }}
-                          className="ml-1 text-luxury-gold hover:text-white"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
-                      </>
-                    )}
-                  </button>
-                  {/* Mobile Filters Dropdown */}
-                  {isFiltersOpen && (
-                    <div className="absolute bottom-full left-0 mb-2 z-[999] w-[220px] bg-[#0A0E14] border border-white/10 rounded-2xl p-3 shadow-2xl">
-                      <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold mb-2">Amenities</p>
-                      <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
-                        {allAmenities.map((amenity: string) => (
-                          <button
-                            key={amenity}
-                            onClick={() => toggleAmenity(amenity)}
-                            className={`flex items-center justify-between w-full px-2 py-1.5 rounded-lg text-[9px] transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/10 text-white/50'}`}
-                          >
-                            <span className="truncate">{amenity}</span>
-                            {searchFilters.selectedAmenities.includes(amenity) && (
-                              <svg className="w-2.5 h-2.5 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-                            )}
-                          </button>
-                        ))}
+                      )}
+                    </button>
+                    {/* Mobile Filters Dropdown */}
+                    {isFiltersOpen && (
+                      <div className="absolute bottom-full left-0 mb-2 z-[999] w-[220px] bg-[#0A0E14] border border-white/10 rounded-2xl p-3 shadow-2xl">
+                        <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold mb-2">Amenities</p>
+                        <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
+                          {allAmenities.map((amenity: string) => (
+                            <button
+                              key={amenity}
+                              onClick={() => toggleAmenity(amenity)}
+                              className={`flex items-center justify-between w-full px-2 py-1.5 rounded-lg text-[9px] transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/10 text-white/50'}`}
+                            >
+                              <span className="truncate">{amenity}</span>
+                              {searchFilters.selectedAmenities.includes(amenity) && (
+                                <svg className="w-2.5 h-2.5 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
+                              )}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
+
+                  {/* Clear button - next to Filters */}
+                  <button
+                    onClick={clearFilters}
+                    className="flex items-center gap-1 px-3 py-2 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border border-white/10 text-white/40 hover:text-white hover:border-white/30"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span>Clear</span>
+                  </button>
                 </div>
 
-                {/* Villa count - left aligned */}
+                {/* Villa count */}
                 <span className="text-[10px] text-white/40">
                   <span className="text-luxury-gold font-medium">{filteredVillas.length}</span>
                   <span className="mx-1">/</span>
