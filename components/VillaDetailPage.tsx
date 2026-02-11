@@ -317,8 +317,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
               setTimeout(() => checkOutInputRef.current?.showPicker?.(), 100);
             }}
             onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/8 border border-white/15 rounded-lg px-2 py-2 text-white focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-            style={{ colorScheme: 'dark', fontSize: '14px' }}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+            style={{ colorScheme: 'dark' }}
           />
         </div>
         <div>
@@ -330,8 +330,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             min={checkIn || getTodayString()}
             onChange={(e) => setCheckOut(e.target.value)}
             onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/8 border border-white/15 rounded-lg px-2 py-2 text-white focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-            style={{ colorScheme: 'dark', fontSize: '14px' }}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+            style={{ colorScheme: 'dark' }}
           />
         </div>
       </div>
