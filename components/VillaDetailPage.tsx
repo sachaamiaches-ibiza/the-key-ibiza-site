@@ -305,7 +305,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)' }}
     >
       <h3 className={`${compact ? 'text-base' : 'text-lg'} font-serif text-white mb-4 tracking-wide text-center`}>Select Your Dates</h3>
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="flex flex-col gap-3 min-[360px]:grid min-[360px]:grid-cols-2 mb-4">
         <div>
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-in</label>
           <input

@@ -186,8 +186,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* === MOBILE LAYOUT (< md) === */}
             <div className="md:hidden space-y-3">
-              {/* Row 1: Date From | Date To */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Row 1: Date From | Date To - stacks on very small screens */}
+              <div className="flex flex-col gap-3 min-[360px]:grid min-[360px]:grid-cols-2">
                 <div className="relative">
                   <input
                     type="date"
@@ -217,8 +217,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                 </div>
               </div>
 
-              {/* Row 2: Bedrooms | Price From */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Row 2: Bedrooms | Price From - stacks on very small screens */}
+              <div className="flex flex-col gap-3 min-[360px]:grid min-[360px]:grid-cols-2">
                 <div className="relative">
                   <select
                     value={searchFilters.minBedrooms}
@@ -244,8 +244,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                 </div>
               </div>
 
-              {/* Row 3: Price To | Location */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Row 3: Price To | Location - stacks on very small screens */}
+              <div className="flex flex-col gap-3 min-[360px]:grid min-[360px]:grid-cols-2">
                 <div className="relative">
                   <input
                     type="number"
