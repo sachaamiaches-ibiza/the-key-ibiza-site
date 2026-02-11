@@ -4,6 +4,8 @@ import { Villa, Language } from '../types';
 import { translations } from '../translations';
 import { LogoTheKey } from './Navbar';
 import VillaMap from './VillaMap';
+import { useIsMobile } from './useIsMobile';
+import MobileDatePickerModal from './MobileDatePickerModal';
 
 interface VillaDetailPageProps {
   villa: Villa;
@@ -63,6 +65,10 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   const [bookingForm, setBookingForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [bookingErrors, setBookingErrors] = useState<Record<string, string>>({});
+
+  // Mobile date picker
+  const isMobile = useIsMobile();
+  const [mobileDatePickerOpen, setMobileDatePickerOpen] = useState(false);
 
   // Touch/swipe refs
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -308,31 +314,51 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       <div className="flex flex-col gap-3 min-[360px]:grid min-[360px]:grid-cols-2 mb-4">
         <div>
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-in</label>
-          <input
-            type="date"
-            value={checkIn}
-            min={getTodayString()}
-            onChange={(e) => {
-              setCheckIn(e.target.value);
-              setTimeout(() => checkOutInputRef.current?.showPicker?.(), 100);
-            }}
-            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-            style={{ colorScheme: 'dark' }}
-          />
+          {isMobile ? (
+            <button
+              type="button"
+              onClick={() => setMobileDatePickerOpen(true)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left"
+            >
+              {checkIn || 'Select date'}
+            </button>
+          ) : (
+            <input
+              type="date"
+              value={checkIn}
+              min={getTodayString()}
+              onChange={(e) => {
+                setCheckIn(e.target.value);
+                setTimeout(() => checkOutInputRef.current?.showPicker?.(), 100);
+              }}
+              onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+              style={{ colorScheme: 'dark' }}
+            />
+          )}
         </div>
         <div>
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-out</label>
-          <input
-            ref={checkOutInputRef}
-            type="date"
-            value={checkOut}
-            min={checkIn || getTodayString()}
-            onChange={(e) => setCheckOut(e.target.value)}
-            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-            style={{ colorScheme: 'dark' }}
-          />
+          {isMobile ? (
+            <button
+              type="button"
+              onClick={() => setMobileDatePickerOpen(true)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left"
+            >
+              {checkOut || 'Select date'}
+            </button>
+          ) : (
+            <input
+              ref={checkOutInputRef}
+              type="date"
+              value={checkOut}
+              min={checkIn || getTodayString()}
+              onChange={(e) => setCheckOut(e.target.value)}
+              onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+              style={{ colorScheme: 'dark' }}
+            />
+          )}
         </div>
       </div>
 
@@ -365,6 +391,20 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
           </button>
         </div>
       ) : null}
+
+      {/* Mobile Date Picker Modal */}
+      {isMobile && (
+        <MobileDatePickerModal
+          isOpen={mobileDatePickerOpen}
+          onClose={() => setMobileDatePickerOpen(false)}
+          checkIn={checkIn}
+          checkOut={checkOut}
+          onDatesChange={(newCheckIn, newCheckOut) => {
+            setCheckIn(newCheckIn);
+            setCheckOut(newCheckOut);
+          }}
+        />
+      )}
     </div>
   );
 

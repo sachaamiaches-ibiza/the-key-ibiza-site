@@ -3,6 +3,8 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import VillaCard from './VillaCard';
 import FooterSEO from './FooterSEO';
 import { Language, Villa } from '../types';
+import { useIsMobile } from './useIsMobile';
+import MobileDatePickerModal from './MobileDatePickerModal';
 
 interface VillaListingPageProps {
   category: string;
@@ -53,7 +55,8 @@ const calculatePriceForPeriod = (villa: Villa, checkIn: string, checkOut: string
 const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, villas = [], initialCheckIn = '', initialCheckOut = '', onDatesChange }) => {
   const VILLAS = villas;
   const checkOutRef = useRef<HTMLInputElement>(null);
-  const checkOutMobileRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
+  const [mobileDatePickerOpen, setMobileDatePickerOpen] = useState(false);
 
   const [searchFilters, setSearchFilters] = useState({
     checkIn: initialCheckIn,
@@ -189,30 +192,23 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
               {/* Row 1: Date From | Date To - stacks on very small screens */}
               <div className="flex flex-col gap-3 min-[360px]:grid min-[360px]:grid-cols-2">
                 <div className="relative">
-                  <input
-                    type="date"
-                    value={searchFilters.checkIn}
-                    onChange={(e) => {
-                      setSearchFilters({...searchFilters, checkIn: e.target.value});
-                      setTimeout(() => checkOutMobileRef.current?.showPicker?.(), 100);
-                    }}
-                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
-                    style={{ colorScheme: 'dark' }}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setMobileDatePickerOpen(true)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer text-left"
+                  >
+                    {searchFilters.checkIn || 'Select date'}
+                  </button>
                   <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-in</span>
                 </div>
                 <div className="relative">
-                  <input
-                    ref={checkOutMobileRef}
-                    type="date"
-                    value={searchFilters.checkOut}
-                    min={searchFilters.checkIn}
-                    onChange={(e) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
-                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
-                    style={{ colorScheme: 'dark' }}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setMobileDatePickerOpen(true)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer text-left"
+                  >
+                    {searchFilters.checkOut || 'Select date'}
+                  </button>
                   <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-out</span>
                 </div>
               </div>
@@ -339,6 +335,17 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
               >
                 Search
               </button>
+
+              {/* Mobile Date Picker Modal */}
+              <MobileDatePickerModal
+                isOpen={mobileDatePickerOpen}
+                onClose={() => setMobileDatePickerOpen(false)}
+                checkIn={searchFilters.checkIn}
+                checkOut={searchFilters.checkOut}
+                onDatesChange={(newCheckIn, newCheckOut) => {
+                  setSearchFilters({...searchFilters, checkIn: newCheckIn, checkOut: newCheckOut});
+                }}
+              />
             </div>
 
             {/* === TABLET & DESKTOP LAYOUT (>= md) === */}
