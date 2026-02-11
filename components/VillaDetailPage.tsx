@@ -116,6 +116,18 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     return () => clearInterval(interval);
   }, [reviews.length]);
 
+  // Prevent body scroll when gallery is open
+  useEffect(() => {
+    if (galleryOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [galleryOpen]);
+
   const monthNameToIndex: { [key: string]: number } = {
     'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5,
     'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11,
@@ -606,9 +618,13 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
               <svg className="w-12 h-12 md:w-14 md:h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M15 19l-7-7 7-7"></path></svg>
             </button>
 
-            {/* Main image container */}
-            <div className="relative w-full h-full flex items-center justify-center px-4 md:px-24 py-20 md:py-28">
-              <WatermarkedImage src={allGalleryImages[galleryIndex]} className="max-h-[60vh] md:max-h-[65vh] max-w-full object-contain rounded-xl md:rounded-2xl shadow-2xl" alt="" />
+            {/* Main image container - centered with proper spacing */}
+            <div className="absolute inset-0 flex items-center justify-center py-16 md:py-24 pb-24 md:pb-28 px-4 md:px-28">
+              <WatermarkedImage
+                src={allGalleryImages[galleryIndex]}
+                className="max-h-full w-auto max-w-full object-contain rounded-xl md:rounded-2xl shadow-2xl"
+                alt=""
+              />
             </div>
 
             <button onClick={() => setGalleryIndex((galleryIndex + 1) % allGalleryImages.length)} className="hidden md:flex absolute right-6 md:right-12 text-white/40 hover:text-luxury-gold transition-colors z-10">
@@ -701,8 +717,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
                                 : isCheckIn || isCheckOut
                                   ? 'bg-luxury-gold text-[#0B1C26] ring-2 ring-white/30 scale-105 cursor-pointer'
                                   : isInRange
-                                    ? 'bg-[#C9B27C]/60 text-[#0B1C26] cursor-pointer'
-                                    : 'bg-[#C9B27C] text-[#0B1C26] hover:scale-105 cursor-pointer'
+                                    ? 'bg-luxury-gold/80 text-[#0B1C26] cursor-pointer'
+                                    : 'bg-white/10 text-white/70 hover:bg-luxury-gold/30 hover:scale-105 cursor-pointer'
                               : ''
                           }`}
                           aria-disabled={isDisabled}
@@ -729,7 +745,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
 
           <div className="flex items-center justify-center gap-6 md:gap-8 mt-4 md:mt-6 text-[10px] md:text-xs text-white/60">
             <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-[#0B1C26] border border-white/10"></div><span>Occupied</span></div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-[#C9B27C]"></div><span>Available</span></div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-white/10"></div><span>Available</span></div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-luxury-gold"></div><span>Selected</span></div>
           </div>
         </div>
 

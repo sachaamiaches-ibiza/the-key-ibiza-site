@@ -310,9 +310,11 @@ const App: React.FC = () => {
       case 'villas-sale':
         return <ComingSoon title="Properties for Sale" onNavigate={setView} lang={lang} />;
       case 'service-yacht':
-      case 'boats-yachts':
-      case 'boats-catamarans':
         return <BoatsPage onNavigate={setView} lang={lang} />;
+      case 'boats-yachts':
+        return <ComingSoon title="Luxury Yachts" onNavigate={setView} lang={lang} />;
+      case 'boats-catamarans':
+        return <ComingSoon title="Premium Catamarans" onNavigate={setView} lang={lang} />;
       case 'service-villas': return <VillasPage onNavigate={setView} lang={lang} />;
       default:
         if (view.startsWith('service-')) {

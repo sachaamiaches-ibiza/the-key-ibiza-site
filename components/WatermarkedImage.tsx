@@ -28,20 +28,20 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
   className = '',
 }) => {
   return (
-    <div className="relative w-full h-full">
+    <div className="relative inline-block w-full h-full">
       <img src={src} alt={alt} className={className} />
-      {/* Centered watermark */}
+      {/* Watermark overlay - centered and attached to image */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-20"
+        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none"
         style={{
           color: 'rgba(255, 255, 255, 0.5)',
         }}
       >
-        <WatermarkLogo className="w-10 h-14 md:w-16 md:h-22 lg:w-20 lg:h-28 drop-shadow-lg" />
+        <WatermarkLogo className="w-10 h-14 md:w-20 md:h-28 drop-shadow-lg" />
         <span
-          className="text-sm md:text-lg lg:text-xl font-serif tracking-[0.3em] uppercase mt-2"
+          className="text-sm md:text-xl font-serif tracking-[0.3em] uppercase mt-2 md:mt-3"
           style={{
-            textShadow: '0 2px 8px rgba(0, 0, 0, 0.7)',
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
           }}
         >
           The Key Ibiza
