@@ -371,15 +371,15 @@ const App: React.FC = () => {
                   </h2>
                 </div>
 
-                {/* Icons Grid - 2 rows of 7 */}
-                <div className="grid grid-cols-3 md:grid-cols-7 gap-8 md:gap-5 lg:gap-8 max-w-6xl mx-auto">
+                {/* Icons Grid - 2 rows of 7, last row centered on mobile */}
+                <div className="flex flex-wrap justify-center gap-8 md:gap-5 lg:gap-8 max-w-6xl mx-auto md:grid md:grid-cols-7">
                   {allServicesGrid.map((service) => {
                     const IconComponent = service.icon;
                     return (
                       <div
                         key={service.id}
                         onClick={() => setView(service.id === 'photographer' ? 'photographer' : `service-${service.id}`)}
-                        className="flex flex-col items-center cursor-pointer group"
+                        className="flex flex-col items-center cursor-pointer group w-[calc(33.333%-1.5rem)] md:w-auto"
                       >
                         {/* Circular Icon Container */}
                         <div
@@ -422,16 +422,16 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Villa Slideshow - shows one villa at a time */}
-                <div className="relative w-full max-w-2xl mx-auto" style={{ minHeight: '500px' }}>
+                <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto px-4 sm:px-0" style={{ minHeight: '420px' }}>
                   {VILLAS.slice(0, 5).map((villa, idx) => (
                     <div
                       key={villa.id}
-                      className="absolute inset-0 w-full"
+                      className="absolute inset-x-4 sm:inset-x-0 top-0"
                       style={{
                         opacity: idx === villaIndex ? (villaVisible ? 1 : 0) : 0,
                         transform: idx === villaIndex
-                          ? (villaVisible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(20px)')
-                          : 'scale(0.95) translateY(-20px)',
+                          ? (villaVisible ? 'scale(1) translateY(0)' : 'scale(0.98) translateY(10px)')
+                          : 'scale(0.98) translateY(-10px)',
                         transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
                         pointerEvents: idx === villaIndex ? 'auto' : 'none',
                         zIndex: idx === villaIndex ? 10 : 0,
@@ -442,7 +442,7 @@ const App: React.FC = () => {
                   ))}
 
                   {/* Navigation dots */}
-                  <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                  <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
                     {VILLAS.slice(0, 5).map((_, idx) => (
                       <button
                         key={idx}
@@ -466,7 +466,7 @@ const App: React.FC = () => {
                 </div>
 
                 {/* View All Button */}
-                <div className="text-center mt-20">
+                <div className="text-center mt-16 md:mt-20">
                   <button
                     onClick={() => setView('villas-holiday')}
                     className="border border-luxury-gold/40 text-luxury-gold px-8 py-3 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all text-[10px] uppercase tracking-[0.3em]"

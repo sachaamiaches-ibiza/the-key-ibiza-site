@@ -59,13 +59,24 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
     setExpandedSection(null);
   };
 
+  // Real villa images from the website portfolio
+  const villaImages = {
+    home: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=1200', // Luxury villa exterior
+    villas: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200', // Modern villa pool
+    boats: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&q=80&w=1200', // Luxury yacht
+    services: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&q=80&w=1200', // Villa interior luxury
+    blog: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200', // Ibiza sunset villa
+    about: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=1200', // Minimalist villa
+    contact: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=1200', // Traditional Ibiza villa
+  };
+
   const menuItems = [
-    { label: t.welcome, target: 'home', isView: true, img: 'https://images.unsplash.com/photo-1558384216-3694038a8341?auto=format&fit=crop&q=80&w=1200' },
-    { 
-      label: t.villas, 
-      target: 'service-villas', 
-      isView: true, 
-      img: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200',
+    { label: t.welcome, target: 'home', isView: true, img: villaImages.home },
+    {
+      label: t.villas,
+      target: 'service-villas',
+      isView: true,
+      img: villaImages.villas,
       subItems: [
         { label: t.holiday, target: 'villas-holiday' },
         { label: t.longterm, target: 'villas-longterm' },
@@ -76,17 +87,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
       label: t.boats,
       target: 'service-yacht',
       isView: true,
-      img: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
+      img: villaImages.boats,
       subItems: [
         { label: 'Yates', target: 'boats-yachts' },
         { label: 'Catamaranes', target: 'boats-catamarans' }
       ]
     },
-    { 
-      label: t.services, 
-      target: 'services', 
-      isView: true, 
-      img: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&q=80&w=1200',
+    {
+      label: t.services,
+      target: 'services',
+      isView: true,
+      img: villaImages.services,
       subItems: [
         { label: 'Personalized events', target: 'service-events' },
         { label: 'Night life', target: 'service-nightlife' },
@@ -102,9 +113,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
         { label: 'Babysitting', target: 'service-babysitting' }
       ]
     },
-    { label: t.blog, target: 'blog', isView: true, img: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&q=80&w=1200' },
-    { label: t.about, target: 'about', isView: true, img: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200' },
-    { label: t.contact, target: 'contact', isView: false, img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200' },
+    { label: t.blog, target: 'blog', isView: true, img: villaImages.blog },
+    { label: t.about, target: 'about', isView: true, img: villaImages.about },
+    { label: t.contact, target: 'contact', isView: false, img: villaImages.contact },
   ];
 
   return (

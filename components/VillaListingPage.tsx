@@ -122,15 +122,16 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
         </div>
 
         {/* Search Filter Panel */}
-        <div className="mb-14 relative z-[1000]">
-          <div className="luxury-card p-6 rounded-[24px] border border-white/5 bg-luxury-blue/40">
-            {/* Row 1 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-4">
+        <div className="mb-10 md:mb-14 relative z-[1000]">
+          <div className="luxury-card p-4 md:p-6 rounded-[20px] md:rounded-[24px] border border-white/5 bg-luxury-blue/40 max-w-4xl mx-auto">
+            {/* Row 1 - Inputs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4 mb-4">
               <div className="relative">
                 <input
                   type="date"
                   value={searchFilters.checkIn}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkIn: e.target.value})}
+                  onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                   style={{ colorScheme: 'dark' }}
                 />
@@ -142,6 +143,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   value={searchFilters.checkOut}
                   min={searchFilters.checkIn}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
+                  onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                   style={{ colorScheme: 'dark' }}
                 />
@@ -190,7 +192,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                 </select>
                 <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Location</span>
               </div>
-              <div className="relative">
+              <div className="relative sm:col-span-2 md:col-span-1">
                 <input
                   type="text"
                   placeholder="Villa name..."
@@ -202,12 +204,12 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
               </div>
             </div>
             {/* Row 2 - Buttons */}
-            <div className="flex justify-between items-start gap-3">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-start gap-3">
               {/* Left - Filters Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border ${isFiltersOpen || searchFilters.selectedAmenities.length > 0 ? 'border-luxury-gold/50 text-luxury-gold' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
+                  className={`w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2 px-5 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border ${isFiltersOpen || searchFilters.selectedAmenities.length > 0 ? 'border-luxury-gold/50 text-luxury-gold' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                   <span>Filters</span>
@@ -219,9 +221,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
                 {/* Dropdown Menu */}
                 {isFiltersOpen && (
-                  <div className="absolute top-full left-0 mt-2 z-[999] min-w-[280px] bg-luxury-blue/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl">
+                  <div className="absolute top-full left-0 right-0 sm:right-auto mt-2 z-[999] sm:min-w-[280px] bg-[#0A0E14] border border-white/10 rounded-2xl p-4 shadow-2xl">
                     <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold mb-3">Amenities</p>
-                    <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto">
+                    <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
                       {allAmenities.map((amenity: string) => (
                         <button
                           key={amenity}
@@ -246,12 +248,12 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
               <div className="flex gap-3">
                 <button
                   onClick={clearFilters}
-                  className="px-6 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border border-white/10 text-white/40 hover:text-white hover:border-white/30"
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border border-white/10 text-white/40 hover:text-white hover:border-white/30"
                 >
                   Clear
                 </button>
                 <button
-                  className="px-8 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all bg-luxury-gold text-luxury-blue hover:bg-white"
+                  className="flex-1 sm:flex-none px-8 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all bg-luxury-gold text-luxury-blue hover:bg-white"
                 >
                   Search
                 </button>
