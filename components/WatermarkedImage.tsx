@@ -53,16 +53,16 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
     <div className="relative w-full h-full">
       <img src={src} alt={alt} className={className} />
       <div
-        className={`absolute ${positionClasses[watermarkPosition]} flex items-center gap-1 md:gap-1.5 pointer-events-none select-none`}
+        className={`absolute ${positionClasses[watermarkPosition]} flex items-center gap-1 md:gap-1.5 pointer-events-none select-none z-20`}
         style={{
-          color: 'rgba(255, 255, 255, 0.6)',
-          textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+          color: 'rgba(255, 255, 255, 0.7)',
+          textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)',
         }}
       >
         <WatermarkLogo className={logoSizes[watermarkSize]} />
         <span
           className={`${sizeClasses[watermarkSize]} font-serif tracking-wider uppercase`}
-          style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}
+          style={{ textShadow: '0 1px 4px rgba(0, 0, 0, 0.8)' }}
         >
           The Key Ibiza
         </span>
