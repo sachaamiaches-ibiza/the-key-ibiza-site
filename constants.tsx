@@ -5,7 +5,7 @@ export const getVillas = (lang: Language): Villa[] => [
   {
     id: 'can-kef',
     name: 'Can Kef',
-    location: 'S’Estanyol',
+    location: "S'Estanyol",
     shortDescription: lang === 'es' ? 'Obra maestra del minimalismo arquitectónico con privacidad absoluta.' : 'Architectural minimalist masterpiece offering absolute privacy.',
     price: lang === 'es' ? 'Disponible bajo solicitud' : 'On Request',
     priceRange: lang === 'es' ? 'Disponible bajo solicitud' : 'Available upon request',
@@ -16,11 +16,12 @@ export const getVillas = (lang: Language): Villa[] => [
     imageUrl: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=2000',
     category: 'Modern',
     listingType: 'holiday',
+    visibility: 'public' as const,
     fullDescription: lang === 'es' ? [
       "Arquitectura icónica inspirada en el Pabellón de Barcelona de Mies van der Rohe.",
       "Una propiedad de lujo tranquila que ofrece total privacidad en una de las ubicaciones más deseables de la isla."
     ] : [
-      "Iconic architecture inspired by Mies van der Rohe’s Barcelona Pavilion.",
+      "Iconic architecture inspired by Mies van der Rohe's Barcelona Pavilion.",
       "A tranquil luxury property providing total privacy."
     ],
     features: lang === 'es' ? ["Parcela de 50.000 m2", "Piscina 22m"] : ["50,000 m2 Plot", "22m Pool"],
@@ -37,9 +38,10 @@ export const getVillas = (lang: Language): Villa[] => [
     bedrooms: 6,
     bathrooms: 6,
     maxGuests: 12,
-    imageUrl: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=2000', 
+    imageUrl: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=2000',
     category: 'Traditional',
     listingType: 'holiday',
+    visibility: 'public' as const,
     fullDescription: lang === 'es' ? [
       "Casa Cigala es la definición del lujo rústico ibicenco. Una propiedad que celebra la mampostería tradicional y la luz del Mediterráneo.",
       "Destaca por sus interiores encalados con suelos de terracota auténtica y mobiliario de obra integrado que aporta una calidez orgánica única.",
@@ -96,6 +98,7 @@ export const getVillas = (lang: Language): Villa[] => [
     imageUrl: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80&w=2000',
     category: 'Traditional',
     listingType: 'holiday',
+    visibility: 'public' as const,
     fullDescription: lang === 'es' ? [
       "Villa Nui Blau representa la Ibiza más pura. Un refugio tradicional con toques de confort contemporáneo.",
       "Sus estancias principales conservan la esencia de la mampostería ibicenca, con baños que integran chimeneas y ventanales que enmarcan la costa.",

@@ -14,11 +14,14 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Check authentication status on mount
+    // Check authentication status on mount only
     const authenticated = vipAuth.isAuthenticated();
     setIsVip(authenticated);
-    onAuthChange?.(authenticated);
-  }, [onAuthChange]);
+    if (onAuthChange) {
+      onAuthChange(authenticated);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,22 +52,22 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
   if (isVip) {
     return (
       <div className="text-center">
-        <h3 className="text-luxury-gold text-[10px] uppercase tracking-[0.4em] font-semibold mb-6">VIP Access</h3>
-        <div className="border border-luxury-gold/20 rounded-2xl p-6 bg-luxury-gold/5 max-w-xs mx-auto">
+        <h3 className="text-luxury-gold text-xs uppercase tracking-[0.3em] font-semibold mb-5">VIP Access</h3>
+        <div className="border border-luxury-gold/30 rounded-2xl p-6 max-w-xs mx-auto" style={{ background: 'linear-gradient(145deg, rgba(196,164,97,0.12) 0%, rgba(196,164,97,0.05) 100%)' }}>
           <div className="mb-4">
-            <svg className="w-8 h-8 mx-auto text-luxury-gold mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-10 h-10 mx-auto text-luxury-gold mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg>
           </div>
-          <p className="text-luxury-gold text-sm font-serif italic mb-3 leading-relaxed">
+          <p className="text-luxury-gold text-base font-serif italic mb-3 leading-relaxed">
             Welcome to the private The Key Ibiza space.
           </p>
-          <p className="text-white/50 text-xs leading-relaxed mb-5">
+          <p className="text-white/60 text-sm leading-relaxed mb-5">
             Please enjoy the journey and feel free to contact us if you have any questions.
           </p>
           <button
             onClick={handleLogout}
-            className="w-full bg-transparent border border-white/20 text-white/60 py-2 rounded-full text-[9px] uppercase tracking-[0.2em] font-medium hover:border-luxury-gold hover:text-luxury-gold transition-all"
+            className="w-full bg-transparent border border-white/30 text-white/70 py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:border-luxury-gold hover:text-luxury-gold transition-all"
           >
             Sign Out
           </button>
@@ -76,35 +79,35 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
   // Login form
   return (
     <div className="text-center">
-      <h3 className="text-luxury-gold text-[10px] uppercase tracking-[0.4em] font-semibold mb-6">VIP Access</h3>
-      <div className="border border-white/10 rounded-2xl p-6 bg-white/5 max-w-xs mx-auto">
+      <h3 className="text-luxury-gold text-xs uppercase tracking-[0.3em] font-semibold mb-5">VIP Access</h3>
+      <div className="border border-white/15 rounded-2xl p-6 max-w-xs mx-auto" style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)' }}>
         <form onSubmit={handleLogin}>
           <input
             type="text"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors placeholder:text-white/30 mb-4"
+            className="w-full bg-transparent border-b border-white/25 px-0 py-2.5 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors placeholder:text-white/40 mb-4"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors placeholder:text-white/30 mb-4"
+            className="w-full bg-transparent border-b border-white/25 px-0 py-2.5 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors placeholder:text-white/40 mb-5"
           />
           {error && (
-            <p className="text-red-400/80 text-[10px] mb-3 tracking-wide">{error}</p>
+            <p className="text-red-400 text-xs mb-3 tracking-wide">{error}</p>
           )}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-transparent border border-luxury-gold/40 text-luxury-gold py-2 rounded-full text-[9px] uppercase tracking-[0.2em] font-medium hover:bg-luxury-gold hover:text-luxury-blue transition-all disabled:opacity-50"
+            className="w-full bg-transparent border border-luxury-gold/50 text-luxury-gold py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-luxury-gold hover:text-luxury-blue transition-all disabled:opacity-50"
           >
             {isLoading ? '...' : 'Enter'}
           </button>
         </form>
-        <p className="text-white/20 text-[8px] mt-4 tracking-wider">Members only</p>
+        <p className="text-white/40 text-[9px] mt-4 tracking-wider">Members only</p>
       </div>
     </div>
   );

@@ -23,9 +23,9 @@ export interface Villa {
   id: string;
   name: string;
   location: string;
-  shortDescription: string; // Added for the card's descriptive phrase
-  price: string; // Etiqueta general (ej: "Desde 12.000€")
-  priceRange?: string; // Rango (ej: "12.000€ - 25.000€")
+  shortDescription: string;
+  price: string;
+  priceRange?: string;
   numericPrice?: number;
   bedrooms: number;
   bathrooms: number;
@@ -39,6 +39,26 @@ export interface Villa {
   locationMapUrl?: string;
   distances?: { label: string; time: string }[];
   gallery?: string[];
+  // Fields from CSV
+  visibility: 'public' | 'private';
+  minStay?: string;
+  checkIn?: string;
+  checkOut?: string;
+  arrivalPolicy?: string;
+  reservationDeposit?: string;
+  securityDeposit?: string;
+  ecotax?: string;
+  servicesIncluded?: string;
+  finalCleaning?: string;
+  occupiedDates?: string[];
+  icalUrl?: string;
+  latitude?: number;
+  longitude?: number;
+  mapRadiusKm?: number;
+  conciergeNote?: string;
+  weeklyRatesRaw?: string;
+  seoKeywords?: string;
+  headerImages?: string[];
 }
 
 export interface Service {

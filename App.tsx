@@ -19,9 +19,11 @@ import ComingSoon from './components/ComingSoon';
 import BoatsPage from './components/BoatsPage';
 import VillasPage from './components/VillasPage';
 import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
-import { getVillas, getServices } from './constants';
+import { getServices } from './constants';
 import { translations } from './translations';
-import { Language } from './types';
+import { Language, Villa } from './types';
+import { fetchVillas, getPublicVillas, getAllVillas } from './services/villaService';
+import { vipAuth } from './services/vipAuth';
 
 export type View = 
   | 'home' | 'services' | 'photographer' | 'about' | 'blog' | 'valerie-detail' | 'francesca-detail'
@@ -176,6 +178,35 @@ const App: React.FC = () => {
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
 
+  // Villa data from CSV
+  const [allVillas, setAllVillas] = useState<Villa[]>([]);
+  const [isVip, setIsVip] = useState(vipAuth.isAuthenticated());
+  const [villasLoading, setVillasLoading] = useState(true);
+
+  // Fetch villas from Google Sheets CSV
+  useEffect(() => {
+    const loadVillas = async () => {
+      setVillasLoading(true);
+      try {
+        const villas = await fetchVillas();
+        setAllVillas(villas);
+      } catch (error) {
+        console.error('Failed to load villas:', error);
+      }
+      setVillasLoading(false);
+    };
+    loadVillas();
+  }, []);
+
+  // Filter villas based on VIP status
+  const VILLAS = isVip ? getAllVillas(allVillas) : getPublicVillas(allVillas);
+  const SERVICES = getServices(lang);
+
+  // Handle VIP auth change - no reload needed, React state handles it
+  const handleVipAuthChange = (authenticated: boolean) => {
+    setIsVip(authenticated);
+  };
+
   // Save language to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('thekey-language', lang);
@@ -184,9 +215,6 @@ const App: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [view]);
-
-  const VILLAS = getVillas(lang);
-  const SERVICES = getServices(lang);
 
   // Auto-transition slideshow
   useEffect(() => {
@@ -217,7 +245,7 @@ const App: React.FC = () => {
       case 'valerie-detail': return <ValerieDetail onNavigate={setView} lang={lang} />;
       case 'francesca-detail': return <FrancescaDetail onNavigate={setView} lang={lang} />;
       case 'villas-holiday':
-        return <VillaListingPage category={view} onNavigate={setView} lang={lang} />;
+        return <VillaListingPage category={view} onNavigate={setView} lang={lang} villas={VILLAS} />;
       case 'villas-longterm':
         return <ComingSoon title="Long Term Rentals" onNavigate={setView} lang={lang} />;
       case 'villas-sale':
@@ -490,7 +518,7 @@ const App: React.FC = () => {
           </div>
 
           {/* MIDDLE - VIP Access */}
-          <VipLogin />
+          <VipLogin onAuthChange={handleVipAuthChange} />
 
           {/* RIGHT - Contact Form */}
           <div className="text-center md:text-left">

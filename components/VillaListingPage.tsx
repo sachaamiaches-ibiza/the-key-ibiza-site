@@ -1,19 +1,18 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { getVillas } from '../constants';
 import VillaCard from './VillaCard';
 import FooterSEO from './FooterSEO';
 import { Language, Villa } from '../types';
-import { translations } from '../translations';
 
 interface VillaListingPageProps {
   category: string;
   onNavigate: (view: any) => void;
   lang: Language;
+  villas?: Villa[];
 }
 
-const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang }) => {
-  const VILLAS = getVillas(lang);
+const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, villas = [] }) => {
+  const VILLAS = villas;
 
   const [searchFilters, setSearchFilters] = useState({
     checkIn: '',
