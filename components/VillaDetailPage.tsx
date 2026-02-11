@@ -199,15 +199,6 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             ))}
           </div>
         )}
-        <div className="absolute top-32 left-6 md:left-12 z-20">
-          <button
-            onClick={() => onNavigate('villas-holiday')}
-            className="flex items-center space-x-3 text-white/60 hover:text-luxury-gold transition-colors uppercase tracking-widest text-[10px] font-bold"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-            <span>{t.back}</span>
-          </button>
-        </div>
       </div>
       {/* ===== END HEADER ===== */}
 
@@ -246,26 +237,26 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)' }}
           >
             <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide text-center">Select Your Dates</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mb-6 md:mb-8">
-              <div>
-                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-2 md:mb-3 block font-medium text-center sm:text-left">Check-in</label>
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-5 mb-6 md:mb-8 justify-center items-center">
+              <div className="w-full sm:w-auto sm:flex-1 max-w-[200px]">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-2 md:mb-3 block font-medium text-center">Check-in</label>
                 <input
                   type="date"
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
                   onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                  className="w-full bg-white/4 border border-white/8 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+                  className="w-full bg-white/4 border border-white/8 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-center"
                   style={{ colorScheme: 'dark' }}
                 />
               </div>
-              <div>
-                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-2 md:mb-3 block font-medium text-center sm:text-left">Check-out</label>
+              <div className="w-full sm:w-auto sm:flex-1 max-w-[200px]">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-2 md:mb-3 block font-medium text-center">Check-out</label>
                 <input
                   type="date"
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
                   onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                  className="w-full bg-white/4 border border-white/8 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+                  className="w-full bg-white/4 border border-white/8 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-center"
                   style={{ colorScheme: 'dark' }}
                 />
               </div>

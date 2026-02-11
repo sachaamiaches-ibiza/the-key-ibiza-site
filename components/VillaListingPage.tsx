@@ -123,7 +123,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
         {/* Search Filter Panel */}
         <div className="mb-10 md:mb-14 relative z-[1000]">
-          <div className="luxury-card p-4 md:p-6 rounded-[20px] md:rounded-[24px] border border-white/5 bg-luxury-blue/40 max-w-4xl mx-auto">
+          <div className="luxury-card p-4 md:p-6 rounded-[20px] md:rounded-[24px] border border-white/5 bg-luxury-blue/40">
 
             {/* === MOBILE LAYOUT (< md) === */}
             <div className="md:hidden space-y-3">
@@ -135,10 +135,10 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     value={searchFilters.checkIn}
                     onChange={(e) => setSearchFilters({...searchFilters, checkIn: e.target.value})}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-2 py-3 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
-                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Date From</span>
+                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Date From</span>
                 </div>
                 <div className="relative">
                   <input
@@ -147,10 +147,10 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     min={searchFilters.checkIn}
                     onChange={(e) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-2 py-3 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
-                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Date To</span>
+                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Date To</span>
                 </div>
               </div>
 
@@ -160,14 +160,14 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   <select
                     value={searchFilters.minBedrooms}
                     onChange={(e) => setSearchFilters({...searchFilters, minBedrooms: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-2 py-3 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     <option value={0} className="bg-luxury-blue">Any</option>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                       <option key={n} value={n} className="bg-luxury-blue">{n}+</option>
                     ))}
                   </select>
-                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Bedrooms</span>
+                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Bedrooms</span>
                 </div>
                 <div className="relative">
                   <input
@@ -175,9 +175,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     placeholder="€ / Week"
                     value={searchFilters.minPrice || ''}
                     onChange={(e) => setSearchFilters({...searchFilters, minPrice: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-2 py-3 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price From</span>
+                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price From</span>
                 </div>
               </div>
 
@@ -189,19 +189,19 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     placeholder="€ / Week"
                     value={searchFilters.maxPrice === 200000 ? '' : searchFilters.maxPrice}
                     onChange={(e) => setSearchFilters({...searchFilters, maxPrice: parseInt(e.target.value) || 200000})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-2 py-3 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price To</span>
+                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price To</span>
                 </div>
                 <div className="relative">
                   <select
                     value={searchFilters.location}
                     onChange={(e) => setSearchFilters({...searchFilters, location: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-2 py-3 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueLocations.map((l: string) => <option key={l} value={l} className="bg-luxury-blue">{l === 'All' ? 'All Locations' : l}</option>)}
                   </select>
-                  <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Location</span>
+                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Location</span>
                 </div>
               </div>
 
@@ -212,9 +212,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   placeholder="Search villa name..."
                   value={searchFilters.searchText}
                   onChange={(e) => setSearchFilters({...searchFilters, searchText: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
                 />
-                <span className="absolute left-2 -top-2 text-[7px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Search</span>
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Search</span>
               </div>
 
               {/* Row 5: Filters + Numbering */}
