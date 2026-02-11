@@ -30,9 +30,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   const currentLanguage = languages.find(l => l.code === currentLang);
 
   if (variant === 'fullscreen') {
-    // Full screen menu variant - dropdown opens UPWARD with solid background
+    // Full screen menu variant - dropdown opens DOWNWARD with solid background
     return (
-      <div ref={dropdownRef} className="relative">
+      <div ref={dropdownRef} className="relative z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center space-x-3 text-white/60 hover:text-luxury-gold transition-colors"
@@ -50,16 +50,16 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           </svg>
         </button>
 
-        {/* Dropdown Menu - Opens UPWARD with solid background */}
+        {/* Dropdown Menu - Opens DOWNWARD with solid background */}
         <div
-          className={`absolute bottom-full left-0 mb-3 transition-all duration-300 z-50 ${
+          className={`absolute top-full left-0 mt-3 transition-all duration-300 z-50 ${
             isOpen
               ? 'opacity-100 translate-y-0 pointer-events-auto'
-              : 'opacity-0 translate-y-2 pointer-events-none'
+              : 'opacity-0 -translate-y-2 pointer-events-none'
           }`}
         >
           <div
-            className="border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-[50vh] overflow-y-auto"
+            className="border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-[40vh] overflow-y-auto"
             style={{ minWidth: '220px', backgroundColor: '#0A0E14' }}
           >
             <div className="py-2">
