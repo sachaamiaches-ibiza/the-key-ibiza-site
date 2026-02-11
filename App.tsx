@@ -177,6 +177,8 @@ const App: React.FC = () => {
   });
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
+  const [villaIndex, setVillaIndex] = useState(0);
+  const [villaVisible, setVillaVisible] = useState(true);
 
   // Villa data from CSV
   const [allVillas, setAllVillas] = useState<Villa[]>([]);
@@ -216,7 +218,7 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
   }, [view]);
 
-  // Auto-transition slideshow
+  // Auto-transition slideshow for services
   useEffect(() => {
     if (view !== 'home') return;
     const interval = setInterval(() => {
@@ -228,6 +230,21 @@ const App: React.FC = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [view]);
+
+  // Auto-transition slideshow for villas (5 villas rotating)
+  useEffect(() => {
+    if (view !== 'home' || VILLAS.length === 0) return;
+    const maxVillas = Math.min(5, VILLAS.length);
+    const interval = setInterval(() => {
+      setVillaVisible(false);
+      setTimeout(() => {
+        setVillaIndex((prev) => (prev + 1) % maxVillas);
+        setVillaVisible(true);
+      }, 600);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [view, VILLAS.length]);
+
   const t = translations[lang].home;
 
   const renderView = () => {
@@ -403,8 +420,59 @@ const App: React.FC = () => {
                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-4 text-white">{t.signatureResidences}</h2>
                   <p className="text-white/40 text-sm md:text-base font-light tracking-wide">{t.residencesDesc}</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 lg:gap-14">
-                  {VILLAS.slice(0, 3).map(villa => <VillaCard key={villa.id} villa={villa} onNavigate={setView} lang={lang} />)}
+
+                {/* Villa Slideshow - shows one villa at a time */}
+                <div className="relative w-full max-w-2xl mx-auto" style={{ minHeight: '500px' }}>
+                  {VILLAS.slice(0, 5).map((villa, idx) => (
+                    <div
+                      key={villa.id}
+                      className="absolute inset-0 w-full"
+                      style={{
+                        opacity: idx === villaIndex ? (villaVisible ? 1 : 0) : 0,
+                        transform: idx === villaIndex
+                          ? (villaVisible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(20px)')
+                          : 'scale(0.95) translateY(-20px)',
+                        transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+                        pointerEvents: idx === villaIndex ? 'auto' : 'none',
+                        zIndex: idx === villaIndex ? 10 : 0,
+                      }}
+                    >
+                      <VillaCard villa={villa} onNavigate={setView} lang={lang} />
+                    </div>
+                  ))}
+
+                  {/* Navigation dots */}
+                  <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                    {VILLAS.slice(0, 5).map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setVillaVisible(false);
+                          setTimeout(() => {
+                            setVillaIndex(idx);
+                            setVillaVisible(true);
+                          }, 300);
+                        }}
+                        className="transition-all duration-500"
+                        style={{
+                          width: idx === villaIndex ? '24px' : '8px',
+                          height: '3px',
+                          backgroundColor: idx === villaIndex ? '#C9B27C' : 'rgba(201,178,124,0.3)',
+                          borderRadius: '2px',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* View All Button */}
+                <div className="text-center mt-20">
+                  <button
+                    onClick={() => setView('villas-holiday')}
+                    className="border border-luxury-gold/40 text-luxury-gold px-8 py-3 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all text-[10px] uppercase tracking-[0.3em]"
+                  >
+                    {lang === 'es' ? 'Ver todas las villas' : 'View All Villas'}
+                  </button>
                 </div>
               </div>
             </section>
@@ -437,8 +505,10 @@ const App: React.FC = () => {
         className="fixed top-0 left-0 right-0 z-[100]"
         style={{ backgroundColor: '#C9B27C' }}
       >
-        <div className="container mx-auto px-6 py-1.5 flex justify-between items-center">
+        <div className="container mx-auto px-4 md:px-6 py-1.5 flex justify-between items-center">
+          {/* Text - hidden on mobile */}
           <span
+            className="hidden md:block"
             style={{
               fontFamily: 'Plus Jakarta Sans, sans-serif',
               fontSize: '8px',
@@ -451,11 +521,29 @@ const App: React.FC = () => {
           >
             The Key that opens all the doors to an unforgettable experience.
           </span>
+          {/* Phone - left on mobile */}
+          <a
+            href="https://wa.me/34660153207"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="md:hidden"
+            style={{
+              fontFamily: 'Plus Jakarta Sans, sans-serif',
+              fontSize: '9px',
+              letterSpacing: '0.08em',
+              color: '#0B1C26',
+              fontWeight: 600,
+            }}
+          >
+            +34 660 153 207
+          </a>
+          {/* Desktop: phone + email together / Mobile: email on right */}
           <div className="flex items-center gap-5" style={{ marginRight: '14px' }}>
             <a
               href="https://wa.me/34660153207"
               target="_blank"
               rel="noopener noreferrer"
+              className="hidden md:block"
               style={{
                 fontFamily: 'Plus Jakarta Sans, sans-serif',
                 fontSize: '8px',
@@ -472,7 +560,7 @@ const App: React.FC = () => {
               rel="noopener noreferrer"
               style={{
                 fontFamily: 'Plus Jakarta Sans, sans-serif',
-                fontSize: '8px',
+                fontSize: '9px',
                 letterSpacing: '0.06em',
                 color: '#0B1C26',
                 fontWeight: 500,
@@ -529,11 +617,11 @@ const App: React.FC = () => {
         </div>
       </section>
       <footer className="py-12" style={{ backgroundColor: '#0B1C26' }}>
-        <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
-           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
+        <div className="container mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-center md:justify-between items-center gap-2 md:gap-0">
+           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30 text-center">
              &copy; {new Date().getFullYear()} THE KEY IBIZA
            </p>
-           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
+           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30 text-center">
              Excellence & Discretion — All Rights Reserved
            </p>
         </div>

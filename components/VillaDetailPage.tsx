@@ -242,75 +242,75 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
 
           {/* Right: Date Picker */}
           <div
-            className="p-8 lg:p-10 rounded-[32px] border border-white/8 shadow-xl"
+            className="p-6 md:p-8 lg:p-10 rounded-[24px] md:rounded-[32px] border border-white/8 shadow-xl mx-auto w-full max-w-md lg:max-w-none"
             style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)' }}
           >
-            <h3 className="text-xl font-serif text-white mb-8 tracking-wide">Select Your Dates</h3>
-            <div className="grid grid-cols-2 gap-5 mb-8">
+            <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide text-center">Select Your Dates</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mb-6 md:mb-8">
               <div>
-                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-3 block font-medium">Check-in</label>
+                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-2 md:mb-3 block font-medium text-center sm:text-left">Check-in</label>
                 <input
                   type="date"
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
                   onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                  className="w-full bg-white/4 border border-white/8 rounded-2xl px-5 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+                  className="w-full bg-white/4 border border-white/8 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
                   style={{ colorScheme: 'dark' }}
                 />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-3 block font-medium">Check-out</label>
+                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35 mb-2 md:mb-3 block font-medium text-center sm:text-left">Check-out</label>
                 <input
                   type="date"
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
                   onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                  className="w-full bg-white/4 border border-white/8 rounded-2xl px-5 py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
+                  className="w-full bg-white/4 border border-white/8 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
                   style={{ colorScheme: 'dark' }}
                 />
               </div>
             </div>
 
             {checkIn && checkOut && !isRangeAvailable() && (
-              <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+              <div className="mb-4 md:mb-6 p-3 md:p-4 rounded-xl md:rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs md:text-sm text-center">
                 Selected dates are not available. Please choose different dates.
               </div>
             )}
 
             {!checkIn || !checkOut ? (
-              <p className="text-white/40 text-sm text-center italic">
+              <p className="text-white/40 text-xs md:text-sm text-center italic px-2">
                 Select your dates and we will calculate the total for the indicated period.
               </p>
             ) : calculatePriceBreakdown() && isRangeAvailable() ? (
-              <div className="border-t border-white/8 pt-8">
+              <div className="border-t border-white/8 pt-6 md:pt-8">
                 {/* Total nights */}
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-white/60 text-sm">Total nights selected</span>
-                  <span className="text-white text-sm font-medium">{calculatePriceBreakdown()?.totalNights} nights</span>
+                <div className="flex justify-between items-center mb-3 md:mb-4">
+                  <span className="text-white/60 text-xs md:text-sm">Total nights selected</span>
+                  <span className="text-white text-xs md:text-sm font-medium">{calculatePriceBreakdown()?.totalNights} nights</span>
                 </div>
 
                 {/* Breakdown by seasonal price */}
                 {calculatePriceBreakdown()?.breakdown.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center mb-3 text-sm">
-                    <span className="text-white/50">
+                  <div key={idx} className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 text-xs md:text-sm">
+                    <span className="text-white/50 text-center sm:text-left">
                       {item.nights} nights in {item.month}
-                      <span className="text-white/30 ml-2">(€{item.weeklyRate.toLocaleString()}/week)</span>
+                      <span className="text-white/30 ml-1 md:ml-2">(€{item.weeklyRate.toLocaleString()}/week)</span>
                     </span>
-                    <span className="text-white/70">€{item.subtotal.toLocaleString()}</span>
+                    <span className="text-white/70 text-center sm:text-right mt-1 sm:mt-0">€{item.subtotal.toLocaleString()}</span>
                   </div>
                 ))}
 
                 {/* Divider */}
-                <div className="border-t border-white/10 my-5"></div>
+                <div className="border-t border-white/10 my-4 md:my-5"></div>
 
                 {/* Total */}
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-white text-base font-medium">Total for your stay</span>
-                  <span className="text-2xl font-serif text-luxury-gold">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-5 md:mb-6 gap-2">
+                  <span className="text-white text-sm md:text-base font-medium">Total for your stay</span>
+                  <span className="text-xl md:text-2xl font-serif text-luxury-gold">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
                 </div>
 
                 <button
-                  className="w-full py-5 rounded-2xl font-semibold uppercase tracking-[0.15em] text-[11px] transition-all duration-300 hover:opacity-90"
+                  className="w-full py-4 md:py-5 rounded-xl md:rounded-2xl font-semibold uppercase tracking-[0.15em] text-[10px] md:text-[11px] transition-all duration-300 hover:opacity-90"
                   style={{ backgroundColor: '#C4A461', color: '#0B1C26' }}
                 >
                   Request Booking
