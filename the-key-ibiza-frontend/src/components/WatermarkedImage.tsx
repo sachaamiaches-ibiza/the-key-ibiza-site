@@ -66,10 +66,10 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
   const sizes = sizeClasses[watermarkSize];
 
   // For full-bleed images (header slideshow), use w-full h-full
-  // For gallery images, use inline-flex with max constraints
+  // For gallery modal images, use flex with full height to properly constrain
   const wrapperClass = fullBleed
     ? "relative w-full h-full"
-    : "relative inline-flex items-center justify-center max-h-full max-w-full";
+    : "relative flex items-center justify-center h-full w-full";
 
   return (
     <div className={wrapperClass}>
