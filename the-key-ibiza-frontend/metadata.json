@@ -1,8 +1,0 @@
-{
-  "name": "The Key Ibiza - Ultra Luxury Concierge",
-  "description": "A 2026-vision luxury concierge platform for Ibiza, featuring high-end villa rentals, yacht charters, and VIP experiences with an integrated AI lifestyle manager.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
