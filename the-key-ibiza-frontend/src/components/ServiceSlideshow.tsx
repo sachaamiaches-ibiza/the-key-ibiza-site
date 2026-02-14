@@ -7,8 +7,9 @@ interface ServiceSlideshowProps {
   lang?: Language;
 }
 
-const ServiceSlideshow: React.FC<ServiceSlideshowProps> = ({ lang = 'en' }) => {
-  const services = getServices(lang);
+const ServiceSlideshow: React.FC<ServiceSlideshowProps> = (props) => {
+  const currentLang = props.lang || 'en';
+  const services = getServices(currentLang);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
@@ -23,7 +24,7 @@ const ServiceSlideshow: React.FC<ServiceSlideshowProps> = ({ lang = 'en' }) => {
       }, 800);
     }, 5000);
     return () => clearInterval(interval);
-  }, [services.length]);
+  }, [services.length, lang]);
 
   const goToSlide = (idx: number) => {
     if (idx === currentIndex) return;

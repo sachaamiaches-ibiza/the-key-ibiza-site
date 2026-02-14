@@ -21,7 +21,7 @@ interface WatermarkedImageProps {
   alt?: string;
   className?: string;
   watermarkSize?: 'small' | 'medium' | 'large' | 'gallery';
-  fullBleed?: boolean; // For full-width/height images like header slideshow
+  fullBleed?: boolean;
 }
 
 const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
@@ -33,7 +33,6 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
 }) => {
   const [isVertical, setIsVertical] = useState(false);
 
-  // Detect image orientation
   useEffect(() => {
     const img = new Image();
     img.onload = () => {
@@ -42,7 +41,6 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
     img.src = src;
   }, [src]);
 
-  // Different sizes for different contexts
   const sizeClasses = {
     small: {
       logo: 'w-6 h-9 md:w-8 md:h-12',
@@ -56,7 +54,6 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
       logo: 'w-16 h-22 md:w-32 md:h-44 lg:w-40 lg:h-56',
       text: 'text-base md:text-2xl lg:text-3xl tracking-[0.3em] mt-3 md:mt-4',
     },
-    // Gallery mode: adapts based on image orientation
     gallery: {
       logo: isVertical ? 'w-12 h-16 md:w-16 md:h-22' : 'w-16 h-22 md:w-24 md:h-32',
       text: isVertical ? 'text-sm md:text-base tracking-[0.2em] mt-2' : 'text-base md:text-xl tracking-[0.25em] mt-3',
@@ -65,33 +62,24 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
 
   const sizes = sizeClasses[watermarkSize];
 
-  // For full-bleed images (header slideshow), use w-full h-full
-  // For gallery modal images, use flex with full height to properly constrain
   const wrapperClass = fullBleed
     ? "relative w-full h-full"
-    : "relative flex items-center justify-center h-full w-full";
+    : "relative inline-flex items-center justify-center max-h-full max-w-full";
 
   return (
     <div className={wrapperClass}>
       <img src={src} alt={alt} className={className} />
-      {/* Watermark overlay - positioned over the image only */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-10"
-        style={{
-          color: 'rgba(255, 255, 255, 0.6)',
-        }}
+        style={{ color: 'rgba(255, 255, 255, 0.6)' }}
       >
         <WatermarkLogo
           className={sizes.logo}
-          style={{
-            filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
-          }}
+          style={{ filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))' }}
         />
         <span
           className={`font-serif uppercase ${sizes.text}`}
-          style={{
-            textShadow: '0 3px 12px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.6)',
-          }}
+          style={{ textShadow: '0 3px 12px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.6)' }}
         >
           The Key Ibiza
         </span>
