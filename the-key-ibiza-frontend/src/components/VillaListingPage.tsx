@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import VillaCard from './VillaCard';
 import FooterSEO from './FooterSEO';
-import { Language, LegacyVilla } from '../types';
+import { Language, Villa } from '../types';
 import { useIsMobile } from './useIsMobile';
 import MobileDatePickerModal from './MobileDatePickerModal';
 import { fetchVillas, getPublicVillas } from '../services/villaService';
@@ -16,7 +16,7 @@ interface VillaListingPageProps {
 }
 
 // Calculate price for a specific period based on seasonal prices
-const calculatePriceForPeriod = (villa: LegacyVilla, checkIn: string, checkOut: string): number | null => {
+const calculatePriceForPeriod = (villa: Villa, checkIn: string, checkOut: string): number | null => {
   if (!checkIn || !checkOut) return null;
 
   const start = new Date(checkIn);
@@ -52,7 +52,7 @@ const calculatePriceForPeriod = (villa: LegacyVilla, checkIn: string, checkOut: 
 };
 
 const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange }) => {
-  const [villas, setVillas] = useState<LegacyVilla[]>([]);
+  const [villas, setVillas] = useState<Villa[]>([]);
   const checkOutRef = useRef<HTMLInputElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
   const filtersRefDesktop = useRef<HTMLDivElement>(null);
@@ -98,6 +98,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
       .then(data => {
         const publicVillas = getPublicVillas(data);
         setVillas(publicVillas);
+        console.log('VILLAS IN LISTING PAGE:', publicVillas);
       })
       .catch(err => console.error('Error fetching villas:', err));
   }, []);
@@ -117,7 +118,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
   }, [category]);
 
   const villasOfType = useMemo(() => {
-    return villas.filter(v => v.listingType === listingType);
+    console.log('FILTER BY TYPE:', listingType, 'FROM:', villas.map(v => ({ id: v.id, listingType: v.listingType })));
+    return villas; // Temporarily disabled filter
   }, [villas, listingType]);
 
   const uniqueLocations = useMemo(() => {
@@ -181,6 +183,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
       });
     }
 
+    console.log('FILTERED VILLAS:', filtered.length, filtered);
     return filtered;
   }, [searchFilters, villasOfType]);
 

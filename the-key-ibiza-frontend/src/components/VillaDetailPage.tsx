@@ -7,6 +7,7 @@ import VillaMap from './VillaMap';
 import { useIsMobile } from './useIsMobile';
 import MobileDatePickerModal from './MobileDatePickerModal';
 import WatermarkedImage from './WatermarkedImage';
+import jsPDF from 'jspdf';
 
 interface VillaDetailPageProps {
   villa: Villa;
@@ -15,6 +16,7 @@ interface VillaDetailPageProps {
   initialCheckIn?: string;
   initialCheckOut?: string;
   onDatesChange?: (checkIn: string, checkOut: string) => void;
+  isVip?: boolean;
 }
 
 /**
@@ -50,7 +52,7 @@ const renderFormattedText = (text: string) => {
   });
 };
 
-const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange }) => {
+const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, isVip = false }) => {
   const t = translations[lang].villa;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -70,6 +72,14 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   // Mobile date picker
   const isMobile = useIsMobile();
   const [mobileDatePickerOpen, setMobileDatePickerOpen] = useState(false);
+
+  // VIP PDF download state
+  const [pdfDropdownOpen, setPdfDropdownOpen] = useState(false);
+  const [pdfPasswordModalOpen, setPdfPasswordModalOpen] = useState(false);
+  const [pdfPassword, setPdfPassword] = useState('');
+  const [pdfPasswordError, setPdfPasswordError] = useState('');
+  const [pdfGenerating, setPdfGenerating] = useState(false);
+  const pdfDropdownRef = useRef<HTMLDivElement>(null);
 
   // Touch/swipe refs
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -274,6 +284,350 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     }
   };
 
+  // Close PDF dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pdfDropdownRef.current && !pdfDropdownRef.current.contains(event.target as Node)) {
+        setPdfDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // PDF Generation function
+  const generateVillaPDF = async (withWatermark: boolean) => {
+    setPdfGenerating(true);
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 20;
+      const contentWidth = pageWidth - (margin * 2);
+
+      // Helper to load image as base64
+      const loadImage = (url: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0);
+              resolve(canvas.toDataURL('image/jpeg', 0.8));
+            } else {
+              reject('Canvas context not available');
+            }
+          };
+          img.onerror = () => reject('Failed to load image');
+          img.src = url;
+        });
+      };
+
+      // Create transparency graphics states - subtle watermarks
+      const gState = new (pdf as any).GState({ opacity: 0.25 });
+      const gStateKey = new (pdf as any).GState({ 'stroke-opacity': 0.25, opacity: 0.25 }); // Transparent strokes for key
+      const gStateImg = new (pdf as any).GState({ 'stroke-opacity': 0.50, opacity: 0.50 }); // 50% for photos
+
+      // Gold color for watermarks (luxury-gold: 201, 178, 124)
+      const goldColor = [201, 178, 124];
+
+      // Helper to draw the key logo - very faded/transparent
+      const drawKeyLogo = (centerX: number, centerY: number, size: number, color: number[], useKeyOpacity: boolean = true) => {
+        // Apply extra transparency for key
+        if (useKeyOpacity) {
+          pdf.setGState(gStateKey);
+        }
+
+        // Draw key shape at position - single pass, thin lines
+        const drawKeyShape = (cx: number, cy: number, lineWidth: number) => {
+          pdf.setLineWidth(lineWidth);
+          // Key head (circle)
+          pdf.circle(cx, cy - size * 0.35, size * 0.28, 'S');
+          // Inner circle
+          pdf.circle(cx, cy - size * 0.35, size * 0.15, 'S');
+          // Key shaft
+          pdf.line(cx, cy - size * 0.07, cx, cy + size * 0.55);
+          // Key teeth
+          pdf.line(cx, cy + size * 0.1, cx + size * 0.18, cy + size * 0.1);
+          pdf.line(cx, cy + size * 0.22, cx + size * 0.25, cy + size * 0.22);
+          pdf.line(cx, cy + size * 0.34, cx + size * 0.15, cy + size * 0.34);
+          pdf.line(cx, cy + size * 0.46, cx + size * 0.28, cy + size * 0.46);
+        };
+
+        // Gold color
+        pdf.setDrawColor(color[0], color[1], color[2]);
+
+        // Draw key with thin line
+        drawKeyShape(centerX, centerY, 0.4);
+
+        // Restore text opacity after key
+        if (useKeyOpacity) {
+          pdf.setGState(gState);
+        }
+      };
+
+      // Helper to draw diffuse watermark with key logo (for page background)
+      const drawPageWatermark = (positionY?: number, size: number = 60) => {
+        if (!withWatermark) return;
+
+        // Save current state and apply transparency
+        pdf.saveGraphicsState();
+        pdf.setGState(gState);
+
+        const centerX = pageWidth / 2;
+        const centerY = positionY || pageHeight / 2;
+
+        // Draw large key logo in gold
+        drawKeyLogo(centerX, centerY - size * 0.4, size, goldColor);
+
+        // Draw text below key in gold
+        pdf.setFontSize(28);
+        pdf.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
+        pdf.setFont('helvetica', 'normal');
+        const watermarkText = 'THE KEY IBIZA';
+        const textWidth = pdf.getTextWidth(watermarkText);
+        pdf.text(watermarkText, (pageWidth - textWidth) / 2, centerY + size * 0.7);
+
+        // Restore state
+        pdf.restoreGraphicsState();
+      };
+
+      // Helper to draw subtle watermark on images
+      const drawImageWatermark = (x: number, y: number, width: number, height: number) => {
+        if (!withWatermark) return;
+
+        pdf.saveGraphicsState();
+        pdf.setGState(gStateImg);
+
+        const centerX = x + width / 2;
+        const centerY = y + height / 2;
+
+        // Draw key logo in gold - use false to NOT override opacity
+        drawKeyLogo(centerX, centerY - 10, 22, goldColor, false);
+
+        // Draw text in gold
+        pdf.setFontSize(10);
+        pdf.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
+        const wmText = 'THE KEY IBIZA';
+        const textWidth = pdf.getTextWidth(wmText);
+        pdf.text(wmText, centerX - textWidth / 2, centerY + 20);
+
+        pdf.restoreGraphicsState();
+      };
+
+      // ===== PAGE 1: Main Photo + Villa Info =====
+      // Draw page watermark FIRST (in background) - positioned lower to not overlap with image
+      drawPageWatermark(pageHeight - 70, 55);
+
+      const headerImages = villa.headerImages || [villa.imageUrl];
+      const mainImage = headerImages[0];
+
+      if (mainImage) {
+        try {
+          const imgData = await loadImage(mainImage);
+          // Draw main image at top
+          pdf.addImage(imgData, 'JPEG', margin, margin, contentWidth, 100);
+
+          // Add watermark on main image
+          drawImageWatermark(margin, margin, contentWidth, 100);
+        } catch (e) {
+          console.error('Failed to load main image:', e);
+        }
+      }
+
+      // Villa info below image
+      let yPos = margin + 110;
+
+      // Villa name
+      pdf.setFontSize(28);
+      pdf.setTextColor(11, 28, 38);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(villa.name, pageWidth / 2, yPos, { align: 'center' });
+      yPos += 12;
+
+      // Location
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(villa.location || 'Ibiza', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 15;
+
+      // Short description
+      if (villa.shortDescription) {
+        pdf.setFontSize(11);
+        pdf.setTextColor(80, 80, 80);
+        const descLines = pdf.splitTextToSize(villa.shortDescription, contentWidth);
+        pdf.text(descLines, pageWidth / 2, yPos, { align: 'center' });
+        yPos += descLines.length * 6 + 10;
+      }
+
+      // Stats (bedrooms, bathrooms, guests)
+      pdf.setFontSize(11);
+      pdf.setTextColor(60, 60, 60);
+      const stats = `${villa.bedrooms} Bedrooms  |  ${villa.bathrooms} Bathrooms  |  Up to ${villa.maxGuests} Guests`;
+      pdf.text(stats, pageWidth / 2, yPos, { align: 'center' });
+      yPos += 12;
+
+      // Price range
+      pdf.setFontSize(14);
+      pdf.setTextColor(201, 178, 124);
+      pdf.setFont('helvetica', 'bold');
+      const priceText = villa.priceRange || villa.price || 'Price on request';
+      pdf.text(priceText, pageWidth / 2, yPos, { align: 'center' });
+
+      // ===== PAGE 2: Description + Amenities =====
+      pdf.addPage();
+
+      // Draw watermark centered in the middle of the page
+      drawPageWatermark(pageHeight / 2, 55);
+
+      yPos = margin;
+
+      // Section title
+      pdf.setFontSize(18);
+      pdf.setTextColor(11, 28, 38);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('About This Villa', margin, yPos);
+      yPos += 12;
+
+      // Description
+      pdf.setFontSize(10);
+      pdf.setTextColor(60, 60, 60);
+      pdf.setFont('helvetica', 'normal');
+      const fullDesc = villa.fullDescription?.join('\n\n') || 'No description available.';
+      const descriptionLines = pdf.splitTextToSize(fullDesc.replace(/\*\*/g, ''), contentWidth);
+
+      // Limit description to fit on page
+      const maxDescLines = 25;
+      const limitedDesc = descriptionLines.slice(0, maxDescLines);
+      pdf.text(limitedDesc, margin, yPos);
+      yPos += limitedDesc.length * 5 + 15;
+
+      // Amenities section
+      if (villa.amenities && villa.amenities.length > 0 && yPos < pageHeight - 80) {
+        pdf.setFontSize(14);
+        pdf.setTextColor(11, 28, 38);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Amenities', margin, yPos);
+        yPos += 10;
+
+        pdf.setFontSize(9);
+        pdf.setTextColor(80, 80, 80);
+        pdf.setFont('helvetica', 'normal');
+
+        // Display amenities in two columns
+        const amenities = villa.amenities.slice(0, 20);
+        const midPoint = Math.ceil(amenities.length / 2);
+        const col1 = amenities.slice(0, midPoint);
+        const col2 = amenities.slice(midPoint);
+
+        col1.forEach((amenity, i) => {
+          pdf.text(`• ${amenity}`, margin, yPos + (i * 5));
+        });
+        col2.forEach((amenity, i) => {
+          pdf.text(`• ${amenity}`, margin + contentWidth / 2, yPos + (i * 5));
+        });
+      }
+
+      // ===== PAGE 3: Gallery - 4 photos in grid + 5th centered =====
+      pdf.addPage();
+      yPos = margin;
+
+      pdf.setFontSize(18);
+      pdf.setTextColor(11, 28, 38);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Gallery', margin, yPos);
+      yPos += 15;
+
+      const imagesToShow = headerImages.slice(0, 5);
+      const imgHeight = 55;
+      const imgWidth = contentWidth / 2 - 5;
+      const gap = 10;
+
+      // First 4 images in 2x2 grid
+      for (let i = 0; i < Math.min(4, imagesToShow.length); i++) {
+        try {
+          const imgData = await loadImage(imagesToShow[i]);
+          const col = i % 2;
+          const row = Math.floor(i / 2);
+          const xPos = margin + (col * (imgWidth + gap));
+          const imgYPos = yPos + (row * (imgHeight + gap));
+
+          pdf.addImage(imgData, 'JPEG', xPos, imgYPos, imgWidth, imgHeight);
+
+          // Watermark on each image
+          drawImageWatermark(xPos, imgYPos, imgWidth, imgHeight);
+        } catch (e) {
+          console.error(`Failed to load image ${i}:`, e);
+        }
+      }
+
+      // 5th image centered below
+      if (imagesToShow.length >= 5) {
+        try {
+          const imgData = await loadImage(imagesToShow[4]);
+          const fifthImgWidth = contentWidth * 0.6;
+          const fifthImgHeight = imgHeight;
+          const fifthXPos = margin + (contentWidth - fifthImgWidth) / 2;
+          const fifthYPos = yPos + (2 * (imgHeight + gap)) + 5;
+
+          pdf.addImage(imgData, 'JPEG', fifthXPos, fifthYPos, fifthImgWidth, fifthImgHeight);
+
+          // Watermark on 5th image
+          drawImageWatermark(fifthXPos, fifthYPos, fifthImgWidth, fifthImgHeight);
+        } catch (e) {
+          console.error('Failed to load 5th image:', e);
+        }
+      }
+
+      // Save the PDF
+      const fileName = `${villa.name.replace(/\s+/g, '_')}_${withWatermark ? 'preview' : 'full'}.pdf`;
+      pdf.save(fileName);
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
+      setPdfGenerating(false);
+      setPdfDropdownOpen(false);
+      setPdfPasswordModalOpen(false);
+      setPdfPassword('');
+    }
+  };
+
+ // Handle PDF password verification (secure - backend)
+const handlePdfPasswordSubmit = async () => {
+  try {
+    const response = await fetch(
+      "https://the-key-ibiza-backend.vercel.app/vip/verify-pdf-password",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ password: pdfPassword })
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.success) {
+      setPdfPasswordError("");
+      setPdfPasswordModalOpen(false);
+      generateVillaPDF(false); // sin watermark
+    } else {
+      setPdfPasswordError("Incorrect password");
+    }
+  } catch (error) {
+    console.error("Password verification failed:", error);
+    setPdfPasswordError("Server error. Try again.");
+  }
+};
+
   // Booking form validation
   const validateBookingForm = () => {
     const errors: Record<string, string> = {};
@@ -432,6 +786,72 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
           }}
         />
       )}
+
+      {/* VIP PDF Download Button */}
+      {isVip && (
+        <div className="mt-6 pt-5 border-t border-white/8">
+          <div className="relative" ref={pdfDropdownRef}>
+            <button
+              onClick={() => setPdfDropdownOpen(!pdfDropdownOpen)}
+              disabled={pdfGenerating}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-white/60 hover:text-luxury-gold border border-white/10 hover:border-luxury-gold/30 transition-all text-xs tracking-wide disabled:opacity-50"
+            >
+              {pdfGenerating ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Generating PDF...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Download PDF</span>
+                  <svg className={`w-3 h-3 transition-transform ${pdfDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </>
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {pdfDropdownOpen && !pdfGenerating && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0B1C26] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+                <button
+                  onClick={() => generateVillaPDF(true)}
+                  className="w-full px-4 py-3 text-left text-xs text-white/70 hover:bg-white/5 hover:text-luxury-gold transition-colors flex items-center gap-3"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <div>
+                    <span className="block font-medium">Preview PDF</span>
+                    <span className="text-[10px] text-white/40">With watermark</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setPdfDropdownOpen(false);
+                    setPdfPasswordModalOpen(true);
+                  }}
+                  className="w-full px-4 py-3 text-left text-xs text-white/70 hover:bg-white/5 hover:text-luxury-gold transition-colors flex items-center gap-3 border-t border-white/5"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <div>
+                    <span className="block font-medium">Full Quality PDF</span>
+                    <span className="text-[10px] text-white/40">Requires password</span>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -510,7 +930,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         </div>
 
         {/* ===== MOBILE: DATE PICKER (between header and description) ===== */}
-        <div className="md:hidden py-8">
+        <div id="date-picker-section" className="md:hidden py-8">
           <DatePickerSection compact />
         </div>
 
@@ -526,7 +946,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
           </div>
 
           {/* Date Picker - 2 columns (Desktop only) */}
-          <div className="hidden lg:block lg:col-span-2">
+          <div id="date-picker-desktop" className="hidden lg:block lg:col-span-2">
             <DatePickerSection />
           </div>
         </div>
@@ -798,6 +1218,29 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
             <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-white/10"></div><span>Available</span></div>
             <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-luxury-gold"></div><span>Selected</span></div>
           </div>
+
+          {/* Message to scroll up when dates are selected */}
+          {checkIn && checkOut && (
+            <div className="mt-8 text-center animate-fade-in">
+              <button
+                onClick={() => {
+                  const target = document.getElementById('date-picker-desktop') || document.getElementById('date-picker-section');
+                  if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }}
+                className="inline-flex items-center gap-3 text-luxury-gold hover:text-white transition-colors group"
+              >
+                <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 15l7-7 7 7"></path>
+                </svg>
+                <span className="text-sm font-light tracking-wide">View your price estimate above</span>
+                <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 15l7-7 7 7"></path>
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ===== LOCATION MAP ===== */}
@@ -1053,6 +1496,80 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* PDF Password Modal */}
+      {pdfPasswordModalOpen && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(11,28,38,0.95)' }}>
+          <div
+            className="w-full max-w-sm rounded-[24px] border border-white/10 p-8"
+            style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)' }}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setPdfPasswordModalOpen(false);
+                setPdfPassword('');
+                setPdfPasswordError('');
+              }}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Lock Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-luxury-gold/10 flex items-center justify-center">
+                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 className="text-xl font-serif text-white text-center mb-2">Full Quality PDF</h3>
+            <p className="text-white/50 text-xs text-center mb-6">Enter your VIP password to download the PDF without watermarks.</p>
+
+            <div className="mb-4">
+              <input
+                type="password"
+                value={pdfPassword}
+                onChange={(e) => {
+                  setPdfPassword(e.target.value);
+                  setPdfPasswordError('');
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && handlePdfPasswordSubmit()}
+                placeholder="Enter password"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30"
+                autoFocus
+              />
+              {pdfPasswordError && (
+                <p className="text-red-400 text-xs mt-2 text-center">{pdfPasswordError}</p>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setPdfPasswordModalOpen(false);
+                  setPdfPassword('');
+                  setPdfPasswordError('');
+                }}
+                className="flex-1 py-3 rounded-xl text-white/60 border border-white/10 hover:border-white/20 hover:text-white transition-colors text-xs uppercase tracking-wider"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePdfPasswordSubmit}
+                disabled={!pdfPassword || pdfGenerating}
+                className="flex-1 py-3 rounded-xl bg-luxury-gold text-luxury-blue font-semibold text-xs uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {pdfGenerating ? 'Generating...' : 'Download'}
+              </button>
+            </div>
           </div>
         </div>
       )}

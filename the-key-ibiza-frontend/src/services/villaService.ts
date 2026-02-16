@@ -1,4 +1,4 @@
-import { LegacyVilla, SeasonalPrice } from '../types';
+import { Villa, SeasonalPrice } from '../types';
 
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app/villas';
 
@@ -28,17 +28,19 @@ function parsePrice(priceStr?: string): number {
 
 function parseWeeklyRates(ratesStr?: string): SeasonalPrice[] {
   if (!ratesStr) return [];
-  return parsePipeSeparated(ratesStr).map(r => {
-    const match = r.match(/(\d{2}-\d{2})\s*to\s*(\d{2}-\d{2}):\s*€([\d\s]+)/);
-    if (match) {
-      return { month: `${match[1]} - ${match[2]}`, price: match[3].replace(/\s/g, '') };
-    }
-    return { month: r, price: '' };
-  }).filter(r => r.price);
+  return parsePipeSeparated(ratesStr)
+    .map(r => {
+      const match = r.match(/(\d{2}-\d{2})\s*to\s*(\d{2}-\d{2}):\s*€([\d\s]+)/);
+      if (match) {
+        return { month: `${match[1]} - ${match[2]}`, price: match[3].replace(/\s/g, '') };
+      }
+      return { month: r, price: '' };
+    })
+    .filter(r => r.price);
 }
 
 // ---------- MAPEO ----------
-function csvRowToVilla(row: any): LegacyVilla {
+function csvRowToVilla(row: any): Villa {
   const minPrice = parsePrice(row.price_min_week);
   const maxPrice = parsePrice(row.price_max_week) || minPrice;
   const headerImagesArray = parsePipeSeparated(row.header_images);
@@ -61,9 +63,10 @@ function csvRowToVilla(row: any): LegacyVilla {
     fullDescription: row.description ? row.description.split('\n\n').filter(Boolean) : [],
     features: parsePipeSeparated(row.amenities),
     seasonalPrices: parseWeeklyRates(row.weekly_rates),
-    locationMapUrl: row.location_lat && row.location_lng
-      ? `https://www.google.com/maps?q=${row.location_lat},${row.location_lng}&z=15`
-      : undefined,
+    locationMapUrl:
+      row.location_lat && row.location_lng
+        ? `https://www.google.com/maps?q=${row.location_lat},${row.location_lng}&z=15`
+        : undefined,
     gallery: parsePipeSeparated(row.gallery_images),
     amenities: parsePipeSeparated(row.amenities),
     availability: undefined,
@@ -72,43 +75,44 @@ function csvRowToVilla(row: any): LegacyVilla {
 }
 
 // ---------- FETCH VILLAS ----------
-let cachedVillas: LegacyVilla[] | null = null;
-let lastFetchTime = 0;
-const CACHE_DURATION = 60000;
-
-export async function fetchVillas(): Promise<LegacyVilla[]> {
-  const now = Date.now();
-  if (cachedVillas && (now - lastFetchTime) < CACHE_DURATION) return cachedVillas;
-
+export async function fetchVillas(): Promise<Villa[]> {
   try {
     const res = await fetch(BACKEND_URL);
     if (!res.ok) throw new Error(`Failed to fetch villas: ${res.status}`);
+
     const json = await res.json();
-    const villas: LegacyVilla[] = json.data || [];
-    cachedVillas = villas;
-    lastFetchTime = now;
+
+    // 🛡️ parseo robusto
+    const villas: Villa[] = Array.isArray(json.data)
+      ? json.data
+      : Array.isArray(json)
+      ? json
+      : [];
+
+    console.log('VILLAS FETCHED:', villas);
+
     return villas;
   } catch (e) {
-    console.error('Error fetching villas:', e);
-    return cachedVillas || [];
+    console.error('❌ Error fetching villas:', e);
+    return [];
   }
 }
 
 // ---------- FILTROS ----------
-export function getPublicVillas(villas: LegacyVilla[]): LegacyVilla[] {
-  return villas.filter(v => !v.isPrivate);
-}
-
-export function getAllVillas(villas: LegacyVilla[]): LegacyVilla[] {
+export function getPublicVillas(villas: Villa[]): Villa[] {
   return villas;
 }
 
-export function getVillaBySlug(villas: LegacyVilla[], slug: string): LegacyVilla | undefined {
+export function getAllVillas(villas: Villa[]): Villa[] {
+  return villas;
+}
+
+export function getVillaBySlug(villas: Villa[], slug: string): Villa | undefined {
   return villas.find(v => v.id === slug);
 }
 
 // ---------- UBICACIONES ÚNICAS ----------
-export function getUniqueLocations(villas: LegacyVilla[]): string[] {
+export function getUniqueLocations(villas: Villa[]): string[] {
   return [...new Set(villas.map(v => v.location).filter(Boolean))];
 }
 
@@ -119,7 +123,9 @@ export function calculateStayPrice(
   weeklyRatesRaw: string,
   defaultWeeklyPrice: number
 ) {
-  const totalNights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+  const totalNights = Math.ceil(
+    (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+  );
   if (totalNights <= 0) return { totalNights: 0, breakdown: [], total: 0 };
 
   const breakdown: { period: string; nights: number; rate: number; subtotal: number }[] = [];
@@ -129,7 +135,8 @@ export function calculateStayPrice(
 
   for (let d = new Date(checkIn); d < checkOut; d.setDate(d.getDate() + 1)) {
     const month = d.toLocaleString('en', { month: 'short' });
-    const rate = parseInt(weeklyRatesRaw.replace(/[^\d]/g, '')) || defaultWeeklyPrice;
+    const rate =
+      parseInt(weeklyRatesRaw.replace(/[^\d]/g, '')) || defaultWeeklyPrice;
     const key = `${month}:${rate}`;
     if (!nightsByPeriod[key]) nightsByPeriod[key] = { nights: 0, rate };
     nightsByPeriod[key].nights++;
@@ -139,7 +146,12 @@ export function calculateStayPrice(
     const [month] = key.split(':');
     const subtotal = Math.round((data.nights / 7) * data.rate);
     total += subtotal;
-    breakdown.push({ period: month, nights: data.nights, rate: data.rate, subtotal });
+    breakdown.push({
+      period: month,
+      nights: data.nights,
+      rate: data.rate,
+      subtotal,
+    });
   });
 
   return { totalNights, breakdown, total };

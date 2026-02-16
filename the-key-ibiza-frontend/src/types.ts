@@ -2,7 +2,7 @@
 // LANGUAGES
 // ============================================
 
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'nl' | 'ru' | 'zh' | 'ja';
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ru' | 'zh' | 'ar' | 'hi';
 
 export interface LanguageOption {
   code: Language;
@@ -16,108 +16,14 @@ export const languages: LanguageOption[] = [
   { code: 'de', native: 'Deutsch' },
   { code: 'it', native: 'Italiano' },
   { code: 'pt', native: 'Português' },
-  { code: 'nl', native: 'Nederlands' },
   { code: 'ru', native: 'Русский' },
   { code: 'zh', native: '中文' },
-  { code: 'ja', native: '日本語' }
+  { code: 'ar', native: 'العربية' },
+  { code: 'hi', native: 'हिन्दी' }
 ];
 
 // ============================================
-// VILLA TYPE - MASTER STRUCTURE
-// ============================================
-
-export interface VillaSpecs {
-  bedrooms: number;
-  bathrooms: number;
-  maxGuests: number;
-  priceRangePerWeek: string;
-}
-
-export interface WeeklyRate {
-  month: string;
-  pricePerWeek: string;
-}
-
-export interface VillaAvailability {
-  calendarMonthsVisible: number;
-  scrollable: boolean;
-  icsSyncAvailable: boolean;
-}
-
-export interface ImportantInformation {
-  maxPersonsPriceInfo: string;
-  arrivalPolicy: string;
-  minimumStay: string;
-  finalCleaning: string;
-  reservationDeposit: string;
-  securityDeposit: string;
-  ecotax: string;
-  checkIn: string;
-  checkOut: string;
-  servicesIncluded: string;
-}
-
-export interface VillaMap {
-  island: string;
-  latitude: number;
-  longitude: number;
-  googleMapsLink: string;
-}
-
-export interface ContactSection {
-  teamImage: string;
-  contactEmail: string;
-  contactPhone: string;
-}
-
-export interface VillaReview {
-  name: string;
-  rating: number;
-  message: string;
-  image?: string;
-}
-
-export interface ReviewForm {
-  fields: string[];
-}
-
-export interface VillaFooter {
-  companyName: string;
-  logo: string;
-  socials: {
-    instagram: string;
-    whatsapp: string;
-    email: string;
-  };
-}
-
-export interface Villa {
-  id: string;
-  name: string;
-  location: string;
-  tagline?: string;
-  isPrivate?: boolean;
-  heroPhotos: string[];
-  specs: VillaSpecs;
-  description: string;
-  gallery: string[];
-  amenities: string[];
-  weeklyRates: WeeklyRate[];
-  availability: VillaAvailability;
-  importantInformation: ImportantInformation;
-  conciergeNote: string;
-  map: VillaMap;
-  contactSection: ContactSection;
-  reviews: VillaReview[];
-  reviewForm: ReviewForm;
-  seoDescription: string;
-  footer: VillaFooter;
-  listingType: 'holiday' | 'longterm' | 'sale';
-  category: 'Modern' | 'Traditional' | 'Cliffs' | 'Beachfront' | 'Luxury' | 'Countryside';
-}
-
-// ============================================
-// TIPOS PARA VILLA LISTING PAGE
+// VILLA FILTER STATE
 // ============================================
 
 export interface VillaFilterState {
@@ -142,7 +48,7 @@ export interface LocationOption {
 }
 
 // ============================================
-// LEGACY VILLA TYPE (para home page y componentes antiguos)
+// VILLA TYPE (flat structure matching CSV)
 // ============================================
 
 export interface SeasonalPrice {
@@ -150,11 +56,11 @@ export interface SeasonalPrice {
   price: string;
 }
 
-export interface LegacyVilla {
+export interface Villa {
   id: string;
   name: string;
   location: string;
-  shortDescription: string;
+  shortDescription?: string;
   price: string;
   priceRange?: string;
   numericPrice?: number;
@@ -163,22 +69,36 @@ export interface LegacyVilla {
   maxGuests: number;
   imageUrl: string;
   headerImages?: string[];
-  category: 'Modern' | 'Traditional' | 'Cliffs' | 'Beachfront';
-  listingType: 'holiday' | 'longterm' | 'sale';
-  fullDescription: string[];
-  features: string[];
+  category?: 'Modern' | 'Traditional' | 'Cliffs' | 'Beachfront' | 'Luxury' | 'Countryside';
+  listingType?: 'holiday' | 'longterm' | 'sale';
+  fullDescription?: string[];
+  features?: string[];
   seasonalPrices?: SeasonalPrice[];
   locationMapUrl?: string;
   distances?: { label: string; time: string }[];
   gallery?: string[];
   amenities?: string[];
   availability?: { from: string; to: string }[];
+  occupiedDates?: string[];
   isPrivate?: boolean;
   weeklyRatesRaw?: string;
+  latitude?: number;
+  longitude?: number;
+  conciergeNote?: string;
+  minStay?: string;
+  checkIn?: string;
+  checkOut?: string;
+  arrivalPolicy?: string;
+  reservationDeposit?: string;
+  securityDeposit?: string;
+  ecotax?: string;
+  finalCleaning?: string;
+  servicesIncluded?: string;
+  visibility?: 'public' | 'private';
 }
 
 // ============================================
-// OTROS TIPOS
+// OTHER TYPES
 // ============================================
 
 export interface Service {

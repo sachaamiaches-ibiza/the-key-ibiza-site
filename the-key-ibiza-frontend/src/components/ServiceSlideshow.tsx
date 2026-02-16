@@ -24,7 +24,7 @@ const ServiceSlideshow: React.FC<ServiceSlideshowProps> = (props) => {
       }, 800);
     }, 5000);
     return () => clearInterval(interval);
-  }, [services.length, lang]);
+  }, [services.length, currentLang]);
 
   const goToSlide = (idx: number) => {
     if (idx === currentIndex) return;

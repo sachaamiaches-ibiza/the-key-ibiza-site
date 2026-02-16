@@ -200,6 +200,7 @@ const App: React.FC = () => {
       try {
         const villas = await fetchVillas();
         setAllVillas(villas);
+        console.log('ALL VILLAS IN STATE:', villas);
       } catch (error) {
         console.error('Failed to load villas:', error);
       }
@@ -240,6 +241,8 @@ const App: React.FC = () => {
   }, [view]);
   const t = translations[lang].home;
 
+  console.log('RENDER VILLAS:', allVillas);
+
   const renderView = () => {
     if (view.startsWith('villa-')) {
       const villaId = view.replace('villa-', '');
@@ -252,6 +255,7 @@ const App: React.FC = () => {
           initialCheckIn={searchCheckIn}
           initialCheckOut={searchCheckOut}
           onDatesChange={handleSearchDatesChange}
+          isVip={isVip}
         />
       );
     }
