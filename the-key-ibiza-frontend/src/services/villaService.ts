@@ -1,6 +1,6 @@
 import { LegacyVilla, SeasonalPrice } from '../types';
 
-const BACKEND_URL = 'http://localhost:5001/villas';
+const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app/villas';
 
 // ---------- UTILIDADES ----------
 function parseCSV(csvText: string): any[] {
