@@ -387,14 +387,14 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Icons Grid - 2 rows of 7 */}
-                <div className="grid grid-cols-3 md:grid-cols-7 gap-8 md:gap-5 lg:gap-8 max-w-6xl mx-auto">
+                <div className="flex flex-wrap justify-center md:grid md:grid-cols-7 gap-8 md:gap-5 lg:gap-8 max-w-6xl mx-auto">
                   {allServicesGrid.map((service) => {
                     const IconComponent = service.icon;
                     return (
                       <div
                         key={service.id}
                         onClick={() => setView(service.id === 'photographer' ? 'photographer' : `service-${service.id}`)}
-                        className="flex flex-col items-center cursor-pointer group"
+                        className="flex flex-col items-center cursor-pointer group w-[calc(33.333%-22px)] md:w-auto"
                       >
                         {/* Circular Icon Container */}
                         <div
