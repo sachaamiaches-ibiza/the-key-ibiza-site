@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getServices } from '../constants';
 import { Language } from '../types';
 
@@ -13,6 +13,10 @@ const ServiceSlideshow: React.FC<ServiceSlideshowProps> = (props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
+
+  // Touch/Swipe state
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,6 +38,45 @@ const ServiceSlideshow: React.FC<ServiceSlideshowProps> = (props) => {
       setCurrentIndex(idx);
       setIsVisible(true);
     }, 400);
+  };
+
+  const goToNext = () => {
+    setIsVisible(false);
+    setDirection('next');
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % services.length);
+      setIsVisible(true);
+    }, 400);
+  };
+
+  const goToPrev = () => {
+    setIsVisible(false);
+    setDirection('prev');
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev - 1 + services.length) % services.length);
+      setIsVisible(true);
+    }, 400);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const swipeThreshold = 50;
+    const diff = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrev();
+      }
+    }
   };
 
   const currentService = services[currentIndex];
@@ -61,7 +104,12 @@ const ServiceSlideshow: React.FC<ServiceSlideshowProps> = (props) => {
         </div>
 
         {/* Slideshow Container */}
-        <div className="relative flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20">
+        <div
+          className="relative flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
 
           {/* Image Side */}
           <div className="relative w-full lg:w-1/2 max-w-xl">
