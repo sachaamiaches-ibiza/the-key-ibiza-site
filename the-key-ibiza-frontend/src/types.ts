@@ -95,6 +95,7 @@ export interface Villa {
   finalCleaning?: string;
   servicesIncluded?: string;
   visibility?: 'public' | 'private';
+  icalUrl?: string;
 }
 
 // ============================================

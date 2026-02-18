@@ -24,7 +24,7 @@ import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
 import { getServices } from './constants';
 import { translations } from './translations';
 import { Language, Villa } from './types';
-import { fetchVillas, getPublicVillas, getAllVillas } from './services/villaService';
+import { fetchVillas, fetchVillaBySlug, getPublicVillas, getAllVillas } from './services/villaService';
 import { vipAuth } from './services/vipAuth';
 
 export type View = 
@@ -180,10 +180,11 @@ const App: React.FC = () => {
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
 
-  // Villa data from backend (SQLite)
+  // Villa data from Backend API
   const [allVillas, setAllVillas] = useState<Villa[]>([]);
   const [isVip, setIsVip] = useState(vipAuth.isAuthenticated());
   const [villasLoading, setVillasLoading] = useState(true);
+  const [directVilla, setDirectVilla] = useState<Villa | null>(null);
 
   // Search dates persistence - keeps dates when navigating between listing and detail pages
   const [searchCheckIn, setSearchCheckIn] = useState<string>('');
@@ -195,14 +196,14 @@ const App: React.FC = () => {
     setSearchCheckOut(checkOut);
   };
 
-  // Fetch villas from backend
+  // Fetch villas from Backend
   useEffect(() => {
     const loadVillas = async () => {
       setVillasLoading(true);
       try {
         const villas = await fetchVillas();
         setAllVillas(villas);
-        console.log('ALL VILLAS IN STATE:', villas);
+        console.log('✅ ALL VILLAS FROM BACKEND:', villas.length);
       } catch (error) {
         console.error('Failed to load villas:', error);
       }
@@ -210,6 +211,29 @@ const App: React.FC = () => {
     };
     loadVillas();
   }, []);
+
+  // Fetch single villa directly from Backend when needed
+  useEffect(() => {
+    if (view.startsWith('villa-') && !villasLoading) {
+      const villaId = view.replace('villa-', '');
+      const villaInState = allVillas.find(v => v.id === villaId);
+
+      if (!villaInState && !directVilla) {
+        // Villa not in state, fetch directly from Backend
+        fetchVillaBySlug(villaId).then(villa => {
+          if (villa) {
+            setDirectVilla(villa);
+          }
+        });
+      } else if (villaInState) {
+        // Clear direct villa if we found it in state
+        setDirectVilla(null);
+      }
+    } else {
+      // Clear direct villa when navigating away
+      setDirectVilla(null);
+    }
+  }, [view, allVillas, villasLoading]);
 
   // Filter villas based on VIP status
   const VILLAS = isVip ? getAllVillas(allVillas) : getPublicVillas(allVillas);
@@ -243,13 +267,14 @@ const App: React.FC = () => {
   }, [view]);
   const t = translations[lang].home;
 
-  console.log('RENDER VILLAS:', allVillas);
+  console.log('RENDER VILLAS:', allVillas.length);
 
   const renderView = () => {
     if (view.startsWith('villa-')) {
       const villaId = view.replace('villa-', '');
-      // First check in filtered VILLAS, then in all villas
-      const villa = VILLAS.find(v => v.id === villaId) || allVillas.find(v => v.id === villaId);
+      // First check in filtered VILLAS, then in all villas, then in directly fetched villa
+      const villa = VILLAS.find(v => v.id === villaId) || allVillas.find(v => v.id === villaId) || directVilla;
+
       if (villa) {
         return (
           <VillaDetailPage
@@ -261,6 +286,16 @@ const App: React.FC = () => {
             onDatesChange={handleSearchDatesChange}
             isVip={isVip}
           />
+        );
+      } else if (villasLoading) {
+        // Still loading - show loading state
+        return (
+          <div className="pt-40 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
+            <div className="container mx-auto px-6 text-center">
+              <div className="w-12 h-12 border-2 border-luxury-gold/30 border-t-luxury-gold rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-white/60">Loading villa...</p>
+            </div>
+          </div>
         );
       } else {
         // Villa not found - show message

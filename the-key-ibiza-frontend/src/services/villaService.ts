@@ -1,53 +1,46 @@
 import { Villa, SeasonalPrice } from '../types';
 
-// Auto-detect environment
-const BACKEND_BASE = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-  ? 'http://localhost:5001'
-  : 'https://the-key-ibiza-backend.vercel.app';
-const BACKEND_URL = `${BACKEND_BASE}/villas`;
+// Backend URL - production only (Vercel)
+const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 
 // ---------- UTILIDADES ----------
-function parseCSV(csvText: string): any[] {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) return [];
-  const headers = lines[0].split(',').map(h => h.trim());
-  const rows = lines.slice(1).map(line => {
-    const values = line.split(',').map(v => v.trim());
-    const obj: any = {};
-    headers.forEach((h, i) => (obj[h] = values[i] || ''));
-    return obj;
-  });
-  return rows;
-}
-
-function parsePipeSeparated(value?: string): string[] {
+function parsePipeSeparated(value?: string | null): string[] {
   if (!value) return [];
   return value.split('|').map(s => s.trim()).filter(Boolean);
 }
 
-function parsePrice(priceStr?: string): number {
+function parsePrice(priceStr?: string | number | null): number {
   if (!priceStr) return 0;
-  return parseInt(priceStr.replace(/[€\s]/g, '')) || 0;
+  if (typeof priceStr === 'number') return priceStr;
+  return parseInt(priceStr.replace(/[€\s,]/g, '')) || 0;
 }
 
-function parseWeeklyRates(ratesStr?: string): SeasonalPrice[] {
+function parseWeeklyRates(ratesStr?: string | null): SeasonalPrice[] {
   if (!ratesStr) return [];
   return parsePipeSeparated(ratesStr)
     .map(r => {
-      const match = r.match(/(\d{2}-\d{2})\s*to\s*(\d{2}-\d{2}):\s*€([\d\s]+)/);
+      // Match patterns like "01-01 to 03-31: €15000" or "01-01 - 03-31: 15000"
+      const match = r.match(/(\d{2}-\d{2})\s*(?:to|-)\s*(\d{2}-\d{2}):\s*€?([\d\s,]+)/);
       if (match) {
-        return { month: `${match[1]} - ${match[2]}`, price: match[3].replace(/\s/g, '') };
+        return { month: `${match[1]} - ${match[2]}`, price: match[3].replace(/[\s,]/g, '') };
       }
       return { month: r, price: '' };
     })
     .filter(r => r.price);
 }
 
-// ---------- MAPEO ----------
-function csvRowToVilla(row: any): Villa {
+// ---------- MAPEO API RESPONSE -> VILLA ----------
+function apiRowToVilla(row: any): Villa {
   const minPrice = parsePrice(row.price_min_week);
   const maxPrice = parsePrice(row.price_max_week) || minPrice;
   const headerImagesArray = parsePipeSeparated(row.header_images);
+  const galleryImagesArray = parsePipeSeparated(row.gallery_images);
+  const amenitiesArray = parsePipeSeparated(row.amenities);
+
+  // Parse description - split by double newlines for paragraphs
+  const descriptionParagraphs = row.description
+    ? row.description.split(/\n\n+/).filter(Boolean)
+    : [];
 
   return {
     id: row.slug || '',
@@ -64,44 +57,61 @@ function csvRowToVilla(row: any): Villa {
     headerImages: headerImagesArray,
     category: 'Modern',
     listingType: 'holiday',
-    fullDescription: row.description ? row.description.split('\n\n').filter(Boolean) : [],
-    features: parsePipeSeparated(row.amenities),
+    fullDescription: descriptionParagraphs,
+    features: amenitiesArray,
     seasonalPrices: parseWeeklyRates(row.weekly_rates),
     locationMapUrl:
       row.location_lat && row.location_lng
         ? `https://www.google.com/maps?q=${row.location_lat},${row.location_lng}&z=15`
         : undefined,
-    gallery: parsePipeSeparated(row.gallery_images),
-    amenities: parsePipeSeparated(row.amenities),
-    availability: undefined,
+    latitude: row.location_lat ? parseFloat(row.location_lat) : undefined,
+    longitude: row.location_lng ? parseFloat(row.location_lng) : undefined,
+    gallery: galleryImagesArray,
+    amenities: amenitiesArray,
+    availability: row.availability || undefined,
     isPrivate: row.visibility?.toLowerCase() === 'private',
+    visibility: row.visibility?.toLowerCase() === 'private' ? 'private' : 'public',
+    // Additional fields
+    minStay: row.min_stay || '7 nights',
+    checkIn: row.check_in || '16:00',
+    checkOut: row.check_out || '10:00',
+    arrivalPolicy: row.arrival_policy || 'Flexible',
+    reservationDeposit: row.reservation_deposit || '50%',
+    securityDeposit: row.security_deposit || '€5,000',
+    ecotax: row.ecotax || 'Included',
+    servicesIncluded: row.services_included || 'Cleaning, Concierge',
+    finalCleaning: row.final_cleaning || 'Included',
+    conciergeNote: row.concierge_note || undefined,
+    icalUrl: row.ical_url || undefined,
   };
 }
 
-// ---------- FETCH VILLAS ----------
+// ---------- FETCH ALL VILLAS FROM BACKEND ----------
 export async function fetchVillas(): Promise<Villa[]> {
   try {
     // Include VIP token if available to see private villas
     const token = localStorage.getItem('vip_token');
-    const headers: HeadersInit = {};
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const res = await fetch(BACKEND_URL, { headers });
-    if (!res.ok) throw new Error(`Failed to fetch villas: ${res.status}`);
+    const res = await fetch(`${BACKEND_URL}/villas`, { headers });
+
+    if (!res.ok) {
+      console.error('❌ Backend error:', res.status);
+      return [];
+    }
 
     const json = await res.json();
 
-    // 🛡️ parseo robusto
-    const villas: Villa[] = Array.isArray(json.data)
-      ? json.data
-      : Array.isArray(json)
-      ? json
-      : [];
+    // Parse response - handle both array and { data: [] } formats
+    const rawVillas = Array.isArray(json) ? json : (json.data || []);
+    const villas = rawVillas.map(apiRowToVilla);
 
-    console.log('VILLAS FETCHED:', villas);
-
+    console.log('✅ VILLAS FETCHED FROM BACKEND:', villas.length);
     return villas;
   } catch (e) {
     console.error('❌ Error fetching villas:', e);
@@ -109,9 +119,40 @@ export async function fetchVillas(): Promise<Villa[]> {
   }
 }
 
+// ---------- FETCH SINGLE VILLA BY SLUG ----------
+export async function fetchVillaBySlug(slug: string): Promise<Villa | null> {
+  try {
+    const token = localStorage.getItem('vip_token');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BACKEND_URL}/villas/${slug}`, { headers });
+
+    if (!res.ok) {
+      console.error('❌ Backend error fetching villa:', res.status);
+      return null;
+    }
+
+    const data = await res.json();
+
+    if (!data) return null;
+
+    const villa = apiRowToVilla(data);
+    console.log('✅ VILLA FETCHED FROM BACKEND:', villa.name);
+    return villa;
+  } catch (e) {
+    console.error('❌ Error fetching villa:', e);
+    return null;
+  }
+}
+
 // ---------- FILTROS ----------
 export function getPublicVillas(villas: Villa[]): Villa[] {
-  return villas;
+  return villas.filter(v => !v.isPrivate);
 }
 
 export function getAllVillas(villas: Villa[]): Villa[] {

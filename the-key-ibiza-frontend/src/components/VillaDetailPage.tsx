@@ -24,7 +24,7 @@ interface VillaDetailPageProps {
  * To refine descriptive texts (improve wording without changing meaning):
  * 1. Export current texts for review
  * 2. Review and refine wording for elegance while preserving intent
- * 3. Update the villa data in SQLite database
+ * 3. Update the villa data in Supabase database
  * 4. Texts will automatically render through renderFormattedText() below
  *
  * This approach keeps content management separate from code changes.
