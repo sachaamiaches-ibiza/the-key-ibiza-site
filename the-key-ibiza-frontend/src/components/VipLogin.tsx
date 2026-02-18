@@ -7,9 +7,10 @@ interface VipLoginProps {
   onAuthChange?: (isVip: boolean) => void;
 }
 
-// PRODUCCIÓN: 'https://the-key-ibiza-backend.vercel.app'
-// LOCAL TEST: 'http://localhost:5001'
-const BACKEND_URL = 'http://localhost:5001';
+// Auto-detect environment
+const BACKEND_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5001'
+  : 'https://the-key-ibiza-backend.vercel.app';
 
 const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
   const [isVip, setIsVip] = useState(false);

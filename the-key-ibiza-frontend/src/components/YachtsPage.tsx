@@ -21,8 +21,10 @@ interface Yacht {
   description: string;
 }
 
-// Backend URL
-const BACKEND_URL = 'http://localhost:5001';
+// Auto-detect environment
+const BACKEND_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5001'
+  : 'https://the-key-ibiza-backend.vercel.app';
 
 const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
   const [yachtsData, setYachtsData] = useState<Yacht[]>([]);

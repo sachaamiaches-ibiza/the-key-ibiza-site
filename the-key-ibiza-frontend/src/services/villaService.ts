@@ -1,8 +1,10 @@
 import { Villa, SeasonalPrice } from '../types';
 
-// PRODUCCIÓN: 'https://the-key-ibiza-backend.vercel.app/villas'
-// LOCAL TEST: 'http://localhost:5001/villas'
-const BACKEND_URL = 'http://localhost:5001/villas';
+// Auto-detect environment
+const BACKEND_BASE = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  ? 'http://localhost:5001'
+  : 'https://the-key-ibiza-backend.vercel.app';
+const BACKEND_URL = `${BACKEND_BASE}/villas`;
 
 // ---------- UTILIDADES ----------
 function parseCSV(csvText: string): any[] {
