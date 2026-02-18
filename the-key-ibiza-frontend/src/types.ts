@@ -48,7 +48,7 @@ export interface LocationOption {
 }
 
 // ============================================
-// VILLA TYPE (flat structure matching CSV)
+// VILLA TYPE (flat structure matching backend)
 // ============================================
 
 export interface SeasonalPrice {

@@ -1,6 +1,8 @@
 import { Villa, SeasonalPrice } from '../types';
 
-const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app/villas';
+// PRODUCCIÓN: 'https://the-key-ibiza-backend.vercel.app/villas'
+// LOCAL TEST: 'http://localhost:5001/villas'
+const BACKEND_URL = 'http://localhost:5001/villas';
 
 // ---------- UTILIDADES ----------
 function parseCSV(csvText: string): any[] {
@@ -77,7 +79,14 @@ function csvRowToVilla(row: any): Villa {
 // ---------- FETCH VILLAS ----------
 export async function fetchVillas(): Promise<Villa[]> {
   try {
-    const res = await fetch(BACKEND_URL);
+    // Include VIP token if available to see private villas
+    const token = localStorage.getItem('vip_token');
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(BACKEND_URL, { headers });
     if (!res.ok) throw new Error(`Failed to fetch villas: ${res.status}`);
 
     const json = await res.json();

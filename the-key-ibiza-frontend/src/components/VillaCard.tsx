@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Villa, Language } from '../types';
 import { translations } from '../translations';
 import { IconBed, IconBath, IconGuests } from './ServiceIcons';
@@ -17,6 +17,19 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
   const t = translations[lang].villa;
   const btnText = lang === 'en' ? 'Discover Property' : (lang === 'es' ? 'Descubrir Propiedad' : 'Découvrir la Propriété');
 
+  const images = villa.headerImages && villa.headerImages.length > 0 ? villa.headerImages : [villa.imageUrl];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <div
       className="group relative flex flex-col h-full luxury-card rounded-[24px] md:rounded-[40px] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:shadow-luxury-gold/10 hover:-translate-y-2 cursor-pointer border border-white/5"
@@ -25,11 +38,33 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
       {/* Photo Section */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <WatermarkedImage
-          src={villa.imageUrl}
+          src={images[currentImageIndex]}
           alt={villa.name}
           className="w-full h-full object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+        {/* Navigation Arrows */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={goToPrev}
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/80 hover:bg-black/60 hover:text-white transition-all z-10"
+            >
+              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={goToNext}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/80 hover:bg-black/60 hover:text-white transition-all z-10"
+            >
+              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
 
         {/* Badge */}
         <div className="absolute top-4 right-4 md:top-6 md:right-6 px-3 md:px-4 py-1 md:py-1.5 bg-luxury-blue/60 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center">

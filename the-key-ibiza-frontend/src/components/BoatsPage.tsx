@@ -15,6 +15,7 @@ const boatCategories = [
     subtitle: 'Luxury Yachts',
     description: 'Experience the Mediterranean in unparalleled style aboard our exclusive selection of luxury yachts. From intimate day charters to week-long adventures, our fleet offers the ultimate in privacy, comfort, and sophistication. Each vessel comes with experienced crew, ensuring an impeccable journey through the crystal waters of Ibiza and Formentera.',
     image: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
+    view: 'boats-yachts',
   },
   {
     id: 'catamarans',
@@ -22,6 +23,7 @@ const boatCategories = [
     subtitle: 'Premium Catamarans',
     description: 'Discover the freedom of sailing with our premium catamaran collection. Perfect for groups and families, these spacious vessels offer stability, comfort, and elegance. Enjoy panoramic views from multiple decks, swim in secluded coves, and create unforgettable memories as you explore the Balearic coastline in absolute luxury.',
     image: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&q=80&w=1200',
+    view: 'boats-catamarans',
   },
 ];
 
@@ -74,10 +76,10 @@ const BoatsPage: React.FC<BoatsPageProps> = ({ onNavigate, lang }) => {
                   {category.description}
                 </p>
                 <button
-                  onClick={() => onNavigate('contact')}
+                  onClick={() => onNavigate(category.view)}
                   className="px-8 py-3 rounded-full bg-luxury-gold text-luxury-blue border border-luxury-gold text-[10px] uppercase tracking-[0.3em] font-medium hover:bg-luxury-blue hover:text-luxury-gold transition-all duration-500"
                 >
-                  Inquire Now
+                  Explore Collection
                 </button>
               </div>
             </div>

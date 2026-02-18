@@ -17,6 +17,8 @@ import FooterSEO from './components/FooterSEO';
 import VipLogin from './components/VipLogin';
 import ComingSoon from './components/ComingSoon';
 import BoatsPage from './components/BoatsPage';
+import YachtsPage from './components/YachtsPage';
+import CatamaransPage from './components/CatamaransPage';
 import VillasPage from './components/VillasPage';
 import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
 import { getServices } from './constants';
@@ -178,7 +180,7 @@ const App: React.FC = () => {
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
 
-  // Villa data from CSV
+  // Villa data from backend (SQLite)
   const [allVillas, setAllVillas] = useState<Villa[]>([]);
   const [isVip, setIsVip] = useState(vipAuth.isAuthenticated());
   const [villasLoading, setVillasLoading] = useState(true);
@@ -193,7 +195,7 @@ const App: React.FC = () => {
     setSearchCheckOut(checkOut);
   };
 
-  // Fetch villas from Google Sheets CSV
+  // Fetch villas from backend
   useEffect(() => {
     const loadVillas = async () => {
       setVillasLoading(true);
@@ -282,9 +284,11 @@ const App: React.FC = () => {
         return <ComingSoon title="Long Term Rentals" onNavigate={setView} lang={lang} />;
       case 'villas-sale':
         return <ComingSoon title="Properties for Sale" onNavigate={setView} lang={lang} />;
-      case 'service-yacht':
       case 'boats-yachts':
+        return <YachtsPage onNavigate={setView} lang={lang} />;
       case 'boats-catamarans':
+        return <CatamaransPage onNavigate={setView} lang={lang} />;
+      case 'service-yacht':
         return <BoatsPage onNavigate={setView} lang={lang} />;
       case 'service-villas': return <VillasPage onNavigate={setView} lang={lang} />;
       default:

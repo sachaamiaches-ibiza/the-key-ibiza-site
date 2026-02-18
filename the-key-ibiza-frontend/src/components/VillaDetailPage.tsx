@@ -22,15 +22,30 @@ interface VillaDetailPageProps {
 /**
  * TEXT REFINEMENT WORKFLOW:
  * To refine descriptive texts (improve wording without changing meaning):
- * 1. Export current texts to a Google Doc or similar collaborative tool
+ * 1. Export current texts for review
  * 2. Review and refine wording for elegance while preserving intent
- * 3. Update the villa data in the data source (e.g., Google Sheets, CMS, or constants.tsx)
+ * 3. Update the villa data in SQLite database
  * 4. Texts will automatically render through renderFormattedText() below
  *
  * This approach keeps content management separate from code changes.
  */
 
-// Helper function to render text with formatting from Google Docs
+// Helper function to format date range "01-01 to 03-31" -> "1 Jan - 31 Mar"
+const formatDateRange = (dateStr: string): string => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  // Match patterns like "01-01 to 03-31" or "01-01 - 03-31"
+  const match = dateStr.match(/(\d{2})-(\d{2})\s*(?:to|-)\s*(\d{2})-(\d{2})/);
+  if (match) {
+    const [, startMonth, startDay, endMonth, endDay] = match;
+    const startMonthName = months[parseInt(startMonth) - 1] || startMonth;
+    const endMonthName = months[parseInt(endMonth) - 1] || endMonth;
+    return `${parseInt(startDay)} ${startMonthName} - ${parseInt(endDay)} ${endMonthName}`;
+  }
+  return dateStr;
+};
+
+// Helper function to render text with formatting (bold, bullets, paragraphs)
 const renderFormattedText = (text: string) => {
   const paragraphs = text.split('\n').filter(p => p.trim());
 
@@ -686,7 +701,6 @@ const handlePdfPasswordSubmit = async () => {
   };
 
   // Date Picker Component (reusable for mobile/desktop positioning)
-  // NOTE: Text content can be refined via Google Docs workflow - export texts, refine wording externally, then update translations.ts
   const DatePickerSection = ({ compact = false }: { compact?: boolean }) => (
     <div
       className={`${compact ? 'p-5 max-w-sm mx-auto' : 'p-6 lg:p-8'} rounded-[20px] md:rounded-[24px] border border-white/8 shadow-xl w-full`}
@@ -901,14 +915,6 @@ const handlePdfPasswordSubmit = async () => {
           </div>
         )}
 
-        {/* Image Counter */}
-        {slideshowImages.length > 1 && (
-          <div className="absolute top-6 right-6 md:top-8 md:right-8 z-10 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm">
-            <span className="text-white/80 text-xs md:text-sm tracking-wider font-medium">
-              {currentSlide + 1} / {slideshowImages.length}
-            </span>
-          </div>
-        )}
       </div>
 
       <div className="container mx-auto px-6 lg:px-16 xl:px-24 pb-8 md:pb-16">
@@ -943,6 +949,12 @@ const handlePdfPasswordSubmit = async () => {
                 {renderFormattedText(p)}
               </div>
             ))}
+            {/* Minimum stay note - only for private villas */}
+            {villa.isPrivate && (
+              <p className="mt-10 text-white/40 text-sm font-light italic">
+                The villa is available for minimum 31 days rentals, for more information please contact us.
+              </p>
+            )}
           </div>
 
           {/* Date Picker - 2 columns (Desktop only) */}
@@ -955,7 +967,7 @@ const handlePdfPasswordSubmit = async () => {
         <div className="py-10 md:py-12">
           <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide text-center">Amenities</h3>
           <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
-            {villa.features?.map((f, i) => (
+            {(villa.amenities || villa.features)?.map((f, i) => (
               <span
                 key={i}
                 className="px-4 md:px-6 py-2.5 md:py-3.5 rounded-full text-white/60 text-xs md:text-sm font-light transition-colors hover:text-white/80"
@@ -975,11 +987,11 @@ const handlePdfPasswordSubmit = async () => {
           >
             <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide">Weekly Rates</h3>
             {villa.seasonalPrices && (
-              <div className="space-y-0">
-                {villa.seasonalPrices.map((sp, i) => (
-                  <div key={i} className="flex justify-between items-center py-3 md:py-4 border-b border-white/5 last:border-0">
-                    <span className="text-white/55 font-light text-sm md:text-base">{sp.month}</span>
-                    <span className="text-luxury-gold font-medium tracking-wide text-sm md:text-base">{sp.price}</span>
+              <div>
+                {villa.seasonalPrices.map((sp, i, arr) => (
+                  <div key={i} className={`flex justify-between items-center py-2.5 md:py-3 ${i < arr.length - 1 ? 'border-b border-white/10' : ''}`}>
+                    <span className="text-white/40 text-xs md:text-sm">{formatDateRange(sp.month)}</span>
+                    <span className="text-white/80 text-xs md:text-sm text-right">€{Number(sp.price).toLocaleString()}</span>
                   </div>
                 ))}
               </div>

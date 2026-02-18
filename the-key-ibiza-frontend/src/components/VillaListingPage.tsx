@@ -70,6 +70,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
     selectedAmenities: [] as string[]
   });
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'size-asc' | 'size-desc'>('price-asc');
 
   // Close filters dropdown when clicking outside
   useEffect(() => {
@@ -130,7 +131,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
   const allAmenities = useMemo(() => {
     const amenitiesSet = new Set<string>();
     villasOfType.forEach(villa => {
-      villa.features?.forEach((feature: string) => amenitiesSet.add(feature));
+      (villa.amenities || villa.features)?.forEach((feature: string) => amenitiesSet.add(feature));
     });
     return Array.from(amenitiesSet).sort();
   }, [villasOfType]);
@@ -165,7 +166,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
       // Amenities filter
       const matchAmenities = searchFilters.selectedAmenities.length === 0 ||
         searchFilters.selectedAmenities.every(amenity =>
-          v.features?.some((f: string) => f.toLowerCase() === amenity.toLowerCase())
+          (v.amenities || v.features)?.some((f: string) => f.toLowerCase() === amenity.toLowerCase())
         );
 
       // Availability check will be implemented with calendar integration
@@ -174,18 +175,29 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
       return matchBeds && matchLoc && matchPrice && matchSearch && matchAmenities && matchAvailability;
     });
 
-    // Sort by calculated price when dates are selected
-    if (searchFilters.checkIn && searchFilters.checkOut) {
-      filtered.sort((a, b) => {
-        const priceA = calculatePriceForPeriod(a, searchFilters.checkIn, searchFilters.checkOut) || 0;
-        const priceB = calculatePriceForPeriod(b, searchFilters.checkIn, searchFilters.checkOut) || 0;
-        return priceA - priceB;
-      });
+    // Sort based on selected option
+    if (sortBy === 'price-asc' || sortBy === 'price-desc') {
+      if (searchFilters.checkIn && searchFilters.checkOut) {
+        filtered.sort((a, b) => {
+          const priceA = calculatePriceForPeriod(a, searchFilters.checkIn, searchFilters.checkOut) || 0;
+          const priceB = calculatePriceForPeriod(b, searchFilters.checkIn, searchFilters.checkOut) || 0;
+          return sortBy === 'price-asc' ? priceA - priceB : priceB - priceA;
+        });
+      } else {
+        filtered.sort((a, b) => {
+          const diff = (a.numericPrice || 0) - (b.numericPrice || 0);
+          return sortBy === 'price-asc' ? diff : -diff;
+        });
+      }
+    } else if (sortBy === 'size-asc') {
+      filtered.sort((a, b) => (a.bedrooms || 0) - (b.bedrooms || 0));
+    } else if (sortBy === 'size-desc') {
+      filtered.sort((a, b) => (b.bedrooms || 0) - (a.bedrooms || 0));
     }
 
     console.log('FILTERED VILLAS:', filtered.length, filtered);
     return filtered;
-  }, [searchFilters, villasOfType]);
+  }, [searchFilters, villasOfType, sortBy]);
 
   const toggleAmenity = (amenity: string) => {
     setSearchFilters(prev => ({
@@ -355,12 +367,23 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   )}
                 </div>
 
-                {/* Villa count - left aligned */}
+                {/* Sort dropdown */}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'price-asc' | 'price-desc' | 'size-asc' | 'size-desc')}
+                  className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-white text-[9px] focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                >
+                  <option value="price-asc" className="bg-luxury-blue">Price ↑</option>
+                  <option value="price-desc" className="bg-luxury-blue">Price ↓</option>
+                  <option value="size-asc" className="bg-luxury-blue">Size ↑</option>
+                  <option value="size-desc" className="bg-luxury-blue">Size ↓</option>
+                </select>
+
+                {/* Villa count */}
                 <span className="text-[10px] text-white/40">
                   <span className="text-luxury-gold font-medium">{filteredVillas.length}</span>
                   <span className="mx-1">/</span>
                   <span>{villasOfType.length}</span>
-                  <span className="ml-1">villas</span>
                 </span>
               </div>
 
@@ -515,6 +538,18 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                       </div>
                     )}
                   </div>
+
+                  {/* Sort dropdown */}
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'price-asc' | 'price-desc' | 'size-asc' | 'size-desc')}
+                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                  >
+                    <option value="price-asc" className="bg-luxury-blue">Price: Low to High</option>
+                    <option value="price-desc" className="bg-luxury-blue">Price: High to Low</option>
+                    <option value="size-asc" className="bg-luxury-blue">Size: Small to Large</option>
+                    <option value="size-desc" className="bg-luxury-blue">Size: Large to Small</option>
+                  </select>
 
                   {/* Villa count */}
                   <span className="text-xs text-white/40">
