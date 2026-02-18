@@ -248,18 +248,37 @@ const App: React.FC = () => {
   const renderView = () => {
     if (view.startsWith('villa-')) {
       const villaId = view.replace('villa-', '');
-      const villa = VILLAS.find(v => v.id === villaId);
-      if (villa) return (
-        <VillaDetailPage
-          villa={villa}
-          onNavigate={setView}
-          lang={lang}
-          initialCheckIn={searchCheckIn}
-          initialCheckOut={searchCheckOut}
-          onDatesChange={handleSearchDatesChange}
-          isVip={isVip}
-        />
-      );
+      // First check in filtered VILLAS, then in all villas
+      const villa = VILLAS.find(v => v.id === villaId) || allVillas.find(v => v.id === villaId);
+      if (villa) {
+        return (
+          <VillaDetailPage
+            villa={villa}
+            onNavigate={setView}
+            lang={lang}
+            initialCheckIn={searchCheckIn}
+            initialCheckOut={searchCheckOut}
+            onDatesChange={handleSearchDatesChange}
+            isVip={isVip}
+          />
+        );
+      } else {
+        // Villa not found - show message
+        return (
+          <div className="pt-40 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
+            <div className="container mx-auto px-6 text-center">
+              <h1 className="text-4xl font-serif text-white mb-4">Villa Not Found</h1>
+              <p className="text-white/60 mb-8">The villa you're looking for is not available.</p>
+              <button
+                onClick={() => setView('villas-holiday')}
+                className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-sm uppercase tracking-wider hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all"
+              >
+                View All Villas
+              </button>
+            </div>
+          </div>
+        );
+      }
     }
 
     switch (view) {
@@ -278,6 +297,7 @@ const App: React.FC = () => {
             initialCheckIn={searchCheckIn}
             initialCheckOut={searchCheckOut}
             onDatesChange={handleSearchDatesChange}
+            villas={VILLAS}
           />
         );
       case 'villas-longterm':

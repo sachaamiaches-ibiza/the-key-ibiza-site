@@ -13,6 +13,7 @@ interface VillaListingPageProps {
   initialCheckIn?: string;
   initialCheckOut?: string;
   onDatesChange?: (checkIn: string, checkOut: string) => void;
+  villas?: Villa[];
 }
 
 // Calculate price for a specific period based on seasonal prices
@@ -51,8 +52,8 @@ const calculatePriceForPeriod = (villa: Villa, checkIn: string, checkOut: string
   return Math.round(total);
 };
 
-const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange }) => {
-  const [villas, setVillas] = useState<Villa[]>([]);
+const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, villas: propVillas }) => {
+  const [villas, setVillas] = useState<Villa[]>(propVillas || []);
   const checkOutRef = useRef<HTMLInputElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
   const filtersRefDesktop = useRef<HTMLDivElement>(null);
@@ -93,16 +94,21 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
     };
   }, [isFiltersOpen]);
 
-  // Fetch villas from backend
+  // Use prop villas if provided, otherwise fetch from backend
   useEffect(() => {
-    fetchVillas()
-      .then(data => {
-        const publicVillas = getPublicVillas(data);
-        setVillas(publicVillas);
-        console.log('VILLAS IN LISTING PAGE:', publicVillas);
-      })
-      .catch(err => console.error('Error fetching villas:', err));
-  }, []);
+    if (propVillas && propVillas.length > 0) {
+      setVillas(propVillas);
+      console.log('VILLAS FROM PROPS:', propVillas);
+    } else {
+      fetchVillas()
+        .then(data => {
+          const publicVillas = getPublicVillas(data);
+          setVillas(publicVillas);
+          console.log('VILLAS FETCHED:', publicVillas);
+        })
+        .catch(err => console.error('Error fetching villas:', err));
+    }
+  }, [propVillas]);
 
   // Sync dates to parent when they change
   useEffect(() => {
