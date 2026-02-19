@@ -37,13 +37,34 @@ function parseArrayField(value: any): string[] {
   return [];
 }
 
+// ---------- HELPER: Format date like "01-01" to "01 Jan" ----------
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function formatDateRange(period: string): string {
+  // Handle format "MM-DD_MM-DD" like "01-01_03-31"
+  const parts = period.split('_');
+  if (parts.length === 2) {
+    const [start, end] = parts;
+    const [startMonth, startDay] = start.split('-').map(Number);
+    const [endMonth, endDay] = end.split('-').map(Number);
+
+    if (startMonth >= 1 && startMonth <= 12 && endMonth >= 1 && endMonth <= 12) {
+      const startFormatted = `${String(startDay).padStart(2, '0')} ${MONTH_NAMES[startMonth - 1]}`;
+      const endFormatted = `${String(endDay).padStart(2, '0')} ${MONTH_NAMES[endMonth - 1]}`;
+      return `${startFormatted} - ${endFormatted}`;
+    }
+  }
+  // Fallback to original format
+  return period.replace(/_/g, ' - ');
+}
+
 // ---------- HELPER: Parse weekly rates from JSON object or string ----------
 function parseWeeklyRatesField(value: any): SeasonalPrice[] {
   if (!value) return [];
   // If it's a JSON object like {"01-01_03-31": 4800, ...}
   if (typeof value === 'object' && !Array.isArray(value)) {
     return Object.entries(value).map(([period, price]) => ({
-      month: period.replace(/_/g, ' to ').replace(/-/g, '/'),
+      month: formatDateRange(period),
       price: String(price)
     }));
   }
