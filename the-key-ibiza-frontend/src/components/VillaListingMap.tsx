@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Villa, Language } from '../types';
+import { vipAuth } from '../services/vipAuth';
 
 // Custom gold marker icon
 const goldIcon = L.divIcon({
@@ -26,6 +27,13 @@ interface VillaListingMapProps {
 
 const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, lang }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Check if user is admin for zoom permissions
+  const isAdmin = vipAuth.isAdmin();
+
+  // Zoom limits: Admin can zoom fully, others limited to area view only
+  const maxZoom = isAdmin ? 18 : 13;
+  const minZoom = 10;
 
   // Ibiza center coordinates
   const ibizaCenter: [number, number] = [38.9067, 1.4206];
@@ -79,6 +87,8 @@ const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, l
         <MapContainer
           center={ibizaCenter}
           zoom={11}
+          minZoom={minZoom}
+          maxZoom={maxZoom}
           style={{ height: '100%', width: '100%' }}
           scrollWheelZoom={true}
           zoomControl={true}
