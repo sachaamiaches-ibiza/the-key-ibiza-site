@@ -1,6 +1,7 @@
-import React from 'react';
-import { Language } from '../types';
+import React, { useState, useEffect } from 'react';
+import { Language, Villa } from '../types';
 import FooterSEO from './FooterSEO';
+import { fetchVillas } from '../services/villaService';
 
 interface VillasPageProps {
   onNavigate: (view: string) => void;
@@ -8,6 +9,25 @@ interface VillasPageProps {
 }
 
 const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
+  const [villaImages, setVillaImages] = useState<string[]>([]);
+
+  // Fetch villas to get real images
+  useEffect(() => {
+    fetchVillas().then(villas => {
+      // Get images from different villas for variety
+      const images: string[] = [];
+      for (let i = 0; i < Math.min(3, villas.length); i++) {
+        const villa = villas[i * 10] || villas[i]; // Spread out selection for variety
+        if (villa?.imageUrl) {
+          images.push(villa.imageUrl);
+        }
+      }
+      if (images.length >= 3) {
+        setVillaImages(images);
+      }
+    });
+  }, []);
+
   const sections = [
     {
       id: 'holiday',
@@ -18,7 +38,7 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
         : lang === 'fr'
         ? 'Découvrez notre collection exclusive de villas de luxe à louer pour les vacances à Ibiza. Chaque propriété a été soigneusement sélectionnée pour offrir une expérience unique, alliant emplacements privilégiés, design architectural exceptionnel et services de conciergerie personnalisés.'
         : 'Discover our exclusive collection of luxury villas for holiday rental in Ibiza. Each property has been carefully selected to offer a unique experience, combining privileged locations, exceptional architectural design, and personalized concierge services.',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1600',
+      image: villaImages[0] || '',
       buttonText: lang === 'es' ? 'Explorar Alquileres' : lang === 'fr' ? 'Explorer les Locations' : 'Explore Rentals',
       view: 'villas-holiday'
     },
@@ -31,7 +51,7 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
         : lang === 'fr'
         ? 'Pour ceux qui souhaitent s\'installer sur l\'île pendant de longues périodes, nous proposons une sélection de résidences longue durée. Des propriétés exceptionnelles qui allient le confort d\'une maison aux services d\'un hôtel cinq étoiles.'
         : 'For those seeking to settle on the island for extended periods, we offer a selection of long-stay residences. Exceptional properties that combine the comfort of a home with five-star hotel services.',
-      image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=1600',
+      image: villaImages[1] || '',
       buttonText: lang === 'es' ? 'Ver Residencias' : lang === 'fr' ? 'Voir les Résidences' : 'View Residences',
       view: 'villas-longterm'
     },
@@ -44,7 +64,7 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
         : lang === 'fr'
         ? 'Accédez aux propriétés les plus exclusives du marché immobilier d\'Ibiza. Notre portefeuille comprend des villas au design contemporain, des fincas traditionnelles restaurées et des propriétés hors marché pour les investisseurs exigeants.'
         : 'Access the most exclusive properties in the Ibiza real estate market. Our portfolio includes contemporary design villas, restored traditional fincas, and off-market properties for discerning investors seeking unique opportunities.',
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1600',
+      image: villaImages[2] || '',
       buttonText: lang === 'es' ? 'Ver Propiedades' : lang === 'fr' ? 'Voir les Propriétés' : 'View Properties',
       view: 'villas-sale'
     }
@@ -88,11 +108,17 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
           >
             {/* Image Side */}
             <div className="w-full lg:w-[45%] h-[280px] md:h-[350px] lg:h-[400px] relative overflow-hidden group rounded-2xl lg:rounded-3xl">
-              <img
-                src={section.image}
-                alt={section.title}
-                className="w-full h-full object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110"
-              />
+              {section.image ? (
+                <img
+                  src={section.image}
+                  alt={section.title}
+                  className="w-full h-full object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110"
+                />
+              ) : (
+                <div className="w-full h-full bg-luxury-slate/30 animate-pulse flex items-center justify-center">
+                  <div className="w-16 h-16 border-2 border-luxury-gold/30 rounded-full"></div>
+                </div>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/40 via-transparent to-transparent rounded-2xl lg:rounded-3xl"></div>
             </div>
 
