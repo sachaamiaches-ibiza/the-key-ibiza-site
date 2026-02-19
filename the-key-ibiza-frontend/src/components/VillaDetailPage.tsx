@@ -1695,6 +1695,31 @@ const handlePdfPasswordSubmit = async () => {
                   setFeedbackStatus('submitting');
 
                   try {
+                    // Upload images to Cloudinary first (if any)
+                    const imageUrls: string[] = [];
+
+                    if (feedbackForm.images.length > 0) {
+                      const CLOUDINARY_CLOUD_NAME = 'drxf80sho';
+                      const CLOUDINARY_UPLOAD_PRESET = 'the-key-feedback';
+
+                      for (const file of feedbackForm.images) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                        const cloudinaryRes = await fetch(
+                          `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+                          { method: 'POST', body: formData }
+                        );
+
+                        if (cloudinaryRes.ok) {
+                          const cloudinaryData = await cloudinaryRes.json();
+                          imageUrls.push(cloudinaryData.secure_url);
+                        }
+                      }
+                    }
+
+                    // Submit feedback with image URLs
                     const response = await fetch('https://the-key-ibiza-backend.vercel.app/feedback', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
@@ -1704,7 +1729,7 @@ const handlePdfPasswordSubmit = async () => {
                         villaName: feedbackForm.villaName,
                         rating: feedbackForm.rating,
                         message: feedbackForm.message,
-                        images: [] // Image upload would need Cloudinary integration
+                        images: imageUrls
                       })
                     });
 
