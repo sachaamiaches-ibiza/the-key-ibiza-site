@@ -62,8 +62,27 @@ const saveUsers = (users: VipUser[]): void => {
   localStorage.setItem(VIP_USERS_KEY, JSON.stringify(users));
 };
 
-// Get current session
+// Get current session - check both localStorage and sessionStorage
 const getSession = (): VipSession | null => {
+  // First check for JWT token (new backend system)
+  const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+  const userStr = localStorage.getItem('vip_user') || sessionStorage.getItem('vip_user');
+
+  if (token && userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      return {
+        userId: user.id,
+        email: user.email,
+        role: user.role || 'user',
+        name: user.name || 'VIP Guest',
+      };
+    } catch {
+      // Fall through to old system
+    }
+  }
+
+  // Fallback to old session system
   const stored = localStorage.getItem(VIP_SESSION_KEY);
   if (!stored) return null;
   try {
@@ -97,9 +116,14 @@ export const vipAuth = {
     return false;
   },
 
-  // Logout
+  // Logout - clear both storages
   logout: (): void => {
     localStorage.removeItem(VIP_SESSION_KEY);
+    localStorage.removeItem('vip_token');
+    localStorage.removeItem('vip_user');
+    localStorage.removeItem('vip_remember');
+    sessionStorage.removeItem('vip_token');
+    sessionStorage.removeItem('vip_user');
   },
 
   // Check if authenticated
@@ -109,6 +133,16 @@ export const vipAuth = {
 
   // Check if current user is admin
   isAdmin: (): boolean => {
+    // Check JWT user first
+    const userStr = localStorage.getItem('vip_user') || sessionStorage.getItem('vip_user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        return user.role === 'admin';
+      } catch {
+        // Fall through
+      }
+    }
     const session = getSession();
     return session?.role === 'admin';
   },

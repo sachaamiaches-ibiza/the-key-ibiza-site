@@ -23,6 +23,7 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
   const [userName, setUserName] = useState('');
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   useEffect(() => {
     // Check authentication status on mount only
@@ -54,9 +55,15 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Store token and user info
-        localStorage.setItem('vip_token', data.token);
-        localStorage.setItem('vip_user', JSON.stringify(data.user));
+        // Store token and user info based on rememberMe preference
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem('vip_token', data.token);
+        storage.setItem('vip_user', JSON.stringify(data.user));
+        if (rememberMe) {
+          localStorage.setItem('vip_remember', 'true');
+        } else {
+          localStorage.removeItem('vip_remember');
+        }
         setIsVip(true);
         setIsAdmin(data.user?.role === 'admin');
         setUserName(data.user?.name || 'VIP Guest');
@@ -183,14 +190,26 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
                 )}
               </button>
             </div>
-            <div className="mb-3"></div>
+            <div className="flex items-center justify-center mt-4 mb-3">
+              <label className="flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/30 bg-transparent text-luxury-gold focus:ring-luxury-gold focus:ring-offset-0 cursor-pointer"
+                />
+                <span className="ml-2 text-white/50 text-[11px] tracking-wide group-hover:text-white/70 transition-colors">
+                  Keep me signed in
+                </span>
+              </label>
+            </div>
             {error && (
               <p className="text-red-400 text-xs mb-3 tracking-wide">{error}</p>
             )}
             <button
               type="button"
               onClick={() => setShowForgotPassword(true)}
-              className="text-white/40 text-[10px] mb-5 block mx-auto hover:text-luxury-gold transition-colors tracking-wide"
+              className="text-white/40 text-[10px] mb-4 block mx-auto hover:text-luxury-gold transition-colors tracking-wide"
             >
               Forgotten password?
             </button>
