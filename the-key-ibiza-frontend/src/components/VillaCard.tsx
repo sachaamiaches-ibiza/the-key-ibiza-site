@@ -78,7 +78,6 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
         <div>
           <div className="flex justify-between items-start mb-4 md:mb-6">
             <div>
-              <span className="text-luxury-gold text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold block mb-1">{villa.location}</span>
               <h3 className="text-xl md:text-2xl lg:text-3xl font-serif text-white group-hover:text-luxury-gold transition-colors duration-500 mb-2 md:mb-3">{villa.name}</h3>
               {/* Added Descriptive Phrase */}
               <p className="text-white/60 text-xs md:text-sm font-serif italic leading-relaxed group-hover:text-white/80 transition-colors line-clamp-2">
