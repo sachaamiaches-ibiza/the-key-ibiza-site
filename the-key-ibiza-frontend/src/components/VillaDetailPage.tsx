@@ -69,6 +69,9 @@ const renderFormattedText = (text: string) => {
 
 const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, isVip = false }) => {
   const t = translations[lang].villa;
+
+  // Detect if villa is from Invenio (external source)
+  const isInvenioVilla = villa.id?.startsWith('invenio-');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -815,8 +818,8 @@ const handlePdfPasswordSubmit = async () => {
         />
       )}
 
-      {/* VIP PDF Download Button */}
-      {isVip && (
+      {/* VIP PDF Download Button - Hidden for Invenio villas */}
+      {isVip && !isInvenioVilla && (
         <div className="mt-6 pt-5 border-t border-white/8">
           <div className="relative" ref={pdfDropdownRef}>
             <button
@@ -941,12 +944,15 @@ const handlePdfPasswordSubmit = async () => {
               <p className="text-white/40 text-sm md:text-base mt-2 font-light">{villa.location}</p>
             )}
           </div>
-          <div className="text-left md:text-right">
-            <span className="text-lg md:text-2xl font-serif text-luxury-gold whitespace-nowrap">
-              {minPrice.toLocaleString()}€ - {maxPrice.toLocaleString()}€
-            </span>
-            <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.25em] mt-1 font-light">per week</p>
-          </div>
+          {/* Hide price range for Invenio villas */}
+          {!isInvenioVilla && (
+            <div className="text-left md:text-right">
+              <span className="text-lg md:text-2xl font-serif text-luxury-gold whitespace-nowrap">
+                {minPrice.toLocaleString()}€ - {maxPrice.toLocaleString()}€
+              </span>
+              <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.25em] mt-1 font-light">per week</p>
+            </div>
+          )}
         </div>
 
         {/* ===== MOBILE: DATE PICKER (between header and description) ===== */}
@@ -1000,7 +1006,12 @@ const handlePdfPasswordSubmit = async () => {
             style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
           >
             <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide">Weekly Rates</h3>
-            {villa.seasonalPrices && (
+            {isInvenioVilla ? (
+              <div className="text-center py-8">
+                <span className="text-luxury-gold text-lg font-serif">Price on Request</span>
+                <p className="text-white/40 text-xs mt-2">Contact us for pricing details</p>
+              </div>
+            ) : villa.seasonalPrices && (
               <div>
                 {villa.seasonalPrices.map((sp, i, arr) => (
                   <div key={i} className={`flex justify-between items-center py-2.5 md:py-3 ${i < arr.length - 1 ? 'border-b border-white/10' : ''}`}>
@@ -1022,16 +1033,19 @@ const handlePdfPasswordSubmit = async () => {
                 ['Maximum guests', villa.maxGuests],
                 ['Bedrooms', villa.bedrooms],
                 ['Bathrooms', villa.bathrooms],
-                ['Minimum stay', villa.minStay || '7 nights'],
-                ['Check-in', villa.checkIn || '16:00'],
-                ['Check-out', villa.checkOut || '10:00'],
+                ['Minimum stay', typeof villa.minStay === 'number' ? `${villa.minStay} nights` : (villa.minStay || '7 nights')],
+                ['Check-in', villa.checkIn ? `From ${villa.checkIn}` : 'From 16:00'],
+                ['Check-out', villa.checkOut ? `Until ${villa.checkOut}` : 'Until 10:00'],
                 ['Arrival policy', villa.arrivalPolicy || 'Flexible'],
                 ['Reservation deposit', villa.reservationDeposit || '50%'],
                 ['Security deposit', villa.securityDeposit || '€5,000'],
                 ['Ecotax', villa.ecotax || 'Included'],
                 ['Final cleaning', villa.finalCleaning || 'Included'],
-                ['Services included', villa.servicesIncluded || 'Cleaning, Concierge'],
-              ].map(([label, value], i, arr) => (
+                // Hide Services included if it contains "concierge" (case insensitive)
+                ...(!String(villa.servicesIncluded || 'Cleaning, Concierge').toLowerCase().includes('concierge')
+                  ? [['Services included', villa.servicesIncluded || 'Cleaning']]
+                  : []),
+              ].filter(([_, value]) => value !== undefined && value !== null && value !== '').map(([label, value], i, arr) => (
                 <div key={i} className={`flex justify-between items-center py-2.5 md:py-3 ${i < arr.length - 1 ? 'border-b border-white/10' : ''}`}>
                   <span className="text-white/40 text-xs md:text-sm">{label}</span>
                   <span className="text-white/80 text-xs md:text-sm text-right">{value}</span>
