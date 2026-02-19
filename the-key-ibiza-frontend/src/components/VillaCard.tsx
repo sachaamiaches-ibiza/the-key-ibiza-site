@@ -68,7 +68,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
 
         {/* Badge */}
         <div className="absolute top-4 right-4 md:top-6 md:right-6 px-3 md:px-4 py-1 md:py-1.5 bg-luxury-blue/60 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center">
-          <span className="text-[7px] md:text-[8px] uppercase tracking-[0.2em] font-bold text-luxury-gold italic text-center">{villa.category || 'Luxury Villa'}</span>
+          <span className="text-[7px] md:text-[8px] uppercase tracking-[0.2em] font-bold text-luxury-gold italic text-center">{villa.district || villa.location || 'Ibiza'}</span>
         </div>
       </div>
 

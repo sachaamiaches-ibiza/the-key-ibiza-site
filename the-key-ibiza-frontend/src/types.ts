@@ -70,6 +70,7 @@ export interface Villa {
   imageUrl: string;
   headerImages?: string[];
   category?: 'Modern' | 'Traditional' | 'Cliffs' | 'Beachfront' | 'Luxury' | 'Countryside';
+  district?: string;
   listingType?: 'holiday' | 'longterm' | 'sale';
   fullDescription?: string[];
   features?: string[];

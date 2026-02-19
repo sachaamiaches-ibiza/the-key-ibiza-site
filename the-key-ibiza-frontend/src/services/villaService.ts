@@ -99,7 +99,7 @@ function apiRowToVilla(row: any): Villa {
     maxGuests: parseInt(row.max_persons) || 0,
     imageUrl: headerImagesArray[0] || '',
     headerImages: headerImagesArray,
-    category: 'Modern',
+    district: row.district || '',
     listingType: 'holiday',
     fullDescription: descriptionParagraphs,
     features: amenitiesArray,
