@@ -98,7 +98,7 @@ function apiRowToVilla(row: any): Villa {
     bedrooms: parseInt(row.bedrooms) || 0,
     bathrooms: parseInt(row.bathrooms) || 0,
     maxGuests: parseInt(row.max_persons) || 0,
-    imageUrl: thumbnailImagesArray[0] || headerImagesArray[0] || '', // Use thumbnail as primary image for faster loading
+    imageUrl: headerImagesArray[0] || '',
     headerImages: headerImagesArray,
     thumbnailImages: thumbnailImagesArray,
     district: row.district || '',

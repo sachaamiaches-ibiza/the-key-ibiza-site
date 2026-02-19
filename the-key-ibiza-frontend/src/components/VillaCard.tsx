@@ -17,11 +17,8 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
   const t = translations[lang].villa;
   const btnText = lang === 'en' ? 'Discover Property' : (lang === 'es' ? 'Descubrir Propiedad' : 'Découvrir la Propriété');
 
-  // Use thumbnails for faster loading on listing page (smaller images)
-  // Fall back to headerImages if thumbnails not available
-  const thumbnails = villa.thumbnailImages && villa.thumbnailImages.length > 0 ? villa.thumbnailImages : null;
-  const fullImages = villa.headerImages && villa.headerImages.length > 0 ? villa.headerImages : [villa.imageUrl];
-  const images = thumbnails || fullImages;
+  // Use full quality header images
+  const images = villa.headerImages && villa.headerImages.length > 0 ? villa.headerImages : [villa.imageUrl];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const goToPrev = (e: React.MouseEvent) => {

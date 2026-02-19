@@ -32,8 +32,14 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
   fullBleed = false,
 }) => {
   const [isVertical, setIsVertical] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    // Reset states when src changes
+    setIsLoaded(false);
+    setHasError(false);
+
     const img = new Image();
     img.onload = () => {
       setIsVertical(img.height > img.width);
@@ -68,7 +74,26 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
 
   return (
     <div className={wrapperClass}>
-      <img src={src} alt={alt} className={className} />
+      {/* Loading placeholder */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 bg-luxury-slate/50 animate-pulse flex items-center justify-center">
+          <WatermarkLogo
+            className="w-12 h-16 opacity-30"
+            style={{ color: 'rgba(212, 175, 55, 0.4)' }}
+          />
+        </div>
+      )}
+
+      <img
+        src={src}
+        alt={alt}
+        className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+        loading="lazy"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
+      />
+
+      {/* Watermark overlay */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-10"
         style={{ color: 'rgba(255, 255, 255, 0.6)' }}
