@@ -337,57 +337,64 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       const margin = 20;
       const contentWidth = pageWidth - (margin * 2);
 
-      // Helper to load image as base64 with CORS proxy fallback
-      const loadImage = (url: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          // Try loading with different methods
-          const tryLoad = (imgUrl: string, useProxy: boolean = false): Promise<string> => {
-            return new Promise((res, rej) => {
+      // Helper to load image as base64 using fetch with CORS proxy
+      const loadImage = async (url: string): Promise<string> => {
+        // List of CORS proxies to try
+        const corsProxies = [
+          (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+          (u: string) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+          (u: string) => `https://proxy.cors.sh/${u}`,
+        ];
+
+        // Try to fetch image via proxy and convert to base64
+        const fetchAsBase64 = async (fetchUrl: string): Promise<string> => {
+          const response = await fetch(fetchUrl);
+          if (!response.ok) throw new Error('Fetch failed');
+          const blob = await response.blob();
+
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64 = reader.result as string;
+              // Resize if needed using canvas
               const img = new Image();
-              img.crossOrigin = 'anonymous';
               img.onload = () => {
-                try {
-                  const canvas = document.createElement('canvas');
-                  // Limit size for performance (max 1200px width)
-                  const maxWidth = 1200;
-                  const scale = img.width > maxWidth ? maxWidth / img.width : 1;
-                  canvas.width = img.width * scale;
-                  canvas.height = img.height * scale;
-                  const ctx = canvas.getContext('2d');
-                  if (ctx) {
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    res(canvas.toDataURL('image/jpeg', 0.85));
-                  } else {
-                    rej('Canvas context not available');
-                  }
-                } catch (e) {
-                  rej('Canvas tainted by cross-origin data');
+                const canvas = document.createElement('canvas');
+                const maxWidth = 1000;
+                const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                  resolve(canvas.toDataURL('image/jpeg', 0.8));
+                } else {
+                  resolve(base64); // Return original if canvas fails
                 }
               };
-              img.onerror = () => rej('Failed to load image');
+              img.onerror = () => resolve(base64); // Return original if resize fails
+              img.src = base64;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        };
 
-              // Use CORS proxy if needed
-              if (useProxy) {
-                img.src = `https://corsproxy.io/?${encodeURIComponent(imgUrl)}`;
-              } else {
-                img.src = imgUrl;
-              }
-            });
-          };
+        // Try each proxy until one works
+        for (const proxyFn of corsProxies) {
+          try {
+            const proxyUrl = proxyFn(url);
+            console.log('Trying to load image via:', proxyUrl.substring(0, 50) + '...');
+            const result = await fetchAsBase64(proxyUrl);
+            console.log('Successfully loaded image');
+            return result;
+          } catch (e) {
+            console.log('Proxy failed, trying next...');
+            continue;
+          }
+        }
 
-          // First try direct load, then try with CORS proxy
-          tryLoad(url, false)
-            .then(resolve)
-            .catch(() => {
-              console.log('Direct load failed, trying CORS proxy for:', url);
-              tryLoad(url, true)
-                .then(resolve)
-                .catch(() => {
-                  console.log('CORS proxy also failed, skipping image:', url);
-                  reject('All loading methods failed');
-                });
-            });
-        });
+        throw new Error('All proxies failed for: ' + url);
       };
 
       // Create transparency graphics states - subtle watermarks
