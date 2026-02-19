@@ -29,13 +29,36 @@ function parseWeeklyRates(ratesStr?: string | null): SeasonalPrice[] {
     .filter(r => r.price);
 }
 
+// ---------- HELPER: Parse array from JSON or pipe-separated string ----------
+function parseArrayField(value: any): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') return parsePipeSeparated(value);
+  return [];
+}
+
+// ---------- HELPER: Parse weekly rates from JSON object or string ----------
+function parseWeeklyRatesField(value: any): SeasonalPrice[] {
+  if (!value) return [];
+  // If it's a JSON object like {"01-01_03-31": 4800, ...}
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    return Object.entries(value).map(([period, price]) => ({
+      month: period.replace(/_/g, ' to ').replace(/-/g, '/'),
+      price: String(price)
+    }));
+  }
+  // If it's a string, use the old parser
+  if (typeof value === 'string') return parseWeeklyRates(value);
+  return [];
+}
+
 // ---------- MAPEO API RESPONSE -> VILLA ----------
 function apiRowToVilla(row: any): Villa {
   const minPrice = parsePrice(row.price_min_week);
   const maxPrice = parsePrice(row.price_max_week) || minPrice;
-  const headerImagesArray = parsePipeSeparated(row.header_images);
-  const galleryImagesArray = parsePipeSeparated(row.gallery_images);
-  const amenitiesArray = parsePipeSeparated(row.amenities);
+  const headerImagesArray = parseArrayField(row.header_images);
+  const galleryImagesArray = parseArrayField(row.gallery_images);
+  const amenitiesArray = parseArrayField(row.amenities);
 
   // Parse description - split by double newlines for paragraphs
   const descriptionParagraphs = row.description
@@ -59,7 +82,7 @@ function apiRowToVilla(row: any): Villa {
     listingType: 'holiday',
     fullDescription: descriptionParagraphs,
     features: amenitiesArray,
-    seasonalPrices: parseWeeklyRates(row.weekly_rates),
+    seasonalPrices: parseWeeklyRatesField(row.weekly_rates),
     locationMapUrl:
       row.location_lat && row.location_lng
         ? `https://www.google.com/maps?q=${row.location_lat},${row.location_lng}&z=15`
@@ -69,8 +92,8 @@ function apiRowToVilla(row: any): Villa {
     gallery: galleryImagesArray,
     amenities: amenitiesArray,
     availability: row.availability || undefined,
-    isPrivate: row.visibility?.toLowerCase() === 'private',
-    visibility: row.visibility?.toLowerCase() === 'private' ? 'private' : 'public',
+    isPrivate: row.visibility === false,
+    visibility: row.visibility === false ? 'private' : 'public',
     // Additional fields
     minStay: row.min_stay || '7 nights',
     checkIn: row.check_in || '16:00',
