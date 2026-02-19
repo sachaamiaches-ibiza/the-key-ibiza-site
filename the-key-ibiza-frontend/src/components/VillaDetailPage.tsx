@@ -1013,28 +1013,26 @@ const handlePdfPasswordSubmit = async () => {
         </div>
 
         {/* ===== RATES + INFO ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 py-10 md:py-12">
-          <div
-            className="p-6 md:p-8 lg:p-10 rounded-[24px] md:rounded-[32px] border border-white/6"
-            style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
-          >
-            <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide">Weekly Rates</h3>
-            {isInvenioVilla ? (
-              <div className="text-center py-8">
-                <span className="text-luxury-gold text-lg font-serif">Price on Request</span>
-                <p className="text-white/40 text-xs mt-2">Contact us for pricing details</p>
-              </div>
-            ) : villa.seasonalPrices && (
-              <div>
-                {villa.seasonalPrices.map((sp, i, arr) => (
-                  <div key={i} className={`flex justify-between items-center py-2.5 md:py-3 ${i < arr.length - 1 ? 'border-b border-white/10' : ''}`}>
-                    <span className="text-white/40 text-xs md:text-sm">{formatDateRange(sp.month)}</span>
-                    <span className="text-white/80 text-xs md:text-sm text-right">€{Number(sp.price).toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className={`grid gap-6 md:gap-8 py-10 md:py-12 ${isInvenioVilla ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-1 lg:grid-cols-2'}`}>
+          {/* Weekly Rates - Hidden for Invenio villas */}
+          {!isInvenioVilla && (
+            <div
+              className="p-6 md:p-8 lg:p-10 rounded-[24px] md:rounded-[32px] border border-white/6"
+              style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
+            >
+              <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide">Weekly Rates</h3>
+              {villa.seasonalPrices && (
+                <div>
+                  {villa.seasonalPrices.map((sp, i, arr) => (
+                    <div key={i} className={`flex justify-between items-center py-2.5 md:py-3 ${i < arr.length - 1 ? 'border-b border-white/10' : ''}`}>
+                      <span className="text-white/40 text-xs md:text-sm">{formatDateRange(sp.month)}</span>
+                      <span className="text-white/80 text-xs md:text-sm text-right">€{Number(sp.price).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <div
             className="p-6 md:p-8 lg:p-10 rounded-[24px] md:rounded-[32px] border border-white/6"
