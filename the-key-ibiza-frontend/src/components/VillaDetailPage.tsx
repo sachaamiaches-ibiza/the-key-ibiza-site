@@ -337,25 +337,56 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       const margin = 20;
       const contentWidth = pageWidth - (margin * 2);
 
-      // Helper to load image as base64
+      // Helper to load image as base64 with CORS proxy fallback
       const loadImage = (url: string): Promise<string> => {
         return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(img, 0, 0);
-              resolve(canvas.toDataURL('image/jpeg', 0.8));
-            } else {
-              reject('Canvas context not available');
-            }
+          // Try loading with different methods
+          const tryLoad = (imgUrl: string, useProxy: boolean = false): Promise<string> => {
+            return new Promise((res, rej) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                try {
+                  const canvas = document.createElement('canvas');
+                  // Limit size for performance (max 1200px width)
+                  const maxWidth = 1200;
+                  const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+                  canvas.width = img.width * scale;
+                  canvas.height = img.height * scale;
+                  const ctx = canvas.getContext('2d');
+                  if (ctx) {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    res(canvas.toDataURL('image/jpeg', 0.85));
+                  } else {
+                    rej('Canvas context not available');
+                  }
+                } catch (e) {
+                  rej('Canvas tainted by cross-origin data');
+                }
+              };
+              img.onerror = () => rej('Failed to load image');
+
+              // Use CORS proxy if needed
+              if (useProxy) {
+                img.src = `https://corsproxy.io/?${encodeURIComponent(imgUrl)}`;
+              } else {
+                img.src = imgUrl;
+              }
+            });
           };
-          img.onerror = () => reject('Failed to load image');
-          img.src = url;
+
+          // First try direct load, then try with CORS proxy
+          tryLoad(url, false)
+            .then(resolve)
+            .catch(() => {
+              console.log('Direct load failed, trying CORS proxy for:', url);
+              tryLoad(url, true)
+                .then(resolve)
+                .catch(() => {
+                  console.log('CORS proxy also failed, skipping image:', url);
+                  reject('All loading methods failed');
+                });
+            });
         });
       };
 
@@ -818,8 +849,8 @@ const handlePdfPasswordSubmit = async () => {
         />
       )}
 
-      {/* VIP PDF Download Button - Hidden for Invenio villas */}
-      {isVip && !isInvenioVilla && (
+      {/* VIP PDF Download Button */}
+      {isVip && (
         <div className="mt-6 pt-5 border-t border-white/8">
           <div className="relative" ref={pdfDropdownRef}>
             <button
