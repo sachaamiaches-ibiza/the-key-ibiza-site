@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import VillaCard from './VillaCard';
 import FooterSEO from './FooterSEO';
+import VillaListingMap from './VillaListingMap';
 import { Language, Villa } from '../types';
 import { useIsMobile } from './useIsMobile';
 import MobileDatePickerModal from './MobileDatePickerModal';
@@ -73,6 +74,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'size-asc' | 'size-desc'>('price-asc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showMap, setShowMap] = useState(false);
   const VILLAS_PER_PAGE = 21; // ~5 pages for 105 villas
 
   // Close filters dropdown when clicking outside
@@ -783,6 +785,35 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
               Clear all
             </button>
           </div>
+        )}
+
+        {/* View on Map Button */}
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={() => setShowMap(!showMap)}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold transition-all border cursor-pointer ${
+              showMap
+                ? 'bg-luxury-gold text-luxury-blue border-luxury-gold'
+                : 'bg-transparent text-luxury-gold border-luxury-gold/50 hover:border-luxury-gold hover:bg-luxury-gold/10'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+            {showMap
+              ? (lang === 'es' ? 'Ocultar Mapa' : lang === 'fr' ? 'Masquer la Carte' : 'Hide Map')
+              : (lang === 'es' ? 'Ver en el Mapa' : lang === 'fr' ? 'Voir sur la Carte' : 'View on Map')
+            }
+          </button>
+        </div>
+
+        {/* Map Section */}
+        {showMap && (
+          <VillaListingMap
+            villas={filteredVillas}
+            onNavigate={onNavigate}
+            lang={lang}
+          />
         )}
 
         {/* Pagination - Top */}
