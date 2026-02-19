@@ -454,25 +454,36 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         pdf.restoreGraphicsState();
       };
 
-      // Helper to draw subtle watermark on images
+      // Helper to draw subtle watermark on images - horizontal layout
       const drawImageWatermark = (x: number, y: number, width: number, height: number) => {
         if (!withWatermark) return;
 
         pdf.saveGraphicsState();
         pdf.setGState(gStateImg);
 
-        const centerX = x + width / 2;
         const centerY = y + height / 2;
+        const logoSize = 18;
+        const logoX = x + 15; // Logo on left side
 
-        // Draw key logo in gold - use false to NOT override opacity
-        drawKeyLogo(centerX, centerY - 10, 22, goldColor, false);
+        // Draw key logo in gold on the left
+        drawKeyLogo(logoX, centerY, logoSize, goldColor, false);
 
-        // Draw text in gold
-        pdf.setFontSize(10);
+        // Draw text to the right of the logo, stretched across
+        pdf.setFontSize(14);
         pdf.setTextColor(goldColor[0], goldColor[1], goldColor[2]);
+        pdf.setFont('helvetica', 'bold');
         const wmText = 'THE KEY IBIZA';
-        const textWidth = pdf.getTextWidth(wmText);
-        pdf.text(wmText, centerX - textWidth / 2, centerY + 20);
+        const textX = logoX + logoSize + 8; // Text starts after logo
+        pdf.text(wmText, textX, centerY + 2);
+
+        // Draw a subtle line across the rest of the image
+        pdf.setDrawColor(goldColor[0], goldColor[1], goldColor[2]);
+        pdf.setLineWidth(0.3);
+        const lineStartX = textX + pdf.getTextWidth(wmText) + 5;
+        const lineEndX = x + width - 15;
+        if (lineEndX > lineStartX) {
+          pdf.line(lineStartX, centerY, lineEndX, centerY);
+        }
 
         pdf.restoreGraphicsState();
       };
