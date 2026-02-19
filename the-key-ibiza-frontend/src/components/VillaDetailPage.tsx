@@ -1723,33 +1723,27 @@ const handlePdfPasswordSubmit = async () => {
                   {/* Golden Keys Rating */}
                   <div className="mb-5">
                     <label className="block text-white/60 text-xs uppercase tracking-wider mb-3">Rate Your Experience</label>
-                    <div className="flex justify-center gap-2">
+                    <div className="flex justify-center gap-3">
                       {[1, 2, 3, 4, 5].map((keyNum) => (
                         <button
                           key={keyNum}
                           type="button"
                           onClick={() => setFeedbackForm(prev => ({ ...prev, rating: keyNum }))}
-                          className={`p-1 transition-all duration-300 transform ${feedbackForm.rating >= keyNum ? 'scale-110' : 'opacity-30 hover:opacity-60 hover:scale-105'}`}
+                          className={`transition-all duration-300 transform ${feedbackForm.rating >= keyNum ? 'scale-110' : 'opacity-40 hover:opacity-70 hover:scale-105'}`}
                           title={keyNum === 1 ? 'Poor' : keyNum === 2 ? 'Fair' : keyNum === 3 ? 'Good' : keyNum === 4 ? 'Very Good' : 'Excellent'}
                         >
                           {/* Golden Key Icon */}
-                          <div className={`relative transition-all duration-300 ${feedbackForm.rating >= keyNum ? 'drop-shadow-[0_0_10px_rgba(196,164,97,0.6)]' : ''}`}>
+                          <div className={`transition-all duration-300 ${feedbackForm.rating >= keyNum ? 'drop-shadow-[0_0_8px_rgba(196,164,97,0.8)]' : ''}`}>
                             <svg
-                              className={`w-10 h-10 transition-colors duration-300 ${feedbackForm.rating >= keyNum ? 'text-luxury-gold' : 'text-white/30'}`}
-                              viewBox="0 0 32 32"
+                              className={`w-8 h-8 transition-colors duration-300 ${feedbackForm.rating >= keyNum ? 'text-luxury-gold' : 'text-white/40'}`}
+                              viewBox="0 0 24 24"
                               fill={feedbackForm.rating >= keyNum ? 'currentColor' : 'none'}
                               stroke="currentColor"
-                              strokeWidth={feedbackForm.rating >= keyNum ? '0' : '1.5'}
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
                             >
-                              {/* Key head (circle) */}
-                              <circle cx="22" cy="10" r="6" />
-                              {/* Key hole */}
-                              <circle cx="22" cy="10" r="2" fill={feedbackForm.rating >= keyNum ? '#0f1923' : 'none'} stroke={feedbackForm.rating >= keyNum ? 'none' : 'currentColor'} />
-                              {/* Key shaft */}
-                              <rect x="4" y="9" width="12" height="2" rx="0.5" />
-                              {/* Key teeth */}
-                              <rect x="6" y="11" width="2" height="4" rx="0.3" />
-                              <rect x="10" y="11" width="2" height="3" rx="0.3" />
+                              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
                             </svg>
                           </div>
                         </button>
