@@ -944,15 +944,28 @@ const handlePdfPasswordSubmit = async () => {
               <p className="text-white/40 text-sm md:text-base mt-2 font-light">{villa.location}</p>
             )}
           </div>
-          {/* Hide price range for Invenio villas */}
-          {!isInvenioVilla && (
-            <div className="text-left md:text-right">
-              <span className="text-lg md:text-2xl font-serif text-luxury-gold whitespace-nowrap">
-                {minPrice.toLocaleString()}€ - {maxPrice.toLocaleString()}€
-              </span>
-              <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.25em] mt-1 font-light">per week</p>
-            </div>
-          )}
+          {/* Show price range - for Invenio villas use priceRange if available, otherwise use calculated min/max */}
+          <div className="text-left md:text-right">
+            {isInvenioVilla ? (
+              villa.numericPrice && villa.numericPrice > 0 ? (
+                <>
+                  <span className="text-lg md:text-2xl font-serif text-luxury-gold whitespace-nowrap">
+                    {villa.priceRange || `From €${villa.numericPrice.toLocaleString()}`}
+                  </span>
+                  <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.25em] mt-1 font-light">per week</p>
+                </>
+              ) : (
+                <span className="text-lg md:text-2xl font-serif text-luxury-gold">Price on Request</span>
+              )
+            ) : (
+              <>
+                <span className="text-lg md:text-2xl font-serif text-luxury-gold whitespace-nowrap">
+                  {minPrice.toLocaleString()}€ - {maxPrice.toLocaleString()}€
+                </span>
+                <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.25em] mt-1 font-light">per week</p>
+              </>
+            )}
+          </div>
         </div>
 
         {/* ===== MOBILE: DATE PICKER (between header and description) ===== */}
