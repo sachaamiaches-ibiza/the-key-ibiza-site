@@ -190,6 +190,10 @@ const App: React.FC = () => {
   const [searchCheckIn, setSearchCheckIn] = useState<string>('');
   const [searchCheckOut, setSearchCheckOut] = useState<string>('');
 
+  // Legal modals
+  const [disclaimerModalOpen, setDisclaimerModalOpen] = useState(false);
+  const [imprintModalOpen, setImprintModalOpen] = useState(false);
+
   // Handler to update search dates from any component
   const handleSearchDatesChange = (checkIn: string, checkOut: string) => {
     setSearchCheckIn(checkIn);
@@ -641,15 +645,189 @@ const App: React.FC = () => {
         </div>
       </section>
       <footer className="py-12" style={{ backgroundColor: '#0B1C26' }}>
-        <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
-           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
-             &copy; {new Date().getFullYear()} THE KEY IBIZA
-           </p>
-           <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
-             Excellence & Discretion — All Rights Reserved
-           </p>
+        <div className="container mx-auto px-6 lg:px-12">
+          {/* Legal Links */}
+          <div className="flex justify-center gap-8 mb-8">
+            <button
+              onClick={() => setDisclaimerModalOpen(true)}
+              className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-luxury-gold transition-colors"
+            >
+              Disclaimer
+            </button>
+            <button
+              onClick={() => setImprintModalOpen(true)}
+              className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-luxury-gold transition-colors"
+            >
+              Imprint
+            </button>
+            <button
+              onClick={() => setDisclaimerModalOpen(true)}
+              className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-luxury-gold transition-colors"
+            >
+              Privacy Policy
+            </button>
+          </div>
+          {/* Copyright */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
+              &copy; {new Date().getFullYear()} THE KEY IBIZA
+            </p>
+            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
+              Excellence & Discretion — All Rights Reserved
+            </p>
+          </div>
         </div>
       </footer>
+
+      {/* ===== DISCLAIMER MODAL ===== */}
+      {disclaimerModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setDisclaimerModalOpen(false)}
+          />
+          <div
+            className="relative bg-gradient-to-b from-[#1a2634] to-[#0f1923] rounded-2xl p-6 md:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+            style={{ border: '1px solid rgba(196,164,97,0.2)' }}
+          >
+            <button
+              onClick={() => setDisclaimerModalOpen(false)}
+              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h2 className="text-2xl font-serif text-luxury-gold mb-6">Disclaimer & Privacy Policy</h2>
+
+            <div className="text-white/70 text-sm leading-relaxed space-y-4">
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">1. General Information</h3>
+              <p>
+                The content of this website is for general information purposes only. The Key Ibiza makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability of the information, products, services, or related graphics contained on the website.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">2. Privacy Policy</h3>
+              <p>
+                We are committed to protecting your privacy. Any personal information collected through this website will be used solely for the purpose of providing our services and will not be shared with third parties without your consent, except as required by law.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">3. Data Collection</h3>
+              <p>
+                We collect information you provide directly to us, such as when you fill out a contact form, request information about our services, or communicate with us. This may include your name, email address, phone number, and any other information you choose to provide.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">4. Cookies</h3>
+              <p>
+                This website uses cookies to enhance your browsing experience. By continuing to use this site, you consent to our use of cookies in accordance with our privacy policy.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">5. Your Rights</h3>
+              <p>
+                You have the right to access, correct, or delete your personal data. To exercise these rights, please contact us at hello@thekey-ibiza.com.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">6. Third-Party Links</h3>
+              <p>
+                This website may contain links to external sites. We are not responsible for the content or privacy practices of these sites.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">7. Contact</h3>
+              <p>
+                For any questions regarding this disclaimer or privacy policy, please contact us at:<br />
+                <span className="text-luxury-gold">hello@thekey-ibiza.com</span>
+              </p>
+            </div>
+
+            <button
+              onClick={() => setDisclaimerModalOpen(false)}
+              className="mt-8 w-full py-3 bg-luxury-gold text-luxury-blue rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-white transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ===== IMPRINT MODAL ===== */}
+      {imprintModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setImprintModalOpen(false)}
+          />
+          <div
+            className="relative bg-gradient-to-b from-[#1a2634] to-[#0f1923] rounded-2xl p-6 md:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+            style={{ border: '1px solid rgba(196,164,97,0.2)' }}
+          >
+            <button
+              onClick={() => setImprintModalOpen(false)}
+              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h2 className="text-2xl font-serif text-luxury-gold mb-6">Imprint</h2>
+
+            <div className="text-white/70 text-sm leading-relaxed space-y-4">
+              <h3 className="text-luxury-gold text-base font-semibold">Company Information</h3>
+              <p>
+                <strong className="text-white">The Key Ibiza</strong><br />
+                Luxury Concierge Services
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">Address</h3>
+              <p>
+                Ibiza, Balearic Islands<br />
+                Spain
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">Contact</h3>
+              <p>
+                Email: <span className="text-luxury-gold">hello@thekey-ibiza.com</span><br />
+                Website: <span className="text-luxury-gold">www.thekey-ibiza.com</span>
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">Responsible for Content</h3>
+              <p>
+                The Key Ibiza<br />
+                In accordance with § 55 Abs. 2 RStV
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">Dispute Resolution</h3>
+              <p>
+                The European Commission provides a platform for online dispute resolution (ODR):
+                <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-luxury-gold hover:underline ml-1">
+                  https://ec.europa.eu/consumers/odr
+                </a>
+              </p>
+              <p>
+                We are not willing or obliged to participate in dispute resolution proceedings before a consumer arbitration board.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">Liability for Content</h3>
+              <p>
+                As a service provider, we are responsible for our own content on these pages according to general laws. However, we are not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.
+              </p>
+
+              <h3 className="text-luxury-gold text-base font-semibold mt-4">Copyright</h3>
+              <p>
+                The content and works created by the site operators on these pages are subject to copyright law. Reproduction, editing, distribution, and any kind of exploitation outside the limits of copyright require the written consent of the respective author or creator.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setImprintModalOpen(false)}
+              className="mt-8 w-full py-3 bg-luxury-gold text-luxury-blue rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-white transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       <AIConcierge lang={lang} />
     </div>
   );
