@@ -1658,6 +1658,23 @@ const handlePdfPasswordSubmit = async () => {
                   Close
                 </button>
               </div>
+            ) : feedbackStatus === 'error' ? (
+              /* Error State */
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-serif text-white mb-3">Oops!</h3>
+                <p className="text-white/60 text-sm mb-6">Something went wrong. Please try again later.</p>
+                <button
+                  onClick={() => setFeedbackStatus('idle')}
+                  className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-white transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
             ) : (
               /* Form State */
               <>
@@ -1673,13 +1690,33 @@ const handlePdfPasswordSubmit = async () => {
                 </div>
 
                 {/* Form */}
-                <form onSubmit={(e) => {
+                <form onSubmit={async (e) => {
                   e.preventDefault();
                   setFeedbackStatus('submitting');
-                  // Simulate submission - in production, send to backend
-                  setTimeout(() => {
-                    setFeedbackStatus('success');
-                  }, 1500);
+
+                  try {
+                    const response = await fetch('https://the-key-ibiza-backend.vercel.app/feedback', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: feedbackForm.name,
+                        email: feedbackForm.email,
+                        villaName: feedbackForm.villaName,
+                        rating: feedbackForm.rating,
+                        message: feedbackForm.message,
+                        images: [] // Image upload would need Cloudinary integration
+                      })
+                    });
+
+                    if (response.ok) {
+                      setFeedbackStatus('success');
+                    } else {
+                      setFeedbackStatus('error');
+                    }
+                  } catch (error) {
+                    console.error('Error submitting feedback:', error);
+                    setFeedbackStatus('error');
+                  }
                 }}>
                   {/* Name */}
                   <div className="mb-4">
