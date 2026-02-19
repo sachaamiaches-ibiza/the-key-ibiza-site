@@ -32,26 +32,28 @@ const VillaMap: React.FC<VillaMapProps> = ({ latitude, longitude }) => {
   const villaPosition: [number, number] = [latitude, longitude];
 
   return (
-    <MapContainer
-      center={IBIZA_CENTER}
-      zoom={10}
-      minZoom={10}
-      maxZoom={10}
-      scrollWheelZoom={false}
-      dragging={false}
-      doubleClickZoom={false}
-      zoomControl={false}
-      attributionControl={false}
-      style={{ width: '100%', height: '300px', borderRadius: '12px' }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      />
-      <Marker position={villaPosition} icon={goldenPin}>
-        <Popup>Villa location</Popup>
-      </Marker>
-    </MapContainer>
+    <div style={{ position: 'relative', zIndex: 1 }}>
+      <MapContainer
+        center={IBIZA_CENTER}
+        zoom={10}
+        minZoom={10}
+        maxZoom={10}
+        scrollWheelZoom={false}
+        dragging={false}
+        doubleClickZoom={false}
+        zoomControl={false}
+        attributionControl={false}
+        style={{ width: '100%', height: '300px', borderRadius: '12px' }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        />
+        <Marker position={villaPosition} icon={goldenPin}>
+          <Popup>Villa location</Popup>
+        </Marker>
+      </MapContainer>
+    </div>
   );
 };
 
