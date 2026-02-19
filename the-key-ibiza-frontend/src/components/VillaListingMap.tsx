@@ -32,7 +32,7 @@ const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, l
   const isAdmin = vipAuth.isAdmin();
 
   // Zoom limits: Admin can zoom fully, others limited to area view only
-  const maxZoom = isAdmin ? 18 : 13;
+  const maxZoom = isAdmin ? 18 : 12;
   const minZoom = 10;
 
   // Ibiza center coordinates
