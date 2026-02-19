@@ -337,19 +337,20 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       const margin = 20;
       const contentWidth = pageWidth - (margin * 2);
 
-      // Helper to load image as base64 using fetch with CORS proxy
+      // Helper to load image as base64 using our backend proxy
       const loadImage = async (url: string): Promise<string> => {
-        // List of CORS proxies to try
-        const corsProxies = [
-          (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-          (u: string) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-          (u: string) => `https://proxy.cors.sh/${u}`,
-        ];
+        // Use our own backend proxy to avoid CORS issues
+        const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
+        const proxyUrl = `${BACKEND_URL}/image-proxy?url=${encodeURIComponent(url)}`;
 
-        // Try to fetch image via proxy and convert to base64
-        const fetchAsBase64 = async (fetchUrl: string): Promise<string> => {
-          const response = await fetch(fetchUrl);
-          if (!response.ok) throw new Error('Fetch failed');
+        try {
+          console.log('Loading image via backend proxy...');
+          const response = await fetch(proxyUrl);
+
+          if (!response.ok) {
+            throw new Error(`Proxy returned ${response.status}`);
+          }
+
           const blob = await response.blob();
 
           return new Promise((resolve, reject) => {
@@ -369,32 +370,19 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
                   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                   resolve(canvas.toDataURL('image/jpeg', 0.8));
                 } else {
-                  resolve(base64); // Return original if canvas fails
+                  resolve(base64);
                 }
               };
-              img.onerror = () => resolve(base64); // Return original if resize fails
+              img.onerror = () => resolve(base64);
               img.src = base64;
             };
             reader.onerror = reject;
             reader.readAsDataURL(blob);
           });
-        };
-
-        // Try each proxy until one works
-        for (const proxyFn of corsProxies) {
-          try {
-            const proxyUrl = proxyFn(url);
-            console.log('Trying to load image via:', proxyUrl.substring(0, 50) + '...');
-            const result = await fetchAsBase64(proxyUrl);
-            console.log('Successfully loaded image');
-            return result;
-          } catch (e) {
-            console.log('Proxy failed, trying next...');
-            continue;
-          }
+        } catch (error) {
+          console.error('Failed to load image:', url, error);
+          throw error;
         }
-
-        throw new Error('All proxies failed for: ' + url);
       };
 
       // Create transparency graphics states - subtle watermarks
