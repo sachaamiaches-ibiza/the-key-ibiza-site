@@ -69,6 +69,7 @@ export interface Villa {
   maxGuests: number;
   imageUrl: string;
   headerImages?: string[];
+  thumbnailImages?: string[]; // Thumbnails for fast loading on listing page
   category?: 'Modern' | 'Traditional' | 'Cliffs' | 'Beachfront' | 'Luxury' | 'Countryside';
   district?: string;
   listingType?: 'holiday' | 'longterm' | 'sale';

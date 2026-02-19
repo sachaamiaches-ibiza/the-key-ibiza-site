@@ -79,6 +79,7 @@ function apiRowToVilla(row: any): Villa {
   const maxPrice = parsePrice(row.price_max_week) || minPrice;
   const headerImagesArray = parseArrayField(row.header_images);
   const galleryImagesArray = parseArrayField(row.gallery_images);
+  const thumbnailImagesArray = parseArrayField(row.thumbnail_images);
   const amenitiesArray = parseArrayField(row.amenities);
 
   // Parse description - split by double newlines for paragraphs
@@ -97,8 +98,9 @@ function apiRowToVilla(row: any): Villa {
     bedrooms: parseInt(row.bedrooms) || 0,
     bathrooms: parseInt(row.bathrooms) || 0,
     maxGuests: parseInt(row.max_persons) || 0,
-    imageUrl: headerImagesArray[0] || '',
+    imageUrl: thumbnailImagesArray[0] || headerImagesArray[0] || '', // Use thumbnail as primary image for faster loading
     headerImages: headerImagesArray,
+    thumbnailImages: thumbnailImagesArray,
     district: row.district || '',
     listingType: 'holiday',
     fullDescription: descriptionParagraphs,
