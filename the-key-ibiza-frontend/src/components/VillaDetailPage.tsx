@@ -8,6 +8,7 @@ import { useIsMobile } from './useIsMobile';
 import MobileDatePickerModal from './MobileDatePickerModal';
 import WatermarkedImage from './WatermarkedImage';
 import jsPDF from 'jspdf';
+import { getHeaderImageUrl, getGalleryImageUrl, getThumbnailUrl } from '../utils/cloudinaryUrl';
 
 interface VillaDetailPageProps {
   villa: Villa;
@@ -127,11 +128,15 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   const touchStartX = useRef(0);
 
   // Use headerImages for the slideshow, fallback to main imageUrl
+  // Apply Cloudinary optimization for faster loading
   const slideshowImages = (villa.headerImages && villa.headerImages.length > 0
     ? villa.headerImages
-    : [villa.imageUrl]).filter(img => img && img.trim().length > 0);
+    : [villa.imageUrl])
+    .filter(img => img && img.trim().length > 0)
+    .map(img => getHeaderImageUrl(img));
 
-  const allGalleryImages = villa.gallery || [];
+  // Apply Cloudinary optimization to gallery images
+  const allGalleryImages = (villa.gallery || []).map(img => getGalleryImageUrl(img));
   const occupiedDates = villa.occupiedDates || [];
 
   const reviews = [

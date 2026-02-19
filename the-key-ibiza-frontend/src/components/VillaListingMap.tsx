@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Villa, Language } from '../types';
 import { vipAuth } from '../services/vipAuth';
+import { getThumbnailUrl } from '../utils/cloudinaryUrl';
 
 // Custom gold marker icon
 const goldIcon = L.divIcon({
@@ -110,7 +111,7 @@ const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, l
                   {villa.imageUrl && (
                     <div style={{ position: 'relative', height: '100px', overflow: 'hidden' }}>
                       <img
-                        src={villa.imageUrl}
+                        src={getThumbnailUrl(villa.imageUrl)}
                         alt={villa.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />

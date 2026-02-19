@@ -4,6 +4,7 @@ import { Villa, Language } from '../types';
 import { translations } from '../translations';
 import { IconBed, IconBath, IconGuests } from './ServiceIcons';
 import WatermarkedImage from './WatermarkedImage';
+import { getCardImageUrl } from '../utils/cloudinaryUrl';
 
 interface VillaCardProps {
   villa: Villa;
@@ -39,7 +40,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
       {/* Photo Section */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <WatermarkedImage
-          src={images[currentImageIndex]}
+          src={getCardImageUrl(images[currentImageIndex])}
           alt={villa.name}
           className="w-full h-full object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110"
         />

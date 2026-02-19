@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Language, Villa } from '../types';
 import FooterSEO from './FooterSEO';
 import { fetchVillas } from '../services/villaService';
+import { getHeaderImageUrl } from '../utils/cloudinaryUrl';
 
 interface VillasPageProps {
   onNavigate: (view: string) => void;
@@ -11,7 +12,7 @@ interface VillasPageProps {
 const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
   const [villaImages, setVillaImages] = useState<string[]>([]);
 
-  // Fetch villas to get real images
+  // Fetch villas to get real images with Cloudinary optimization
   useEffect(() => {
     fetchVillas().then(villas => {
       // Get images from different villas for variety
@@ -19,7 +20,7 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
       for (let i = 0; i < Math.min(3, villas.length); i++) {
         const villa = villas[i * 10] || villas[i]; // Spread out selection for variety
         if (villa?.imageUrl) {
-          images.push(villa.imageUrl);
+          images.push(getHeaderImageUrl(villa.imageUrl));
         }
       }
       if (images.length >= 3) {
