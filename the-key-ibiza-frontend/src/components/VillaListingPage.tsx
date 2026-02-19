@@ -72,6 +72,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
   });
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'size-asc' | 'size-desc'>('price-asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const VILLAS_PER_PAGE = 21; // ~5 pages for 105 villas
 
   // Close filters dropdown when clicking outside
   useEffect(() => {
@@ -204,6 +206,82 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
     console.log('FILTERED VILLAS:', filtered.length, filtered);
     return filtered;
   }, [searchFilters, villasOfType, sortBy]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchFilters, sortBy]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredVillas.length / VILLAS_PER_PAGE);
+  const paginatedVillas = useMemo(() => {
+    const startIndex = (currentPage - 1) * VILLAS_PER_PAGE;
+    return filteredVillas.slice(startIndex, startIndex + VILLAS_PER_PAGE);
+  }, [filteredVillas, currentPage, VILLAS_PER_PAGE]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Pagination component
+  const Pagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center justify-center gap-2 py-6">
+        {/* Previous button */}
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`flex items-center justify-center w-10 h-10 rounded-full border transition-all cursor-pointer ${
+            currentPage === 1
+              ? 'border-white/10 text-white/20 cursor-not-allowed'
+              : 'border-white/20 text-white/60 hover:border-luxury-gold hover:text-luxury-gold'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        {/* Page numbers */}
+        {pages.map(page => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`flex items-center justify-center w-10 h-10 rounded-full border transition-all cursor-pointer ${
+              page === currentPage
+                ? 'bg-luxury-gold border-luxury-gold text-luxury-blue font-bold'
+                : 'border-white/20 text-white/60 hover:border-luxury-gold hover:text-luxury-gold'
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {/* Next button */}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`flex items-center justify-center w-10 h-10 rounded-full border transition-all cursor-pointer ${
+            currentPage === totalPages
+              ? 'border-white/10 text-white/20 cursor-not-allowed'
+              : 'border-white/20 text-white/60 hover:border-luxury-gold hover:text-luxury-gold'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    );
+  };
 
   const toggleAmenity = (amenity: string) => {
     setSearchFilters(prev => ({
@@ -707,8 +785,11 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
           </div>
         )}
 
+        {/* Pagination - Top */}
+        <Pagination />
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 animate-fade-in">
-          {filteredVillas.map(villa => (
+          {paginatedVillas.map(villa => (
             <VillaCard
               key={villa.id}
               villa={villa}
@@ -719,6 +800,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
             />
           ))}
         </div>
+
+        {/* Pagination - Bottom */}
+        <Pagination />
 
         {filteredVillas.length === 0 && (
           <div className="py-48 text-center space-y-10 animate-fade-in">
