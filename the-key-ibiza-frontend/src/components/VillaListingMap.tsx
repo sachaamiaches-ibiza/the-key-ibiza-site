@@ -87,7 +87,7 @@ const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, l
       <div className={`${mapHeight} transition-all duration-500`}>
         <MapContainer
           center={ibizaCenter}
-          zoom={11}
+          zoom={10}
           minZoom={minZoom}
           maxZoom={maxZoom}
           style={{ height: '100%', width: '100%' }}
