@@ -843,7 +843,11 @@ const handlePdfPasswordSubmit = async () => {
           </div>
           <div className="flex justify-between items-center mb-4">
             <span className="text-white text-sm font-medium">Total</span>
-            <span className="text-lg font-serif text-luxury-gold">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
+            {isInvenioVilla ? (
+              <span className="text-lg font-serif text-luxury-gold">Price on Request</span>
+            ) : (
+              <span className="text-lg font-serif text-luxury-gold">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
+            )}
           </div>
           <button
             onClick={() => setBookingModalOpen(true)}
@@ -1556,7 +1560,11 @@ const handlePdfPasswordSubmit = async () => {
                   {calculatePriceBreakdown() && (
                     <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
                       <span className="text-white/60 text-sm">Estimated Total</span>
-                      <span className="text-luxury-gold font-serif text-lg">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
+                      {isInvenioVilla ? (
+                        <span className="text-luxury-gold font-serif text-lg">Price on Request</span>
+                      ) : (
+                        <span className="text-luxury-gold font-serif text-lg">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
+                      )}
                     </div>
                   )}
                 </div>
