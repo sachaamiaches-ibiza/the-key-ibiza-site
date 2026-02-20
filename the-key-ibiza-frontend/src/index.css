@@ -103,6 +103,17 @@ textarea:-webkit-autofill {
 }
 
 /* ============================================
+   SCROLLBAR HIDE - for thumbnail strips
+   ============================================ */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================
    GALLERY OPEN - Hide navbar
    ============================================ */
 body.gallery-open > div > nav,
