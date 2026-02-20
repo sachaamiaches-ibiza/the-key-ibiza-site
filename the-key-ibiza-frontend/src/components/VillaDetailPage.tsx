@@ -1151,8 +1151,8 @@ const handlePdfPasswordSubmit = async () => {
         {galleryOpen && (
           <div
             ref={galleryRef}
-            className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
-            style={{ backgroundColor: 'rgba(11,28,38,0.98)', touchAction: 'none' }}
+            className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
+            style={{ backgroundColor: 'rgba(11,28,38,0.98)', touchAction: 'none', zIndex: 999999 }}
             onTouchStart={handleGalleryTouchStart}
             onTouchEnd={handleGalleryTouchEnd}
           >
