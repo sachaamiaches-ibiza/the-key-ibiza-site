@@ -719,7 +719,7 @@ const App: React.FC = () => {
             </button>
           </div>
           {/* Copyright */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.4em] text-white/30">
               &copy; {new Date().getFullYear()} THE KEY IBIZA
             </p>
