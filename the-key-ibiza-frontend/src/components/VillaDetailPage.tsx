@@ -118,6 +118,10 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   const calendarRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const checkOutInputRef = useRef<HTMLInputElement>(null);
+  const thumbnailStripRef = useRef<HTMLDivElement>(null);
+  const isDraggingThumbnails = useRef(false);
+  const thumbnailStartX = useRef(0);
+  const thumbnailScrollLeft = useRef(0);
 
   // Sync dates to parent when they change
   useEffect(() => {
@@ -1201,50 +1205,44 @@ const handlePdfPasswordSubmit = async () => {
 
             {/* Thumbnail strip - scrollable with drag */}
             <div
-              className="absolute bottom-3 md:bottom-6 left-0 right-0 overflow-x-scroll scrollbar-hide"
+              ref={thumbnailStripRef}
+              className="absolute bottom-3 md:bottom-6 left-4 right-4 flex gap-2 md:gap-3 overflow-x-auto cursor-grab active:cursor-grabbing scrollbar-hide"
               style={{
                 WebkitOverflowScrolling: 'touch',
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none'
               }}
+              onMouseDown={(e) => {
+                isDraggingThumbnails.current = true;
+                thumbnailStartX.current = e.pageX - (thumbnailStripRef.current?.offsetLeft || 0);
+                thumbnailScrollLeft.current = thumbnailStripRef.current?.scrollLeft || 0;
+                if (thumbnailStripRef.current) thumbnailStripRef.current.style.cursor = 'grabbing';
+              }}
+              onMouseMove={(e) => {
+                if (!isDraggingThumbnails.current || !thumbnailStripRef.current) return;
+                e.preventDefault();
+                const x = e.pageX - (thumbnailStripRef.current.offsetLeft || 0);
+                const walk = (x - thumbnailStartX.current) * 1.5;
+                thumbnailStripRef.current.scrollLeft = thumbnailScrollLeft.current - walk;
+              }}
+              onMouseUp={() => {
+                isDraggingThumbnails.current = false;
+                if (thumbnailStripRef.current) thumbnailStripRef.current.style.cursor = 'grab';
+              }}
+              onMouseLeave={() => {
+                isDraggingThumbnails.current = false;
+                if (thumbnailStripRef.current) thumbnailStripRef.current.style.cursor = 'grab';
+              }}
             >
-              <div
-                className="flex gap-2 md:gap-3 px-4 w-max mx-auto"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  const container = e.currentTarget.parentElement;
-                  if (!container) return;
-                  let isDown = true;
-                  let startX = e.pageX;
-                  let scrollStart = container.scrollLeft;
-
-                  const onMove = (ev: MouseEvent) => {
-                    if (!isDown) return;
-                    ev.preventDefault();
-                    const diff = ev.pageX - startX;
-                    container.scrollLeft = scrollStart - diff;
-                  };
-
-                  const onUp = () => {
-                    isDown = false;
-                    window.removeEventListener('mousemove', onMove);
-                    window.removeEventListener('mouseup', onUp);
-                  };
-
-                  window.addEventListener('mousemove', onMove);
-                  window.addEventListener('mouseup', onUp);
-                }}
-              >
-                {allGalleryImages.map((img, i) => (
-                  <div
-                    key={i}
-                    onClick={() => setGalleryIndex(i)}
-                    className={`flex-shrink-0 w-14 h-10 md:w-20 md:h-14 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${galleryIndex === i ? 'border-luxury-gold scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
-                  >
-                    <img src={img} className="w-full h-full object-cover pointer-events-none" alt="" draggable={false} />
-                  </div>
-                ))}
-              </div>
+              {allGalleryImages.map((img, i) => (
+                <div
+                  key={i}
+                  onClick={() => !isDraggingThumbnails.current && setGalleryIndex(i)}
+                  className={`flex-shrink-0 w-14 h-10 md:w-20 md:h-14 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${galleryIndex === i ? 'border-luxury-gold scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                >
+                  <img src={img} className="w-full h-full object-cover pointer-events-none select-none" alt="" draggable={false} />
+                </div>
+              ))}
             </div>
           </div>
         )}
