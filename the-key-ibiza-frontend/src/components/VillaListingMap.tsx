@@ -36,8 +36,8 @@ const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, l
   const maxZoom = isAdmin ? 18 : 12;
   const minZoom = 10;
 
-  // Ibiza center coordinates
-  const ibizaCenter: [number, number] = [38.9067, 1.4206];
+  // Ibiza center coordinates (centered on Ibiza, excluding Formentera)
+  const ibizaCenter: [number, number] = [38.98, 1.41];
 
   // Filter villas that have coordinates
   const villasWithCoords = villas.filter(v => v.latitude && v.longitude);
