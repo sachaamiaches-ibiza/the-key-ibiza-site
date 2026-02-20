@@ -59,6 +59,20 @@ Implementar validación de estancia mínima con soporte para temporadas flexible
 
 ---
 
+### 4. Galería de Miniaturas Arrastrable
+**Complejidad:** Media | **Tiempo estimado:** 30-45 min
+
+**Descripción:**
+En la galería de fotos de las villas, la tira de miniaturas de abajo no se puede arrastrar para ver más imágenes. Implementar scroll horizontal interactivo.
+
+**Tareas:**
+- [ ] Implementar drag-to-scroll funcional con el ratón
+- [ ] Asegurar que funcione swipe en móvil/tablet
+- [ ] Evitar conflictos entre arrastre y click para seleccionar imagen
+- [ ] Ubicación: `VillaDetailPage.tsx`, sección gallery modal
+
+---
+
 ## Notas
 - Última actualización: 19 Feb 2026
 - Orden de prioridad: Admin Panel → Estancia Mínima → Filtros

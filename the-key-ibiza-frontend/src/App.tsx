@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import VillaCard from './components/VillaCard';
@@ -179,6 +179,9 @@ const App: React.FC = () => {
   });
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
+  const [mobileVillaIndex, setMobileVillaIndex] = useState(0);
+  const mobileVillaRef = useRef<HTMLDivElement>(null);
+  const mobileVillaTouchStart = useRef(0);
 
   // Villa data from Backend API
   const [allVillas, setAllVillas] = useState<Villa[]>([]);
@@ -498,8 +501,55 @@ const App: React.FC = () => {
                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-4 text-white">{t.signatureResidences}</h2>
                   <p className="text-white/40 text-sm md:text-base font-light tracking-wide">{t.residencesDesc}</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 lg:gap-14">
+
+                {/* Desktop: Grid layout */}
+                <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 lg:gap-14">
                   {VILLAS.slice(0, 3).map(villa => <VillaCard key={villa.id} villa={villa} onNavigate={setView} lang={lang} />)}
+                </div>
+
+                {/* Mobile: Swipeable carousel */}
+                <div className="md:hidden">
+                  <div
+                    ref={mobileVillaRef}
+                    className="overflow-hidden"
+                    onTouchStart={(e) => {
+                      mobileVillaTouchStart.current = e.touches[0].clientX;
+                    }}
+                    onTouchEnd={(e) => {
+                      const touchEnd = e.changedTouches[0].clientX;
+                      const diff = mobileVillaTouchStart.current - touchEnd;
+                      const threshold = 50;
+                      const maxIndex = Math.min(VILLAS.length, 3) - 1;
+
+                      if (diff > threshold && mobileVillaIndex < maxIndex) {
+                        setMobileVillaIndex(mobileVillaIndex + 1);
+                      } else if (diff < -threshold && mobileVillaIndex > 0) {
+                        setMobileVillaIndex(mobileVillaIndex - 1);
+                      }
+                    }}
+                  >
+                    <div
+                      className="flex transition-transform duration-300 ease-out"
+                      style={{ transform: `translateX(-${mobileVillaIndex * 100}%)` }}
+                    >
+                      {VILLAS.slice(0, 3).map(villa => (
+                        <div key={villa.id} className="w-full flex-shrink-0 px-2">
+                          <VillaCard villa={villa} onNavigate={setView} lang={lang} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Dots indicator */}
+                  <div className="flex justify-center gap-2 mt-6">
+                    {VILLAS.slice(0, 3).map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setMobileVillaIndex(i)}
+                        className={`w-2 h-2 rounded-full transition-all ${i === mobileVillaIndex ? 'bg-luxury-gold w-6' : 'bg-white/30'}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </section>
