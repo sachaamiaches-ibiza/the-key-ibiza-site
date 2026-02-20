@@ -164,10 +164,12 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     return () => clearInterval(interval);
   }, [reviews.length]);
 
-  // Prevent body scroll when gallery is open + keyboard navigation
+  // Prevent body scroll when gallery is open + keyboard navigation + hide navbar
   useEffect(() => {
     if (galleryOpen) {
       document.body.style.overflow = 'hidden';
+      // Hide navbar when gallery is open
+      document.body.classList.add('gallery-open');
 
       // Keyboard navigation handler
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -183,10 +185,12 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       window.addEventListener('keydown', handleKeyDown);
       return () => {
         document.body.style.overflow = '';
+        document.body.classList.remove('gallery-open');
         window.removeEventListener('keydown', handleKeyDown);
       };
     } else {
       document.body.style.overflow = '';
+      document.body.classList.remove('gallery-open');
     }
   }, [galleryOpen, allGalleryImages.length]);
 

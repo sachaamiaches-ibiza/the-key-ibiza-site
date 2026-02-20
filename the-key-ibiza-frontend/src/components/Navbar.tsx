@@ -123,7 +123,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
   return (
     <>
       {/* Navbar Wrapper - positioned below top gold bar */}
-      <div className="fixed left-0 w-full overflow-visible" style={{ top: '23px', zIndex: 99999, position: 'fixed' }}>
+      <div data-navbar="true" className="fixed left-0 w-full overflow-visible" style={{ top: '23px', zIndex: 99999, position: 'fixed' }}>
         {/* Navbar Content + Golden Line Container */}
         <div
           className={`w-full transition-all duration-500 overflow-visible`}

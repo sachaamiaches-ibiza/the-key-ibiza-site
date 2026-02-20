@@ -102,3 +102,17 @@ textarea:-webkit-autofill {
   color: #ffffff;
 }
 
+/* ============================================
+   GALLERY OPEN - Hide navbar
+   ============================================ */
+body.gallery-open > div > nav,
+body.gallery-open > div > header,
+body.gallery-open > nav,
+body.gallery-open > header,
+body.gallery-open [data-navbar],
+body.gallery-open .navbar-container {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+

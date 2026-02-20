@@ -529,6 +529,7 @@ const App: React.FC = () => {
     <div className="min-h-screen selection:bg-luxury-gold selection:text-white overflow-x-hidden">
       {/* Golden Top Bar - visible on all pages */}
       <div
+        data-navbar="true"
         className="fixed top-0 left-0 right-0 z-[100]"
         style={{ backgroundColor: '#C9B27C' }}
       >
