@@ -123,18 +123,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
   return (
     <>
       {/* Navbar Wrapper - positioned below top gold bar */}
-      <div className="fixed left-0 w-full z-[60]" style={{ top: '23px' }}>
+      <div className="fixed left-0 w-full overflow-visible" style={{ top: '23px', zIndex: 99999, position: 'fixed' }}>
         {/* Navbar Content + Golden Line Container */}
         <div
-          className={`w-full transition-all duration-500`}
+          className={`w-full transition-all duration-500 overflow-visible`}
           style={{
             backgroundColor: isScrolled ? 'rgba(8, 20, 28, 1)' : 'transparent',
             backdropFilter: isScrolled ? 'blur(12px)' : 'none',
             borderBottom: isScrolled ? '1px solid rgba(201,178,124,0.3)' : 'none',
           }}
         >
-          <nav className={`w-full ${isScrolled ? 'py-3 md:py-4' : 'py-6 md:py-8'}`}>
-          <div className="container mx-auto px-6 flex justify-between items-center">
+          <nav className={`w-full overflow-visible ${isScrolled ? 'py-3 md:py-4' : 'py-6 md:py-8'}`}>
+          <div className="container mx-auto px-6 flex justify-between items-center overflow-visible">
             {/* Back Button + Logo */}
             <div className="flex items-center gap-3">
               {canGoBack && currentView !== 'home' && (
@@ -164,7 +164,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
               </div>
             </div>
 
-            <div className="hidden lg:flex space-x-6 items-center text-xs uppercase tracking-[0.3em] font-semibold text-white/40">
+            <div className="hidden lg:flex space-x-6 items-center text-xs uppercase tracking-[0.3em] font-semibold text-white/40 overflow-visible">
             {menuItems.slice(0, 6).map((item) => (
               <div key={item.label} className="relative group/item">
                 <button 
@@ -178,7 +178,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                 </button>
                 
                 {item.subItems && (
-                  <div className="absolute top-full left-0 pt-6 opacity-0 translate-y-2 pointer-events-none group-hover/item:opacity-100 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-300">
+                  <div className="absolute top-full left-0 pt-6 opacity-0 translate-y-2 pointer-events-none group-hover/item:opacity-100 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-300" style={{ zIndex: 999999 }}>
                     <div className="bg-luxury-blue/95 backdrop-blur-xl border border-white/5 p-6 rounded-[24px] shadow-2xl min-w-[280px]">
                       <div className="grid grid-cols-1 gap-y-3.5">
                         {item.subItems.map(sub => (

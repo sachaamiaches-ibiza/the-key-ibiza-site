@@ -3,6 +3,38 @@ import { Villa, SeasonalPrice } from '../types';
 // Backend URL - production only (Vercel)
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 
+// Cache for Cloudinary folder images to avoid repeated API calls
+const cloudinaryCache: { [folder: string]: string[] } = {};
+
+// ---------- CLOUDINARY FOLDER IMAGES ----------
+async function fetchCloudinaryFolder(folderPath: string): Promise<string[]> {
+  // Check cache first
+  if (cloudinaryCache[folderPath]) {
+    return cloudinaryCache[folderPath];
+  }
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent(folderPath)}`);
+
+    if (!res.ok) {
+      console.warn(`⚠️ Cloudinary folder not found: ${folderPath}`);
+      return [];
+    }
+
+    const data = await res.json();
+    const images = data.images || [];
+
+    // Cache the result
+    cloudinaryCache[folderPath] = images;
+
+    console.log(`📁 Cloudinary folder ${folderPath}: ${images.length} images`);
+    return images;
+  } catch (e) {
+    console.error(`❌ Error fetching Cloudinary folder ${folderPath}:`, e);
+    return [];
+  }
+}
+
 // ---------- UTILIDADES ----------
 function parsePipeSeparated(value?: string | null): string[] {
   if (!value) return [];
@@ -132,6 +164,45 @@ function apiRowToVilla(row: any): Villa {
   };
 }
 
+// ---------- LOAD CLOUDINARY IMAGES FOR MANUAL VILLAS ----------
+async function loadCloudinaryImagesForVilla(villa: Villa, rawRow: any): Promise<Villa> {
+  // Only load from Cloudinary if:
+  // 1. Villa is NOT from Invenio (source !== 'invenio')
+  // 2. Header images are empty or villa has cloudinary_folder set
+  const isManualVilla = rawRow.source !== 'invenio';
+  const hasNoHeaderImages = !villa.headerImages || villa.headerImages.length === 0 || villa.headerImages[0] === '';
+  const hasNoGallery = !villa.gallery || villa.gallery.length === 0;
+
+  if (!isManualVilla) {
+    return villa; // Invenio villas already have images
+  }
+
+  // Use cloudinary_folder from DB or construct from villa name
+  const cloudinaryFolder = rawRow.cloudinary_folder || villa.name;
+
+  if (!cloudinaryFolder) {
+    return villa;
+  }
+
+  try {
+    // Fetch header and gallery in parallel
+    const [headerImages, galleryImages] = await Promise.all([
+      hasNoHeaderImages ? fetchCloudinaryFolder(`${cloudinaryFolder}/header`) : Promise.resolve(villa.headerImages),
+      hasNoGallery ? fetchCloudinaryFolder(`${cloudinaryFolder}/gallery`) : Promise.resolve(villa.gallery)
+    ]);
+
+    return {
+      ...villa,
+      headerImages: headerImages.length > 0 ? headerImages : villa.headerImages,
+      imageUrl: headerImages.length > 0 ? headerImages[0] : villa.imageUrl,
+      gallery: galleryImages.length > 0 ? galleryImages : villa.gallery
+    };
+  } catch (e) {
+    console.error(`❌ Error loading Cloudinary images for ${villa.name}:`, e);
+    return villa;
+  }
+}
+
 // ---------- FETCH ALL VILLAS FROM BACKEND ----------
 export async function fetchVillas(): Promise<Villa[]> {
   try {
@@ -157,8 +228,13 @@ export async function fetchVillas(): Promise<Villa[]> {
     const rawVillas = Array.isArray(json) ? json : (json.data || []);
     const villas = rawVillas.map(apiRowToVilla);
 
-    console.log('✅ VILLAS FETCHED FROM BACKEND:', villas.length);
-    return villas;
+    // Load Cloudinary images for manual villas in parallel
+    const villasWithImages = await Promise.all(
+      villas.map((villa, index) => loadCloudinaryImagesForVilla(villa, rawVillas[index]))
+    );
+
+    console.log('✅ VILLAS FETCHED FROM BACKEND:', villasWithImages.length);
+    return villasWithImages;
   } catch (e) {
     console.error('❌ Error fetching villas:', e);
     return [];
@@ -188,8 +264,12 @@ export async function fetchVillaBySlug(slug: string): Promise<Villa | null> {
     if (!data) return null;
 
     const villa = apiRowToVilla(data);
-    console.log('✅ VILLA FETCHED FROM BACKEND:', villa.name);
-    return villa;
+
+    // Load Cloudinary images for manual villas
+    const villaWithImages = await loadCloudinaryImagesForVilla(villa, data);
+
+    console.log('✅ VILLA FETCHED FROM BACKEND:', villaWithImages.name);
+    return villaWithImages;
   } catch (e) {
     console.error('❌ Error fetching villa:', e);
     return null;

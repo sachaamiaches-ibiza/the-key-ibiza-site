@@ -317,7 +317,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
         </div>
 
         {/* Search Filter Panel */}
-        <div className="mb-10 md:mb-14 relative z-[1100]">
+        <div className="mb-10 md:mb-14 relative" style={{ zIndex: 1 }}>
           <div className="luxury-card p-4 md:p-6 rounded-[20px] md:rounded-[24px] border border-white/5 bg-luxury-blue/40">
 
             {/* === MOBILE LAYOUT (< md) === */}
@@ -433,7 +433,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   </button>
                   {/* Mobile Filters Dropdown */}
                   {isFiltersOpen && (
-                    <div className="absolute bottom-full left-0 mb-2 z-[1200] w-[220px] bg-[#0A0E14] border border-white/10 rounded-2xl p-3 shadow-2xl">
+                    <div className="absolute bottom-full left-0 mb-2 z-[60] w-[220px] bg-[#0A0E14] border border-white/10 rounded-2xl p-3 shadow-2xl">
                       <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold mb-2">Amenities</p>
                       <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
                         {allAmenities.map((amenity: string) => (
@@ -602,7 +602,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                       <svg className={`w-3 h-3 transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     {isFiltersOpen && (
-                      <div className="absolute top-full left-0 mt-2 z-[1200] min-w-[280px] bg-[#0A0E14] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                      <div className="absolute top-full left-0 mt-2 z-[60] min-w-[280px] bg-[#0A0E14] border border-white/10 rounded-2xl p-4 shadow-2xl">
                         <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold mb-3">Amenities</p>
                         <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
                           {allAmenities.map((amenity: string) => (
