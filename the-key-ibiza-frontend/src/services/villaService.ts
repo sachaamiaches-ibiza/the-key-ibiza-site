@@ -178,17 +178,19 @@ async function loadCloudinaryImagesForVilla(villa: Villa, rawRow: any): Promise<
   }
 
   // Use cloudinary_folder from DB or construct from villa name
-  const cloudinaryFolder = rawRow.cloudinary_folder || villa.name;
+  // Folder structure: Villas/{Villa Name}/Header and Villas/{Villa Name}/Gallery
+  const villaFolderName = rawRow.cloudinary_folder || villa.name;
 
-  if (!cloudinaryFolder) {
+  if (!villaFolderName) {
     return villa;
   }
 
   try {
     // Fetch header and gallery in parallel
+    // Always use: Villas/{name}/Header and Villas/{name}/Gallery
     const [headerImages, galleryImages] = await Promise.all([
-      hasNoHeaderImages ? fetchCloudinaryFolder(`${cloudinaryFolder}/header`) : Promise.resolve(villa.headerImages),
-      hasNoGallery ? fetchCloudinaryFolder(`${cloudinaryFolder}/gallery`) : Promise.resolve(villa.gallery)
+      hasNoHeaderImages ? fetchCloudinaryFolder(`Villas/${villaFolderName}/Header`) : Promise.resolve(villa.headerImages),
+      hasNoGallery ? fetchCloudinaryFolder(`Villas/${villaFolderName}/Gallery`) : Promise.resolve(villa.gallery)
     ]);
 
     return {
