@@ -1183,7 +1183,7 @@ const handlePdfPasswordSubmit = async () => {
             </button>
 
             {/* Main image container - bounded area above thumbnails */}
-            <div className="absolute top-14 bottom-24 left-4 right-4 md:top-16 md:bottom-28 md:left-20 md:right-20 flex items-center justify-center">
+            <div className="absolute top-16 bottom-24 left-4 right-4 md:top-20 md:bottom-28 md:left-20 md:right-20 flex items-center justify-center">
               <WatermarkedImage
                 src={allGalleryImages[galleryIndex]}
                 className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl md:rounded-2xl shadow-2xl"
@@ -1201,33 +1201,38 @@ const handlePdfPasswordSubmit = async () => {
 
             {/* Thumbnail strip - scrollable with drag */}
             <div
-              className="absolute bottom-3 md:bottom-6 left-0 right-0 flex justify-center"
+              className="absolute bottom-3 md:bottom-6 left-0 right-0 overflow-x-scroll scrollbar-hide"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
             >
               <div
-                className="flex gap-2 md:gap-3 overflow-x-auto max-w-[95vw] pb-2 px-4 cursor-grab active:cursor-grabbing scrollbar-hide"
-                style={{
-                  touchAction: 'pan-x',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
-                }}
+                className="flex gap-2 md:gap-3 px-4 w-max mx-auto"
                 onMouseDown={(e) => {
-                  const el = e.currentTarget;
-                  el.style.cursor = 'grabbing';
-                  const startX = e.pageX - el.offsetLeft;
-                  const scrollLeft = el.scrollLeft;
-                  const onMouseMove = (e: MouseEvent) => {
-                    const x = e.pageX - el.offsetLeft;
-                    const walk = (x - startX) * 2;
-                    el.scrollLeft = scrollLeft - walk;
+                  e.preventDefault();
+                  const container = e.currentTarget.parentElement;
+                  if (!container) return;
+                  let isDown = true;
+                  let startX = e.pageX;
+                  let scrollStart = container.scrollLeft;
+
+                  const onMove = (ev: MouseEvent) => {
+                    if (!isDown) return;
+                    ev.preventDefault();
+                    const diff = ev.pageX - startX;
+                    container.scrollLeft = scrollStart - diff;
                   };
-                  const onMouseUp = () => {
-                    el.style.cursor = 'grab';
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
+
+                  const onUp = () => {
+                    isDown = false;
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
                   };
-                  document.addEventListener('mousemove', onMouseMove);
-                  document.addEventListener('mouseup', onMouseUp);
+
+                  window.addEventListener('mousemove', onMove);
+                  window.addEventListener('mouseup', onUp);
                 }}
               >
                 {allGalleryImages.map((img, i) => (
@@ -1236,7 +1241,7 @@ const handlePdfPasswordSubmit = async () => {
                     onClick={() => setGalleryIndex(i)}
                     className={`flex-shrink-0 w-14 h-10 md:w-20 md:h-14 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${galleryIndex === i ? 'border-luxury-gold scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
                   >
-                    <img src={img} className="w-full h-full object-cover" alt="" draggable={false} />
+                    <img src={img} className="w-full h-full object-cover pointer-events-none" alt="" draggable={false} />
                   </div>
                 ))}
               </div>
