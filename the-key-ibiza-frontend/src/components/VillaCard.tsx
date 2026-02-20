@@ -17,6 +17,7 @@ interface VillaCardProps {
 const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculatedPrice, hasDateRange }) => {
   const t = translations[lang].villa;
   const btnText = lang === 'en' ? 'Discover Property' : (lang === 'es' ? 'Descubrir Propiedad' : 'Découvrir la Propriété');
+  const isInvenioVilla = villa.id?.startsWith('invenio-');
 
   // Use full quality header images
   const images = villa.headerImages && villa.headerImages.length > 0 ? villa.headerImages : [villa.imageUrl];
@@ -109,7 +110,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
 
         <div className="space-y-4 md:space-y-6">
           <div className="flex flex-col items-center text-center">
-            {hasDateRange && calculatedPrice ? (
+            {hasDateRange && calculatedPrice && !isInvenioVilla ? (
               <>
                 <span className="text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-luxury-gold/60 font-bold mb-1">Total for Selected Period</span>
                 <span className="text-base md:text-lg font-bold text-white tracking-wide">
