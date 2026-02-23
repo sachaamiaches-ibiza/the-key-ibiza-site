@@ -7,7 +7,7 @@ import { useIsMobile } from './useIsMobile';
 import WatermarkedImage from './WatermarkedImage';
 import FooterSEO from './FooterSEO';
 
-// Extended Yacht interface for detail page
+// Yacht interface for detail page
 interface Yacht {
   id: string;
   nombre: string;
@@ -24,11 +24,8 @@ interface Yacht {
   daily_rates?: Record<string, number>;
   header_images?: string;
   gallery_images?: string;
-  full_description?: string;
-  features?: string;
   crew_members?: number;
   cabins?: number;
-  builder?: string;
   year_built?: number;
   fuel_included?: boolean;
   min_charter_hours?: number;
@@ -113,11 +110,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const allGalleryImages = yacht.gallery_images
     ? yacht.gallery_images.split('|').filter(img => img.trim())
     : slideshowImages;
-
-  // Parse features/amenities
-  const features = yacht.features
-    ? yacht.features.split('|').map(f => f.trim()).filter(Boolean)
-    : [];
 
   // Parse daily rates
   const dailyRates = yacht.daily_rates || {};
@@ -428,9 +420,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 py-8 md:py-16">
           {/* Description */}
           <div className="lg:col-span-3 text-white/65 text-base md:text-lg font-light leading-relaxed">
-            {yacht.full_description ? (
-              renderFormattedText(yacht.full_description)
-            ) : yacht.description ? (
+            {yacht.description ? (
               renderFormattedText(yacht.description)
             ) : (
               <p className="text-white/40 italic">Contact us for more details about this yacht.</p>
@@ -462,24 +452,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ===== AMENITIES/FEATURES ===== */}
-        {features.length > 0 && (
-          <div className="py-10 md:py-12">
-            <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide text-center">Amenities</h3>
-            <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
-              {features.map((f, i) => (
-                <span
-                  key={i}
-                  className="px-4 md:px-6 py-2.5 md:py-3.5 rounded-full text-white/60 text-xs md:text-sm font-light transition-colors hover:text-white/80"
-                  style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(255,255,255,0.06)' }}
-                >
-                  {f}
-                </span>
               ))}
             </div>
           </div>
@@ -517,7 +489,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
                 ['Length', yacht.metros ? `${yacht.metros}m` : null],
                 ['Cabins', yacht.cabins],
                 ['Crew members', yacht.crew_members],
-                ['Builder', yacht.builder],
                 ['Year built', yacht.year_built],
                 ['Mooring', yacht.amarre],
                 ['Location', yacht.localidad],
