@@ -6,8 +6,40 @@ import { LogoTheKey } from './Navbar';
 import { useIsMobile } from './useIsMobile';
 import WatermarkedImage from './WatermarkedImage';
 import FooterSEO from './FooterSEO';
+import { DayPicker } from 'react-day-picker';
+import { format } from 'date-fns';
+import 'react-day-picker/dist/style.css';
 
-// Yacht interface for detail page
+// Backend URL for Cloudinary API
+const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
+
+// Cache for Cloudinary folder images
+const cloudinaryCache: { [folder: string]: string[] } = {};
+
+// Fetch images from Cloudinary folder
+async function fetchCloudinaryFolder(folderPath: string): Promise<string[]> {
+  if (cloudinaryCache[folderPath]) {
+    return cloudinaryCache[folderPath];
+  }
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent(folderPath)}`);
+    if (!res.ok) {
+      console.warn(`⚠️ Cloudinary folder not found: ${folderPath}`);
+      return [];
+    }
+    const data = await res.json();
+    const images = data.images || [];
+    cloudinaryCache[folderPath] = images;
+    console.log(`📁 Cloudinary folder ${folderPath}: ${images.length} images`);
+    return images;
+  } catch (e) {
+    console.error(`❌ Error fetching Cloudinary folder ${folderPath}:`, e);
+    return [];
+  }
+}
+
+// Yacht interface for detail page (images fetched from Cloudinary)
 interface Yacht {
   id: string;
   nombre: string;
@@ -20,8 +52,6 @@ interface Yacht {
   price_min_day?: number;
   price_max_day?: number;
   daily_rates?: Record<string, number>;
-  header_images?: string;
-  gallery_images?: string;
   crew_members?: number;
   cabins?: number;
   year_built?: number;
@@ -102,18 +132,45 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [bookingErrors, setBookingErrors] = useState<Record<string, string>>({});
 
+  // Mobile date picker modal
+  const [mobileDatePickerOpen, setMobileDatePickerOpen] = useState(false);
+
   // Touch swipe
   const touchStartX = useRef(0);
 
-  // Parse header images (pipe-separated)
-  const slideshowImages = yacht.header_images
-    ? yacht.header_images.split('|').filter(img => img.trim())
-    : [];
+  // Images from Cloudinary (fetched on mount)
+  const [slideshowImages, setSlideshowImages] = useState<string[]>([]);
+  const [allGalleryImages, setAllGalleryImages] = useState<string[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(true);
 
-  // Parse gallery images
-  const allGalleryImages = yacht.gallery_images
-    ? yacht.gallery_images.split('|').filter(img => img.trim())
-    : slideshowImages;
+  // Fetch images from Cloudinary folders on mount
+  useEffect(() => {
+    async function loadImages() {
+      if (!yacht.nombre) {
+        setImagesLoading(false);
+        return;
+      }
+
+      setImagesLoading(true);
+      try {
+        // Folder structure: Yates/{yacht name}/Header and Yates/{yacht name}/Gallery
+        const [headerImages, galleryImages] = await Promise.all([
+          fetchCloudinaryFolder(`Yates/${yacht.nombre}/Header`),
+          fetchCloudinaryFolder(`Yates/${yacht.nombre}/Gallery`)
+        ]);
+
+        setSlideshowImages(headerImages);
+        // Use gallery images, or fall back to header images if no gallery
+        setAllGalleryImages(galleryImages.length > 0 ? galleryImages : headerImages);
+      } catch (e) {
+        console.error('Error loading yacht images:', e);
+      } finally {
+        setImagesLoading(false);
+      }
+    }
+
+    loadImages();
+  }, [yacht.nombre]);
 
   // Parse daily rates
   const dailyRates = yacht.daily_rates || {};
@@ -127,6 +184,47 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
     const today = new Date();
     return today.toISOString().split('T')[0];
   };
+
+  // Calculate price for selected date based on daily_rates
+  const getPriceForDate = (dateStr: string): number | null => {
+    if (!dateStr || Object.keys(dailyRates).length === 0) return null;
+
+    const selectedDate = new Date(dateStr);
+    const selectedMonth = selectedDate.getMonth() + 1; // 1-12
+    const selectedDay = selectedDate.getDate();
+
+    // Find matching rate period (format: "MM-DD_MM-DD")
+    for (const [period, price] of Object.entries(dailyRates)) {
+      const match = period.match(/(\d{2})-(\d{2})_(\d{2})-(\d{2})/);
+      if (match) {
+        const [, startMonth, startDay, endMonth, endDay] = match.map(Number);
+
+        // Create comparison values (month * 100 + day for easy comparison)
+        const selectedValue = selectedMonth * 100 + selectedDay;
+        const startValue = startMonth * 100 + startDay;
+        const endValue = endMonth * 100 + endDay;
+
+        // Handle year wrap-around (e.g., 10-01 to 01-01)
+        if (startValue <= endValue) {
+          // Normal range (e.g., 01-01 to 03-31)
+          if (selectedValue >= startValue && selectedValue <= endValue) {
+            return Number(price);
+          }
+        } else {
+          // Wrap-around range (e.g., 10-01 to 01-01)
+          if (selectedValue >= startValue || selectedValue <= endValue) {
+            return Number(price);
+          }
+        }
+      }
+    }
+
+    // Fallback to min price if no matching period
+    return minPrice || null;
+  };
+
+  // Calculated price for selected date
+  const selectedDatePrice = getPriceForDate(charterDate);
 
   // Scroll to top on mount
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -256,28 +354,56 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
     }
   };
 
-  // Charter Request Section
-  const CharterSection = ({ compact = false }: { compact?: boolean }) => (
-    <div
-      className={`${compact ? 'p-5 max-w-sm mx-auto' : 'p-6 lg:p-8'} rounded-[24px] md:rounded-[32px] border border-white/6`}
-      style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
-    >
+  // Format date for display
+  const formatDisplayDate = (dateStr: string) => {
+    if (!dateStr) return 'Select date';
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  // Render charter section content
+  const renderCharterContent = (compact: boolean) => (
+    <>
       <h3 className="text-base md:text-lg font-serif text-white mb-4 md:mb-6 tracking-wide text-center">
         Select Your Date
       </h3>
 
-      {/* Date Selection */}
-      <div className="mb-6">
-        <label className="text-[10px] uppercase tracking-[0.2em] text-white/40 block mb-2">Charter Date</label>
-        <input
-          type="date"
-          value={charterDate}
-          min={getTodayString()}
-          onChange={(e) => setCharterDate(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
-          style={{ colorScheme: 'dark' }}
-        />
+      {/* Date Selection - Always use button that opens modal */}
+      <div className="mb-6 relative">
+        <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5 z-10">Charter Date</span>
+        <button
+          type="button"
+          onClick={() => setMobileDatePickerOpen(true)}
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer text-left flex items-center justify-between hover:border-luxury-gold/50"
+        >
+          <span className={charterDate ? 'text-white' : 'text-white/40'}>{formatDisplayDate(charterDate)}</span>
+          <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </button>
       </div>
+
+      {/* Price Display */}
+      {!charterDate ? (
+        <p className="text-white/40 text-xs text-center italic mb-6">
+          Select a date to see the price
+        </p>
+      ) : selectedDatePrice ? (
+        <div className="border-t border-white/10 pt-5 mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-white/50 text-xs">8-hour charter</span>
+            <span className="text-white/80 text-sm">€{selectedDatePrice.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between items-center pt-3 border-t border-white/10">
+            <span className="text-white text-sm font-medium">Total</span>
+            <span className="text-luxury-gold text-lg font-serif">€{selectedDatePrice.toLocaleString()}</span>
+          </div>
+        </div>
+      ) : (
+        <p className="text-white/40 text-xs text-center italic mb-6">
+          Price on request
+        </p>
+      )}
 
       {/* Request Button */}
       <button
@@ -286,14 +412,21 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
       >
         Request Charter
       </button>
-    </div>
+    </>
   );
 
   return (
     <div style={{ backgroundColor: '#0B1C26' }}>
       {/* ===== HEADER SLIDESHOW ===== */}
       <div className="relative w-full h-[60vh] md:h-[80vh] overflow-hidden group">
-        {slideshowImages.length > 0 ? (
+        {imagesLoading ? (
+          <div className="absolute inset-0 bg-luxury-slate flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-8 h-8 border-2 border-luxury-gold/30 border-t-luxury-gold rounded-full animate-spin"></div>
+              <span className="text-white/40 text-sm">Loading images...</span>
+            </div>
+          </div>
+        ) : slideshowImages.length > 0 ? (
           slideshowImages.map((img, index) => (
             <div
               key={index}
@@ -368,7 +501,12 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
 
         {/* ===== MOBILE: CHARTER SECTION ===== */}
         <div className="md:hidden py-8">
-          <CharterSection compact />
+          <div
+            className="p-5 max-w-sm mx-auto rounded-[24px] md:rounded-[32px] border border-white/6"
+            style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
+          >
+            {renderCharterContent(true)}
+          </div>
         </div>
 
         {/* ===== DESCRIPTION + CHARTER (Desktop) ===== */}
@@ -384,7 +522,12 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
 
           {/* Charter Section (Desktop) */}
           <div className="hidden lg:block lg:col-span-2">
-            <CharterSection />
+            <div
+              className="p-6 lg:p-8 rounded-[24px] md:rounded-[32px] border border-white/6"
+              style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
+            >
+              {renderCharterContent(false)}
+            </div>
           </div>
         </div>
 
@@ -420,7 +563,10 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
               className="p-6 md:p-8 lg:p-10 rounded-[24px] md:rounded-[32px] border border-white/6"
               style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
             >
-              <h3 className="text-lg md:text-xl font-serif text-white mb-6 md:mb-8 tracking-wide">Daily Rates</h3>
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-lg md:text-xl font-serif text-white tracking-wide">Daily Rates</h3>
+                <p className="text-[10px] md:text-xs text-white/40 font-light tracking-wider mt-1.5 uppercase">8-hour charter prices</p>
+              </div>
               <div>
                 {Object.entries(dailyRates).map(([period, price], i, arr) => (
                   <div key={period} className={`flex justify-between items-center py-2.5 md:py-3 ${i < arr.length - 1 ? 'border-b border-white/10' : ''}`}>
@@ -473,6 +619,12 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
               Private chef, catering, and bespoke experiences available upon request.
             </p>
           </div>
+          <button
+            onClick={() => onNavigate('services')}
+            className="mt-2 px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-transparent border border-luxury-gold/50 text-luxury-gold text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium hover:bg-luxury-gold hover:text-luxury-blue transition-all duration-500"
+          >
+            Explore Our Services
+          </button>
         </div>
 
         {/* ===== GALLERY MODAL ===== */}
@@ -638,6 +790,57 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
                   </form>
                 </>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Date Picker Modal */}
+        {mobileDatePickerOpen && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileDatePickerOpen(false)} />
+            <div className="relative bg-[#0B1C26] border border-white/10 rounded-2xl p-4 mx-4 max-w-sm w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-white font-serif text-lg">Select Date</h3>
+                <button onClick={() => setMobileDatePickerOpen(false)} className="text-white/50 hover:text-white p-1">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="yacht-calendar-wrapper">
+                <style>{`
+                  .yacht-calendar-wrapper .rdp {
+                    --rdp-cell-size: 40px;
+                    --rdp-accent-color: #C4A461;
+                    --rdp-background-color: rgba(196, 164, 97, 0.2);
+                    margin: 0;
+                  }
+                  .yacht-calendar-wrapper .rdp-month { width: 100%; }
+                  .yacht-calendar-wrapper .rdp-table { width: 100%; }
+                  .yacht-calendar-wrapper .rdp-caption_label { color: white; font-size: 14px; }
+                  .yacht-calendar-wrapper .rdp-nav_button { color: rgba(255,255,255,0.5); }
+                  .yacht-calendar-wrapper .rdp-nav_button:hover { color: #C4A461; background: rgba(196, 164, 97, 0.1); }
+                  .yacht-calendar-wrapper .rdp-head_cell { color: rgba(255,255,255,0.4); font-size: 10px; font-weight: normal; }
+                  .yacht-calendar-wrapper .rdp-day { color: white; font-size: 13px; }
+                  .yacht-calendar-wrapper .rdp-day:hover:not(.rdp-day_disabled) { background: rgba(196, 164, 97, 0.2); }
+                  .yacht-calendar-wrapper .rdp-day_selected { background: #C4A461 !important; color: #0B1C26 !important; }
+                  .yacht-calendar-wrapper .rdp-day_disabled { color: rgba(255,255,255,0.2); }
+                  .yacht-calendar-wrapper .rdp-day_today { border: 1px solid #C4A461; }
+                `}</style>
+                <DayPicker
+                  mode="single"
+                  selected={charterDate ? new Date(charterDate) : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      setCharterDate(format(date, 'yyyy-MM-dd'));
+                      setMobileDatePickerOpen(false);
+                    }
+                  }}
+                  disabled={{ before: new Date() }}
+                  numberOfMonths={1}
+                  showOutsideDays={false}
+                />
+              </div>
             </div>
           </div>
         )}
