@@ -354,10 +354,10 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
                     <span className="text-luxury-gold font-medium">€{(yacht.price_high_season || 0).toLocaleString()}/day</span>
                   </div>
                   <button
-                    onClick={() => onNavigate('contact')}
+                    onClick={() => onNavigate(`yacht-${yacht.id}`)}
                     className="w-full py-3 rounded-full bg-luxury-gold text-luxury-blue border border-luxury-gold text-[9px] uppercase tracking-[0.2em] font-medium hover:bg-luxury-blue hover:text-luxury-gold transition-all"
                   >
-                    Inquire Now
+                    Discover Yacht
                   </button>
                 </div>
               </div>

@@ -18,6 +18,7 @@ import VipLogin from './components/VipLogin';
 import ComingSoon from './components/ComingSoon';
 import BoatsPage from './components/BoatsPage';
 import YachtsPage from './components/YachtsPage';
+import YachtDetailPage from './components/YachtDetailPage';
 import CatamaransPage from './components/CatamaransPage';
 import VillasPage from './components/VillasPage';
 import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
@@ -197,6 +198,10 @@ const App: React.FC = () => {
   const [disclaimerModalOpen, setDisclaimerModalOpen] = useState(false);
   const [imprintModalOpen, setImprintModalOpen] = useState(false);
 
+  // Yacht detail state
+  const [selectedYacht, setSelectedYacht] = useState<any>(null);
+  const [yachtLoading, setYachtLoading] = useState(false);
+
   // Handler to update search dates from any component
   const handleSearchDatesChange = (checkIn: string, checkOut: string) => {
     setSearchCheckIn(checkIn);
@@ -242,6 +247,29 @@ const App: React.FC = () => {
     }
   }, [view, allVillas, villasLoading]);
 
+  // Fetch yacht when navigating to yacht detail
+  useEffect(() => {
+    if (view.startsWith('yacht-')) {
+      const yachtId = view.replace('yacht-', '');
+      setYachtLoading(true);
+      const BACKEND_URL = window.location.hostname === 'localhost'
+        ? 'http://localhost:5001'
+        : 'https://the-key-ibiza-backend.vercel.app';
+      fetch(`${BACKEND_URL}/yachts/${yachtId}`)
+        .then(res => res.json())
+        .then(data => {
+          setSelectedYacht(data);
+          setYachtLoading(false);
+        })
+        .catch(() => {
+          setSelectedYacht(null);
+          setYachtLoading(false);
+        });
+    } else {
+      setSelectedYacht(null);
+    }
+  }, [view]);
+
   // Filter villas based on VIP status
   const VILLAS = isVip ? getAllVillas(allVillas) : getPublicVillas(allVillas);
   const SERVICES = getServices(lang);
@@ -277,6 +305,38 @@ const App: React.FC = () => {
   console.log('RENDER VILLAS:', allVillas.length);
 
   const renderView = () => {
+    // Yacht detail page
+    if (view.startsWith('yacht-')) {
+      if (yachtLoading) {
+        return (
+          <div className="pt-40 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
+            <div className="container mx-auto px-6 text-center">
+              <div className="w-12 h-12 border-2 border-luxury-gold/30 border-t-luxury-gold rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-white/60">Loading yacht...</p>
+            </div>
+          </div>
+        );
+      }
+      if (selectedYacht) {
+        return <YachtDetailPage yacht={selectedYacht} onNavigate={setView} lang={lang} />;
+      }
+      return (
+        <div className="pt-40 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
+          <div className="container mx-auto px-6 text-center">
+            <h1 className="text-4xl font-serif text-white mb-4">Yacht Not Found</h1>
+            <p className="text-white/60 mb-8">The yacht you're looking for is not available.</p>
+            <button
+              onClick={() => setView('boats-yachts')}
+              className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-sm uppercase tracking-wider hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all"
+            >
+              View All Yachts
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // Villa detail page
     if (view.startsWith('villa-')) {
       const villaId = view.replace('villa-', '');
       // First check in filtered VILLAS, then in all villas, then in directly fetched villa
