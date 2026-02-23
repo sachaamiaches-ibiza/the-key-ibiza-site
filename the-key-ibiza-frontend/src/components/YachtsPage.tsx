@@ -8,16 +8,16 @@ interface YachtsPageProps {
   lang: Language;
 }
 
-// Yacht data interface matching backend API
+// Yacht data interface matching backend API (Supabase fields)
 interface Yacht {
-  id: number;
-  name: string;
-  paxMax: number;
+  id: string;
+  nombre: string;
+  pax_max: number;
   amarre: string;
-  price: number;
+  price_high_season: number;
   metros: number;
-  location: string;
-  image: string;
+  localidad: string;
+  photo: string | null;
   description: string;
 }
 
@@ -64,7 +64,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
 
   // Get unique locations from yachts data
   const uniqueLocations = useMemo(() => {
-    const locations = new Set(yachtsData.map(y => y.location).filter(Boolean));
+    const locations = new Set(yachtsData.map(y => y.localidad).filter(Boolean));
     if (locations.size === 0) return ['All', 'Ibiza'];
     return ['All', ...Array.from(locations)];
   }, [yachtsData]);
@@ -82,21 +82,22 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
   // Filter yachts based on search criteria
   const filteredYachts = useMemo(() => {
     return yachtsData.filter(yacht => {
-      const matchPax = searchFilters.paxMax === 0 || yacht.paxMax >= searchFilters.paxMax;
+      const matchPax = searchFilters.paxMax === 0 || (yacht.pax_max || 0) >= searchFilters.paxMax;
       const matchAmarre = searchFilters.amarre === 'All' || yacht.amarre === searchFilters.amarre;
-      const matchPrice = searchFilters.priceMax === 0 || yacht.price <= searchFilters.priceMax;
-      const matchLocation = searchFilters.localidad === 'All' || yacht.location === searchFilters.localidad;
+      const matchPrice = searchFilters.priceMax === 0 || (yacht.price_high_season || 0) <= searchFilters.priceMax;
+      const matchLocation = searchFilters.localidad === 'All' || yacht.localidad === searchFilters.localidad;
 
       // Meter range filter
       let matchMeters = true;
+      const metros = yacht.metros || 0;
       if (searchFilters.metros !== 'All') {
         if (searchFilters.metros === '30+') {
-          matchMeters = yacht.metros >= 30;
+          matchMeters = metros >= 30;
         } else if (searchFilters.metros === '0-10') {
-          matchMeters = yacht.metros < 10;
+          matchMeters = metros < 10;
         } else {
           const [min, max] = searchFilters.metros.split('-').map(Number);
-          matchMeters = yacht.metros >= min && yacht.metros < max;
+          matchMeters = metros >= min && metros < max;
         }
       }
 
@@ -337,20 +338,20 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
-                    src={yacht.image || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
-                    alt={yacht.name}
+                    src={yacht.photo || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
+                    alt={yacht.nombre}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/80 via-transparent to-transparent"></div>
                   <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-xl font-serif text-white mb-1">{yacht.name}</h3>
-                    <p className="text-luxury-gold text-sm">{yacht.metros}m | {yacht.paxMax} pax</p>
+                    <h3 className="text-xl font-serif text-white mb-1">{yacht.nombre}</h3>
+                    <p className="text-luxury-gold text-sm">{yacht.metros}m | {yacht.pax_max} pax</p>
                   </div>
                 </div>
                 <div className="p-5 bg-luxury-slate/30">
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-white/50 text-xs">{yacht.amarre || yacht.location}</span>
-                    <span className="text-luxury-gold font-medium">€{yacht.price.toLocaleString()}/day</span>
+                    <span className="text-white/50 text-xs">{yacht.amarre || yacht.localidad}</span>
+                    <span className="text-luxury-gold font-medium">€{(yacht.price_high_season || 0).toLocaleString()}/day</span>
                   </div>
                   <button
                     onClick={() => onNavigate('contact')}
