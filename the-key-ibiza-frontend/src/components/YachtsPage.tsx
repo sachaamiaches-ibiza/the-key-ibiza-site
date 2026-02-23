@@ -14,7 +14,8 @@ interface Yacht {
   nombre: string;
   pax_max: number;
   amarre: string;
-  price_high_season: number;
+  price_min_day?: number;
+  price_max_day?: number;
   metros: number;
   localidad: string;
   photo: string | null;
@@ -84,7 +85,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
     return yachtsData.filter(yacht => {
       const matchPax = searchFilters.paxMax === 0 || (yacht.pax_max || 0) >= searchFilters.paxMax;
       const matchAmarre = searchFilters.amarre === 'All' || yacht.amarre === searchFilters.amarre;
-      const matchPrice = searchFilters.priceMax === 0 || (yacht.price_high_season || 0) <= searchFilters.priceMax;
+      const matchPrice = searchFilters.priceMax === 0 || (yacht.price_min_day || 0) <= searchFilters.priceMax;
       const matchLocation = searchFilters.localidad === 'All' || yacht.localidad === searchFilters.localidad;
 
       // Meter range filter
@@ -351,7 +352,12 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
                 <div className="p-5 bg-luxury-slate/30">
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-white/50 text-xs">{yacht.amarre || yacht.localidad}</span>
-                    <span className="text-luxury-gold font-medium">€{(yacht.price_high_season || 0).toLocaleString()}/day</span>
+                    <span className="text-luxury-gold font-medium">
+                      {yacht.price_min_day && yacht.price_max_day && yacht.price_min_day !== yacht.price_max_day
+                        ? `€${yacht.price_min_day.toLocaleString()} - €${yacht.price_max_day.toLocaleString()}/day`
+                        : `€${(yacht.price_min_day || yacht.price_max_day || 0).toLocaleString()}/day`
+                      }
+                    </span>
                   </div>
                   <button
                     onClick={() => onNavigate(`yacht-${yacht.id}`)}

@@ -13,12 +13,11 @@ interface Yacht {
   nombre: string;
   pax_max: number;
   amarre: string;
-  price_high_season: number;
   metros: number;
   localidad: string;
   photo: string | null;
   description: string;
-  // Extended fields for detail page
+  // Price fields
   price_min_day?: number;
   price_max_day?: number;
   daily_rates?: Record<string, number>;
@@ -115,8 +114,8 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const dailyRates = yacht.daily_rates || {};
 
   // Calculate price
-  const minPrice = yacht.price_min_day || yacht.price_high_season || 0;
-  const maxPrice = yacht.price_max_day || yacht.price_high_season || minPrice;
+  const minPrice = yacht.price_min_day || 0;
+  const maxPrice = yacht.price_max_day || minPrice;
 
   // Get today's date string for min date
   const getTodayString = () => {
@@ -126,7 +125,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
 
   // Calculate charter price based on duration
   const calculatePrice = () => {
-    const basePrice = yacht.price_high_season || minPrice;
+    const basePrice = maxPrice || minPrice;
     switch (duration) {
       case '4h': return Math.round(basePrice * 0.5);
       case '6h': return Math.round(basePrice * 0.7);
