@@ -44,9 +44,9 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
       try {
         const res = await fetch(`${BACKEND_URL}/yachts`);
         const json = await res.json();
-        if (json.data) {
-          setYachtsData(json.data);
-        }
+        // Handle both array and { data: [] } formats
+        const yachts = Array.isArray(json) ? json : (json.data || []);
+        setYachtsData(yachts);
       } catch (error) {
         console.error('Error fetching yachts:', error);
       }
