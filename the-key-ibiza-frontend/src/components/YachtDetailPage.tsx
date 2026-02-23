@@ -15,7 +15,6 @@ interface Yacht {
   amarre: string;
   metros: number;
   localidad: string;
-  photo: string | null;
   description: string;
   // Price fields
   price_min_day?: number;
@@ -98,12 +97,10 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   // Touch swipe
   const touchStartX = useRef(0);
 
-  // Parse header images (pipe-separated or single photo)
+  // Parse header images (pipe-separated)
   const slideshowImages = yacht.header_images
     ? yacht.header_images.split('|').filter(img => img.trim())
-    : yacht.photo
-      ? [yacht.photo]
-      : [];
+    : [];
 
   // Parse gallery images
   const allGalleryImages = yacht.gallery_images

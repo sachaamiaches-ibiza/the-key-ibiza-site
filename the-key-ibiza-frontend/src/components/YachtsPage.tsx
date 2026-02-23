@@ -18,8 +18,8 @@ interface Yacht {
   price_max_day?: number;
   metros: number;
   localidad: string;
-  photo: string | null;
   description: string;
+  header_images?: string;
 }
 
 // Auto-detect environment
@@ -339,7 +339,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
-                    src={yacht.photo || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
+                    src={yacht.header_images?.split('|')[0] || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
                     alt={yacht.nombre}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
