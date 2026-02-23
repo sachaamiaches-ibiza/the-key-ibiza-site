@@ -6,6 +6,8 @@ import FooterSEO from './FooterSEO';
 interface YachtsPageProps {
   onNavigate: (view: string) => void;
   lang: Language;
+  initialDate?: string;
+  onDateChange?: (date: string) => void;
 }
 
 // Yacht data interface matching backend API (Supabase fields)
@@ -27,17 +29,24 @@ const BACKEND_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001'
   : 'https://the-key-ibiza-backend.vercel.app';
 
-const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang }) => {
+const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate = '', onDateChange }) => {
   const [yachtsData, setYachtsData] = useState<Yacht[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchFilters, setSearchFilters] = useState({
-    fecha: '',
+    fecha: initialDate,
     paxMax: 0,
     amarre: 'All',
     priceMax: 0,
     metros: 'All',
     localidad: 'All'
   });
+
+  // Sync date changes to parent
+  useEffect(() => {
+    if (onDateChange && searchFilters.fecha !== initialDate) {
+      onDateChange(searchFilters.fecha);
+    }
+  }, [searchFilters.fecha]);
 
   // Fetch yachts from backend
   useEffect(() => {

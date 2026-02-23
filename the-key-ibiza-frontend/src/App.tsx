@@ -201,6 +201,7 @@ const App: React.FC = () => {
   // Yacht detail state
   const [selectedYacht, setSelectedYacht] = useState<any>(null);
   const [yachtLoading, setYachtLoading] = useState(false);
+  const [yachtSearchDate, setYachtSearchDate] = useState<string>('');
 
   // Handler to update search dates from any component
   const handleSearchDatesChange = (checkIn: string, checkOut: string) => {
@@ -318,7 +319,15 @@ const App: React.FC = () => {
         );
       }
       if (selectedYacht) {
-        return <YachtDetailPage yacht={selectedYacht} onNavigate={setView} lang={lang} />;
+        return (
+          <YachtDetailPage
+            yacht={selectedYacht}
+            onNavigate={setView}
+            lang={lang}
+            initialDate={yachtSearchDate}
+            onDateChange={setYachtSearchDate}
+          />
+        );
       }
       return (
         <div className="pt-40 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
@@ -407,7 +416,14 @@ const App: React.FC = () => {
       case 'villas-sale':
         return <ComingSoon title="Properties for Sale" onNavigate={setView} lang={lang} />;
       case 'boats-yachts':
-        return <YachtsPage onNavigate={setView} lang={lang} />;
+        return (
+          <YachtsPage
+            onNavigate={setView}
+            lang={lang}
+            initialDate={yachtSearchDate}
+            onDateChange={setYachtSearchDate}
+          />
+        );
       case 'boats-catamarans':
         return <CatamaransPage onNavigate={setView} lang={lang} />;
       case 'service-yacht':

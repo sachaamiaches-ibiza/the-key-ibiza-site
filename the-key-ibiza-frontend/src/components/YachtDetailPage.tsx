@@ -33,6 +33,8 @@ interface YachtDetailPageProps {
   yacht: Yacht;
   onNavigate: (view: string) => void;
   lang: Language;
+  initialDate?: string;
+  onDateChange?: (date: string) => void;
 }
 
 // Helper function to format date range "01-01_03-31" -> "1 Jan - 31 Mar"
@@ -68,7 +70,7 @@ const renderFormattedText = (text: string) => {
   });
 };
 
-const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, lang }) => {
+const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, lang, initialDate = '', onDateChange }) => {
   const t = translations[lang];
   const isMobile = useIsMobile();
 
@@ -84,9 +86,15 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const thumbnailStartX = useRef(0);
   const thumbnailScrollLeft = useRef(0);
 
-  // Date selection state
-  const [charterDate, setCharterDate] = useState('');
-  const [duration, setDuration] = useState('full'); // '4h', '6h', '8h', 'full'
+  // Date selection state (synced with parent)
+  const [charterDate, setCharterDate] = useState(initialDate);
+
+  // Sync date changes to parent
+  useEffect(() => {
+    if (onDateChange) {
+      onDateChange(charterDate);
+    }
+  }, [charterDate, onDateChange]);
 
   // Booking modal state
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -118,17 +126,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const getTodayString = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
-  };
-
-  // Calculate charter price based on duration
-  const calculatePrice = () => {
-    const basePrice = maxPrice || minPrice;
-    switch (duration) {
-      case '4h': return Math.round(basePrice * 0.5);
-      case '6h': return Math.round(basePrice * 0.7);
-      case '8h': return Math.round(basePrice * 0.85);
-      default: return basePrice;
-    }
   };
 
   // Scroll to top on mount
@@ -227,17 +224,12 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
 
     setBookingStatus('submitting');
 
-    const durationText = duration === '4h' ? '4 Hours' : duration === '6h' ? '6 Hours' : duration === '8h' ? '8 Hours' : 'Full Day';
-    const priceText = `€${calculatePrice().toLocaleString()}`;
-
     const formData = new FormData();
     formData.append('name', bookingForm.name);
     formData.append('email', bookingForm.email);
     formData.append('phone', bookingForm.phone);
     formData.append('yacht', yacht.nombre);
     formData.append('date', charterDate || 'Not specified');
-    formData.append('duration', durationText);
-    formData.append('price', priceText);
     formData.append('message', bookingForm.message || 'No message');
     formData.append('_subject', `Yacht Charter Request: ${yacht.nombre} – The Key Ibiza`);
     formData.append('_captcha', 'false');
@@ -258,7 +250,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
     } catch {
       // Fallback to mailto
       const subject = encodeURIComponent(`Yacht Charter Request: ${yacht.nombre}`);
-      const body = encodeURIComponent(`Name: ${bookingForm.name}\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nYacht: ${yacht.nombre}\nDate: ${charterDate || 'Not specified'}\nDuration: ${durationText}\nPrice: ${priceText}\nMessage: ${bookingForm.message || 'None'}`);
+      const body = encodeURIComponent(`Name: ${bookingForm.name}\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nYacht: ${yacht.nombre}\nDate: ${charterDate || 'Not specified'}\nMessage: ${bookingForm.message || 'None'}`);
       window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
       setBookingStatus('success');
     }
@@ -271,11 +263,11 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
       style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
     >
       <h3 className="text-base md:text-lg font-serif text-white mb-4 md:mb-6 tracking-wide text-center">
-        Select Your Charter
+        Select Your Date
       </h3>
 
       {/* Date Selection */}
-      <div className="mb-4">
+      <div className="mb-6">
         <label className="text-[10px] uppercase tracking-[0.2em] text-white/40 block mb-2">Charter Date</label>
         <input
           type="date"
@@ -285,39 +277,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
           style={{ colorScheme: 'dark' }}
         />
-      </div>
-
-      {/* Duration Selection */}
-      <div className="mb-6">
-        <label className="text-[10px] uppercase tracking-[0.2em] text-white/40 block mb-2">Duration</label>
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { value: '4h', label: '4h' },
-            { value: '6h', label: '6h' },
-            { value: '8h', label: '8h' },
-            { value: 'full', label: 'Full Day' },
-          ].map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setDuration(opt.value)}
-              className={`py-2.5 rounded-xl text-xs font-medium transition-all ${
-                duration === opt.value
-                  ? 'bg-luxury-gold text-luxury-blue'
-                  : 'bg-white/5 text-white/60 hover:bg-white/10'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Price */}
-      <div className="border-t border-white/8 pt-5 mb-5">
-        <div className="flex justify-between items-center">
-          <span className="text-white/50 text-sm">Estimated Price</span>
-          <span className="text-lg font-serif text-luxury-gold">€{calculatePrice().toLocaleString()}</span>
-        </div>
       </div>
 
       {/* Request Button */}
@@ -619,20 +578,14 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
                   <p className="text-white/50 text-sm mb-6">{yacht.nombre}</p>
 
                   {/* Summary */}
-                  <div className="bg-white/5 rounded-xl p-4 mb-6">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-white/50">Date</span>
-                      <span className="text-white">{charterDate || 'Not selected'}</span>
+                  {charterDate && (
+                    <div className="bg-white/5 rounded-xl p-4 mb-6">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-white/50">Selected Date</span>
+                        <span className="text-luxury-gold">{charterDate}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-white/50">Duration</span>
-                      <span className="text-white">{duration === '4h' ? '4 Hours' : duration === '6h' ? '6 Hours' : duration === '8h' ? '8 Hours' : 'Full Day'}</span>
-                    </div>
-                    <div className="flex justify-between text-sm pt-2 border-t border-white/10">
-                      <span className="text-white/50">Total</span>
-                      <span className="text-luxury-gold font-medium">€{calculatePrice().toLocaleString()}</span>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Form */}
                   <form onSubmit={handleBookingSubmit} className="space-y-4">
