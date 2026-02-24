@@ -746,12 +746,15 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
             </button>
 
             {/* Main image container - bounded area above thumbnails */}
-            <div className="absolute top-16 bottom-24 left-4 right-4 md:top-20 md:bottom-28 md:left-20 md:right-20 flex items-center justify-center">
-              <WatermarkedImage
+            <div
+              className="absolute top-16 bottom-24 left-4 right-4 md:top-20 md:bottom-28 md:left-20 md:right-20 flex items-center justify-center"
+              style={{ maxHeight: 'calc(100vh - 160px)' }}
+            >
+              <img
                 src={allGalleryImages[galleryIndex]}
                 className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl md:rounded-2xl shadow-2xl"
                 alt=""
-                watermarkSize="gallery"
+                style={{ maxHeight: 'calc(100vh - 200px)', maxWidth: 'calc(100vw - 160px)' }}
               />
             </div>
 
