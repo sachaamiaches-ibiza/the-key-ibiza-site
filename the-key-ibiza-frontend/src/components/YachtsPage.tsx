@@ -2,6 +2,31 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
+import { LogoTheKey } from './Navbar';
+
+// Watermark overlay component for images and videos
+const WatermarkOverlay = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) => {
+  const sizeClasses = {
+    small: { logo: 'w-6 h-9 md:w-8 md:h-12', text: 'text-[8px] md:text-xs tracking-[0.2em] mt-1' },
+    medium: { logo: 'w-10 h-14 md:w-14 md:h-20', text: 'text-xs md:text-sm tracking-[0.25em] mt-2' },
+    large: { logo: 'w-16 h-22 md:w-24 md:h-32', text: 'text-base md:text-xl tracking-[0.3em] mt-3' },
+  };
+  const s = sizeClasses[size];
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-10">
+      <LogoTheKey
+        className={s.logo}
+        color="rgba(255,255,255,0.6)"
+      />
+      <span
+        className={`font-serif uppercase ${s.text}`}
+        style={{ color: 'rgba(255,255,255,0.6)', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+      >
+        The Key Ibiza
+      </span>
+    </div>
+  );
+};
 
 interface YachtsPageProps {
   onNavigate: (view: string) => void;
@@ -415,6 +440,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
                   )}
+                  <WatermarkOverlay size="small" />
                   <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/80 via-transparent to-transparent"></div>
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-xl font-serif text-white mb-1">{yacht.nombre}</h3>
