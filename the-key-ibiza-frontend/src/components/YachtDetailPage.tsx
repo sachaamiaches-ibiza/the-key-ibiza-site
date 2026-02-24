@@ -6,9 +6,6 @@ import { LogoTheKey } from './Navbar';
 import { useIsMobile } from './useIsMobile';
 import WatermarkedImage from './WatermarkedImage';
 import FooterSEO from './FooterSEO';
-import { DayPicker } from 'react-day-picker';
-import { format } from 'date-fns';
-import 'react-day-picker/dist/style.css';
 
 // Backend URL for Cloudinary API
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
@@ -132,8 +129,9 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [bookingErrors, setBookingErrors] = useState<Record<string, string>>({});
 
-  // Mobile date picker modal
-  const [mobileDatePickerOpen, setMobileDatePickerOpen] = useState(false);
+  // Inline calendar state
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
 
   // Touch swipe
   const touchStartX = useRef(0);
@@ -361,6 +359,28 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
     return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
+  // Generate calendar days for a month
+  const generateCalendarDays = (month: number, year: number) => {
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const days: (number | null)[] = [];
+    const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+    for (let i = 0; i < startOffset; i++) days.push(null);
+    for (let d = 1; d <= daysInMonth; d++) days.push(d);
+    return days;
+  };
+
+  // Check if date is in the past
+  const isDateInPast = (day: number, month: number, year: number) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(year, month, day);
+    return checkDate < today;
+  };
+
+  // Month names
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
   // Render charter section content
   const renderCharterContent = (compact: boolean) => (
     <>
@@ -368,19 +388,69 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
         Select Your Date
       </h3>
 
-      {/* Date Selection - Always use button that opens modal */}
-      <div className="mb-6 relative">
-        <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5 z-10">Charter Date</span>
-        <button
-          type="button"
-          onClick={() => setMobileDatePickerOpen(true)}
-          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer text-left flex items-center justify-between hover:border-luxury-gold/50"
-        >
-          <span className={charterDate ? 'text-white' : 'text-white/40'}>{formatDisplayDate(charterDate)}</span>
-          <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </button>
+      {/* Inline Calendar */}
+      <div className="mb-6">
+        {/* Month navigation */}
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={() => {
+              if (calendarMonth === 0) { setCalendarMonth(11); setCalendarYear(calendarYear - 1); }
+              else { setCalendarMonth(calendarMonth - 1); }
+            }}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-luxury-gold hover:bg-white/5 transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
+          <span className="text-white text-sm font-medium">{monthNames[calendarMonth]} {calendarYear}</span>
+          <button
+            onClick={() => {
+              if (calendarMonth === 11) { setCalendarMonth(0); setCalendarYear(calendarYear + 1); }
+              else { setCalendarMonth(calendarMonth + 1); }
+            }}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-luxury-gold hover:bg-white/5 transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
+
+        {/* Day headers */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(day => (
+            <div key={day} className="text-center text-[10px] text-white/30 font-medium">{day}</div>
+          ))}
+        </div>
+
+        {/* Calendar days */}
+        <div className="grid grid-cols-7 gap-1">
+          {generateCalendarDays(calendarMonth, calendarYear).map((day, i) => {
+            if (!day) return <div key={i} className="aspect-square"></div>;
+
+            const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isSelected = dateStr === charterDate;
+            const isPast = isDateInPast(day, calendarMonth, calendarYear);
+
+            return (
+              <button
+                key={i}
+                disabled={isPast}
+                onClick={() => !isPast && setCharterDate(dateStr)}
+                className={`aspect-square rounded-lg flex items-center justify-center text-xs transition-all
+                  ${isPast ? 'text-white/20 cursor-not-allowed' : 'hover:bg-luxury-gold/20 cursor-pointer'}
+                  ${isSelected ? 'bg-luxury-gold text-luxury-blue font-bold' : 'text-white/70'}
+                `}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Selected date display */}
+        {charterDate && (
+          <div className="mt-4 text-center">
+            <span className="text-luxury-gold text-sm">{formatDisplayDate(charterDate)}</span>
+          </div>
+        )}
       </div>
 
       {/* Price Display */}
@@ -790,57 +860,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
                   </form>
                 </>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* Mobile Date Picker Modal */}
-        {mobileDatePickerOpen && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileDatePickerOpen(false)} />
-            <div className="relative bg-[#0B1C26] border border-white/10 rounded-2xl p-4 mx-4 max-w-sm w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-white font-serif text-lg">Select Date</h3>
-                <button onClick={() => setMobileDatePickerOpen(false)} className="text-white/50 hover:text-white p-1">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="yacht-calendar-wrapper">
-                <style>{`
-                  .yacht-calendar-wrapper .rdp {
-                    --rdp-cell-size: 40px;
-                    --rdp-accent-color: #C4A461;
-                    --rdp-background-color: rgba(196, 164, 97, 0.2);
-                    margin: 0;
-                  }
-                  .yacht-calendar-wrapper .rdp-month { width: 100%; }
-                  .yacht-calendar-wrapper .rdp-table { width: 100%; }
-                  .yacht-calendar-wrapper .rdp-caption_label { color: white; font-size: 14px; }
-                  .yacht-calendar-wrapper .rdp-nav_button { color: rgba(255,255,255,0.5); }
-                  .yacht-calendar-wrapper .rdp-nav_button:hover { color: #C4A461; background: rgba(196, 164, 97, 0.1); }
-                  .yacht-calendar-wrapper .rdp-head_cell { color: rgba(255,255,255,0.4); font-size: 10px; font-weight: normal; }
-                  .yacht-calendar-wrapper .rdp-day { color: white; font-size: 13px; }
-                  .yacht-calendar-wrapper .rdp-day:hover:not(.rdp-day_disabled) { background: rgba(196, 164, 97, 0.2); }
-                  .yacht-calendar-wrapper .rdp-day_selected { background: #C4A461 !important; color: #0B1C26 !important; }
-                  .yacht-calendar-wrapper .rdp-day_disabled { color: rgba(255,255,255,0.2); }
-                  .yacht-calendar-wrapper .rdp-day_today { border: 1px solid #C4A461; }
-                `}</style>
-                <DayPicker
-                  mode="single"
-                  selected={charterDate ? new Date(charterDate) : undefined}
-                  onSelect={(date) => {
-                    if (date) {
-                      setCharterDate(format(date, 'yyyy-MM-dd'));
-                      setMobileDatePickerOpen(false);
-                    }
-                  }}
-                  disabled={{ before: new Date() }}
-                  numberOfMonths={1}
-                  showOutsideDays={false}
-                />
-              </div>
             </div>
           </div>
         )}
