@@ -268,7 +268,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             </button>
           </div>
 
-          <div className="flex flex-col space-y-2 md:space-y-3 w-full max-w-4xl py-4">
+          <div className="flex flex-col space-y-2 md:space-y-3 w-full max-w-4xl py-4 max-h-[65vh] overflow-y-auto no-scrollbar">
             {menuItems.map((item, idx) => (
               <div key={item.label} className="flex flex-col items-center md:items-start">
                 <button 
