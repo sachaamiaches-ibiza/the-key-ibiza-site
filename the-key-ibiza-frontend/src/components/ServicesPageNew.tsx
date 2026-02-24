@@ -97,9 +97,9 @@ const serviceDetails = [
 ];
 
 const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) => {
-  const scrollToService = (serviceId: string) => {
-    const element = document.getElementById(`service-${serviceId}`);
-    element?.scrollIntoView({ behavior: 'smooth' });
+  // Navigate to service detail page
+  const goToService = (serviceId: string) => {
+    onNavigate(serviceId === 'photographer' ? 'photographer' : `service-${serviceId}`);
   };
 
   return (
@@ -125,7 +125,7 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
             return (
               <div
                 key={service.id}
-                onClick={() => scrollToService(service.id)}
+                onClick={() => goToService(service.id)}
                 className="flex flex-col items-center cursor-pointer group"
               >
                 <div
@@ -196,10 +196,10 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
                     {service.description}
                   </p>
                   <button
-                    onClick={() => onNavigate('contact')}
+                    onClick={() => goToService(service.id)}
                     className="px-8 py-3 rounded-full bg-luxury-gold text-luxury-blue border border-luxury-gold text-[10px] uppercase tracking-[0.3em] font-medium hover:bg-luxury-blue hover:text-luxury-gold transition-all duration-500"
                   >
-                    Inquire Now
+                    Discover More
                   </button>
                 </div>
               </div>
