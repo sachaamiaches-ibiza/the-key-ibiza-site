@@ -1,20 +1,22 @@
 /**
  * Cloudinary Watermark Utility
- * Transforms Cloudinary URLs to include a watermark overlay
+ * Transforms Cloudinary URLs to include the logo watermark overlay
  * The watermark is embedded in the image, so downloads include it
+ *
+ * USAGE: Import and call addCloudinaryWatermark(url, size) on image URLs
+ * This is prepared for future implementation when download watermarks are needed.
  */
 
-// Watermark configuration - using Cloudinary text overlay
-// To use a logo image instead, upload it to Cloudinary and use: l_<public_id>
-const WATERMARK_TEXT = 'THE KEY IBIZA';
-const WATERMARK_FONT = 'Playfair Display';
-const WATERMARK_OPACITY = 40; // 0-100
+// Logo configuration - using uploaded logo from "THE KEY IBIZA LOGO" folder
+// The public_id uses colons instead of slashes for Cloudinary overlay syntax
+const LOGO_PUBLIC_ID = 'THE_KEY_IBIZA_LOGO:logo';
+const WATERMARK_OPACITY = 50; // 0-100
 
 /**
- * Add watermark transformation to a Cloudinary URL
+ * Add logo watermark to a Cloudinary URL
  * @param url - Original Cloudinary image URL
- * @param size - Size of watermark: 'small', 'medium', 'large'
- * @returns URL with watermark transformation
+ * @param size - Size of watermark: 'small', 'medium', 'large', 'gallery'
+ * @returns URL with logo watermark transformation
  */
 export function addCloudinaryWatermark(
   url: string,
@@ -24,19 +26,19 @@ export function addCloudinaryWatermark(
     return url; // Return unchanged if not a Cloudinary URL
   }
 
-  // Size configurations for text
+  // Size configurations - width of logo
   const sizeConfig = {
-    small: { fontSize: 30, spacing: 8 },
-    medium: { fontSize: 50, spacing: 12 },
-    large: { fontSize: 80, spacing: 16 },
-    gallery: { fontSize: 60, spacing: 14 },
+    small: { width: 100 },
+    medium: { width: 180 },
+    large: { width: 280 },
+    gallery: { width: 220 },
   };
 
   const config = sizeConfig[size];
 
-  // Cloudinary text overlay transformation
-  // Format: l_text:<font>_<size>:<text>,co_rgb:ffffff,o_<opacity>,g_center
-  const watermarkTransform = `l_text:${encodeURIComponent(WATERMARK_FONT)}_${config.fontSize}_bold:${encodeURIComponent(WATERMARK_TEXT)},co_rgb:ffffff,o_${WATERMARK_OPACITY},g_center`;
+  // Logo overlay transformation
+  // Format: l_<public_id>,w_<width>,o_<opacity>,g_center,fl_layer_apply
+  const watermarkTransform = `l_${LOGO_PUBLIC_ID},w_${config.width},o_${WATERMARK_OPACITY},g_center/fl_layer_apply`;
 
   // Find the upload/ part of the URL and insert transformation after it
   const uploadIndex = url.indexOf('/upload/');
@@ -47,63 +49,40 @@ export function addCloudinaryWatermark(
   const beforeUpload = url.substring(0, uploadIndex + 8); // includes '/upload/'
   const afterUpload = url.substring(uploadIndex + 8);
 
-  // Check if there are already transformations
-  if (afterUpload.startsWith('v') && /^v\d+\//.test(afterUpload)) {
-    // Has version, insert before version
-    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
-  } else if (afterUpload.includes('/')) {
-    // Has other transformations, append to them
-    const firstSlash = afterUpload.indexOf('/');
-    const existingTransforms = afterUpload.substring(0, firstSlash);
-    const rest = afterUpload.substring(firstSlash + 1);
-    return `${beforeUpload}${existingTransforms},${watermarkTransform}/${rest}`;
-  } else {
-    // No transformations, just add it
-    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
-  }
+  // Insert watermark transformation
+  return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
 }
 
 /**
- * Add watermark with logo overlay (requires logo uploaded to Cloudinary)
- * @param url - Original Cloudinary image URL
- * @param logoPublicId - Public ID of the logo in Cloudinary
+ * Add watermark to external URL via Cloudinary fetch
+ * For non-Cloudinary URLs that need watermarking
+ * @param url - External image URL
  * @param size - Size of watermark
- * @returns URL with logo watermark
+ * @returns Cloudinary fetch URL with watermark
  */
-export function addCloudinaryLogoWatermark(
+export function addWatermarkToExternalUrl(
   url: string,
-  logoPublicId: string = 'the-key-ibiza-watermark',
   size: 'small' | 'medium' | 'large' | 'gallery' = 'medium'
 ): string {
-  if (!url || !url.includes('cloudinary.com')) {
-    return url;
+  if (!url || url.includes('cloudinary.com')) {
+    // If already Cloudinary, use the standard function
+    return addCloudinaryWatermark(url, size);
   }
 
   const sizeConfig = {
-    small: { width: 80, opacity: 50 },
-    medium: { width: 150, opacity: 45 },
-    large: { width: 250, opacity: 40 },
-    gallery: { width: 200, opacity: 45 },
+    small: { width: 100 },
+    medium: { width: 180 },
+    large: { width: 280 },
+    gallery: { width: 220 },
   };
 
   const config = sizeConfig[size];
+  const CLOUD_NAME = 'drxf80sho';
 
-  // Logo overlay transformation
-  const watermarkTransform = `l_${logoPublicId},w_${config.width},o_${config.opacity},g_center`;
+  // Fetch URL with watermark overlay
+  const transforms = `l_${LOGO_PUBLIC_ID},w_${config.width},o_${WATERMARK_OPACITY},g_center/fl_layer_apply`;
 
-  const uploadIndex = url.indexOf('/upload/');
-  if (uploadIndex === -1) {
-    return url;
-  }
-
-  const beforeUpload = url.substring(0, uploadIndex + 8);
-  const afterUpload = url.substring(uploadIndex + 8);
-
-  if (afterUpload.startsWith('v') && /^v\d+\//.test(afterUpload)) {
-    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
-  } else {
-    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
-  }
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/fetch/${transforms}/${encodeURIComponent(url)}`;
 }
 
 export default addCloudinaryWatermark;
