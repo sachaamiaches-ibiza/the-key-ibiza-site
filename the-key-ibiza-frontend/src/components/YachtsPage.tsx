@@ -3,6 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
 import { LogoTheKey } from './Navbar';
+import { addCloudinaryWatermark } from '../utils/cloudinaryWatermark';
 
 // Watermark overlay component for images and videos
 const WatermarkOverlay = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) => {
@@ -84,7 +85,7 @@ async function fetchYachtHeaderMedia(yachtName: string): Promise<{ image: string
     const images = allMedia.filter((url: string) => !isVideoUrl(url));
 
     const result = {
-      image: images[0] || null,
+      image: images[0] ? addCloudinaryWatermark(images[0], 'medium') : null,
       video: videos[0] || null
     };
     yachtMediaCache[yachtName] = result;
@@ -435,7 +436,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                     />
                   ) : (
                     <img
-                      src={yachtMedia[yacht.nombre]?.image || yacht.header_images?.split('|')[0] || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
+                      src={yachtMedia[yacht.nombre]?.image || addCloudinaryWatermark(yacht.header_images?.split('|')[0] || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg', 'medium')}
                       alt={yacht.nombre}
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
