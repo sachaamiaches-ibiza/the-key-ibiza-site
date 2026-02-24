@@ -3,7 +3,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
 import { LogoTheKey } from './Navbar';
-import { addCloudinaryWatermark } from '../utils/cloudinaryWatermark';
 
 // Watermark overlay component for images and videos
 const WatermarkOverlay = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) => {
@@ -84,9 +83,8 @@ async function fetchYachtHeaderMedia(yachtName: string): Promise<{ image: string
     const videos = allMedia.filter((url: string) => isVideoUrl(url));
     const images = allMedia.filter((url: string) => !isVideoUrl(url));
 
-    // Apply Cloudinary watermark to image (embedded for downloads)
     const result = {
-      image: images[0] ? addCloudinaryWatermark(images[0], 'medium') : null,
+      image: images[0] || null,
       video: videos[0] || null
     };
     yachtMediaCache[yachtName] = result;
