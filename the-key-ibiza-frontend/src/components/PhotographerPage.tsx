@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Language } from '../types';
 
 // Add lang to the props interface
@@ -9,6 +9,63 @@ interface PhotographerPageProps {
 }
 
 const PhotographerPage: React.FC<PhotographerPageProps> = ({ onNavigate, lang }) => {
+  // Contact modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', details: '' });
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Form validation
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.name.trim()) errors.name = 'Required';
+    if (!formData.email.trim()) errors.email = 'Required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = 'Invalid email';
+    if (!formData.phone.trim()) errors.phone = 'Required';
+    return errors;
+  };
+
+  // Submit form
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setFormStatus('submitting');
+
+    const formPayload = new FormData();
+    formPayload.append('name', formData.name);
+    formPayload.append('email', formData.email);
+    formPayload.append('phone', formData.phone);
+    formPayload.append('service', 'Professional Photographer');
+    formPayload.append('details', formData.details || 'No details provided');
+    formPayload.append('_subject', 'Photo Session Inquiry – The Key Ibiza');
+    formPayload.append('_captcha', 'false');
+    formPayload.append('_template', 'table');
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
+        method: 'POST',
+        body: formPayload,
+      });
+      const result = await response.json();
+      if (result.success) {
+        setFormStatus('success');
+        setFormData({ name: '', email: '', phone: '', details: '' });
+      } else {
+        throw new Error('Failed');
+      }
+    } catch {
+      const subject = encodeURIComponent('Photo Session Inquiry');
+      const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nDetails: ${formData.details || 'None'}`);
+      window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
+      setFormStatus('success');
+    }
+  };
+
   return (
     <div className="pt-40 pb-24">
       <div className="container mx-auto px-6">
@@ -57,11 +114,8 @@ const PhotographerPage: React.FC<PhotographerPageProps> = ({ onNavigate, lang })
             </div>
 
             <div className="pt-10">
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('contact');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
+              <button
+                onClick={() => setModalOpen(true)}
                 className="bg-luxury-gold text-luxury-blue px-12 py-6 rounded-full font-bold border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold transition-all shadow-2xl uppercase tracking-widest text-xs"
               >
                 Book a Session
@@ -90,6 +144,103 @@ const PhotographerPage: React.FC<PhotographerPageProps> = ({ onNavigate, lang })
           </div>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(11,28,38,0.95)' }}>
+          <div
+            className="relative w-full max-w-lg p-6 md:p-8 rounded-[24px] border border-white/10 max-h-[90vh] overflow-y-auto"
+            style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)' }}
+          >
+            <button
+              onClick={() => { setModalOpen(false); setFormStatus('idle'); setFormErrors({}); }}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            {formStatus === 'success' ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-luxury-gold/20 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 className="text-xl font-serif text-white mb-2">Request Sent</h3>
+                <p className="text-white/60 text-sm">We'll contact you shortly to discuss your session.</p>
+                <button
+                  onClick={() => { setModalOpen(false); setFormStatus('idle'); }}
+                  className="mt-6 px-6 py-2 rounded-full bg-luxury-gold/20 text-luxury-gold text-xs uppercase tracking-wider hover:bg-luxury-gold hover:text-luxury-blue transition-all"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="mb-6">
+                  <span className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.2em] font-medium">Art & Lifestyle</span>
+                  <h3 className="text-xl md:text-2xl font-serif text-white mt-1">Book a Photo Session</h3>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.15em] text-white/40 block mb-1.5">Full Name *</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setFormErrors({ ...formErrors, name: '' }); }}
+                      className={`w-full bg-white/5 border ${formErrors.name ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors`}
+                      placeholder="Your name"
+                    />
+                    {formErrors.name && <span className="text-red-400 text-xs mt-1">{formErrors.name}</span>}
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.15em] text-white/40 block mb-1.5">Email *</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setFormErrors({ ...formErrors, email: '' }); }}
+                      className={`w-full bg-white/5 border ${formErrors.email ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors`}
+                      placeholder="your@email.com"
+                    />
+                    {formErrors.email && <span className="text-red-400 text-xs mt-1">{formErrors.email}</span>}
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.15em] text-white/40 block mb-1.5">Phone *</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setFormErrors({ ...formErrors, phone: '' }); }}
+                      className={`w-full bg-white/5 border ${formErrors.phone ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors`}
+                      placeholder="+34 600 000 000"
+                    />
+                    {formErrors.phone && <span className="text-red-400 text-xs mt-1">{formErrors.phone}</span>}
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.15em] text-white/40 block mb-1.5">What type of photo session do you need?</label>
+                    <textarea
+                      value={formData.details}
+                      onChange={(e) => setFormData({ ...formData, details: e.target.value })}
+                      rows={4}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors resize-none"
+                      placeholder="Style of shoot, location, number of people, occasion..."
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={formStatus === 'submitting'}
+                    className="w-full py-4 rounded-full bg-luxury-gold text-luxury-blue text-xs uppercase tracking-[0.2em] font-bold hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all duration-500 disabled:opacity-50"
+                  >
+                    {formStatus === 'submitting' ? 'Sending...' : 'Send Request'}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
