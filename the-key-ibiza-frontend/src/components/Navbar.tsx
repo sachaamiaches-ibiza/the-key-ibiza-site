@@ -225,7 +225,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
       </div>
 
       {/* Full screen menu */}
-      <div className={`fixed inset-0 z-[100] transition-all duration-700 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+      <div className={`fixed inset-0 z-[100000] transition-all duration-700 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
         <div className="absolute inset-0 bg-luxury-blue/98 backdrop-blur-xl" onClick={() => setIsMenuOpen(false)}></div>
         
         <div className="absolute inset-0 z-0 pointer-events-none transition-all duration-1000 overflow-hidden">
