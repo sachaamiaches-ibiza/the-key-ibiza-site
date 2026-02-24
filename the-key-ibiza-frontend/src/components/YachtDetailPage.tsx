@@ -302,27 +302,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
     }
   };
 
-  // Thumbnail drag handlers
-  const handleThumbnailMouseDown = (e: React.MouseEvent) => {
-    isDraggingThumbnails.current = true;
-    thumbnailStartX.current = e.pageX;
-    thumbnailScrollLeft.current = thumbnailStripRef.current?.scrollLeft || 0;
-  };
-
-  const handleThumbnailMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingThumbnails.current) return;
-    e.preventDefault();
-    const x = e.pageX;
-    const walk = (x - thumbnailStartX.current) * 1.5;
-    if (thumbnailStripRef.current) {
-      thumbnailStripRef.current.scrollLeft = thumbnailScrollLeft.current - walk;
-    }
-  };
-
-  const handleThumbnailMouseUp = () => {
-    isDraggingThumbnails.current = false;
-  };
-
   // Form validation
   const validateBookingForm = () => {
     const errors: Record<string, string> = {};
@@ -735,7 +714,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
           </button>
         </div>
 
-        {/* ===== GALLERY MODAL ===== */}
+        {/* ===== GALLERY MODAL - Full screen with scroll prevention ===== */}
         {galleryOpen && (
           <div
             ref={galleryRef}
@@ -744,7 +723,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
             onTouchStart={handleGalleryTouchStart}
             onTouchEnd={handleGalleryTouchEnd}
           >
-            {/* Close button */}
+            {/* Close button - prominent X */}
             <button
               onClick={() => setGalleryOpen(false)}
               className="absolute top-4 right-4 md:top-8 md:right-8 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-luxury-gold hover:text-luxury-blue transition-all"
@@ -753,12 +732,12 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
-            {/* Counter */}
+            {/* Counter - top center */}
             <div className="absolute top-5 md:top-8 left-1/2 -translate-x-1/2 text-luxury-gold text-sm md:text-base tracking-widest font-medium z-20">
               {galleryIndex + 1} / {allGalleryImages.length}
             </div>
 
-            {/* Navigation arrows */}
+            {/* Navigation arrows - always visible */}
             <button
               onClick={() => setGalleryIndex((galleryIndex - 1 + allGalleryImages.length) % allGalleryImages.length)}
               className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-luxury-gold hover:bg-white/20 transition-all"
@@ -766,7 +745,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7"></path></svg>
             </button>
 
-            {/* Main image */}
+            {/* Main image container - bounded area above thumbnails */}
             <div className="absolute top-16 bottom-24 left-4 right-4 md:top-20 md:bottom-28 md:left-20 md:right-20 flex items-center justify-center">
               <WatermarkedImage
                 src={allGalleryImages[galleryIndex]}
@@ -783,29 +762,46 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
               <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7"></path></svg>
             </button>
 
-            {/* Thumbnail strip */}
+            {/* Thumbnail strip - scrollable with drag */}
             <div
               ref={thumbnailStripRef}
-              className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-16 md:right-16 overflow-x-auto scrollbar-hide cursor-grab"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              onMouseDown={handleThumbnailMouseDown}
-              onMouseMove={handleThumbnailMouseMove}
-              onMouseUp={handleThumbnailMouseUp}
-              onMouseLeave={handleThumbnailMouseUp}
+              className="absolute bottom-3 md:bottom-6 left-4 right-4 flex gap-2 md:gap-3 overflow-x-auto cursor-grab active:cursor-grabbing scrollbar-hide"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
+              onMouseDown={(e) => {
+                isDraggingThumbnails.current = true;
+                thumbnailStartX.current = e.pageX - (thumbnailStripRef.current?.offsetLeft || 0);
+                thumbnailScrollLeft.current = thumbnailStripRef.current?.scrollLeft || 0;
+                if (thumbnailStripRef.current) thumbnailStripRef.current.style.cursor = 'grabbing';
+              }}
+              onMouseMove={(e) => {
+                if (!isDraggingThumbnails.current || !thumbnailStripRef.current) return;
+                e.preventDefault();
+                const x = e.pageX - (thumbnailStripRef.current.offsetLeft || 0);
+                const walk = (x - thumbnailStartX.current) * 1.5;
+                thumbnailStripRef.current.scrollLeft = thumbnailScrollLeft.current - walk;
+              }}
+              onMouseUp={() => {
+                isDraggingThumbnails.current = false;
+                if (thumbnailStripRef.current) thumbnailStripRef.current.style.cursor = 'grab';
+              }}
+              onMouseLeave={() => {
+                isDraggingThumbnails.current = false;
+                if (thumbnailStripRef.current) thumbnailStripRef.current.style.cursor = 'grab';
+              }}
             >
-              <div className="flex gap-2 md:gap-3 justify-start md:justify-center min-w-max md:min-w-0 px-2">
-                {allGalleryImages.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setGalleryIndex(i)}
-                    className={`flex-shrink-0 w-14 h-10 md:w-20 md:h-14 rounded-lg overflow-hidden transition-all duration-300 ${
-                      galleryIndex === i ? 'ring-2 ring-luxury-gold opacity-100' : 'opacity-40 hover:opacity-70'
-                    }`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" draggable={false} />
-                  </button>
-                ))}
-              </div>
+              {allGalleryImages.map((img, i) => (
+                <div
+                  key={i}
+                  onClick={() => !isDraggingThumbnails.current && setGalleryIndex(i)}
+                  className={`flex-shrink-0 w-14 h-10 md:w-20 md:h-14 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${galleryIndex === i ? 'border-luxury-gold scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                >
+                  <img src={img} className="w-full h-full object-cover pointer-events-none select-none" alt="" draggable={false} />
+                </div>
+              ))}
             </div>
           </div>
         )}
