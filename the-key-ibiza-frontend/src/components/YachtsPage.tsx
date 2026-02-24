@@ -94,10 +94,14 @@ async function fetchYachtHeaderMedia(yachtName: string): Promise<{ image: string
   }
 }
 
+// Sort options
+type SortOption = 'default' | 'price-asc' | 'price-desc' | 'size-asc' | 'size-desc';
+
 const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate = '', onDateChange }) => {
   const [yachtsData, setYachtsData] = useState<Yacht[]>([]);
   const [loading, setLoading] = useState(true);
   const [yachtMedia, setYachtMedia] = useState<{ [name: string]: { image: string | null; video: string | null } }>({});
+  const [sortBy, setSortBy] = useState<SortOption>('default');
   const [searchFilters, setSearchFilters] = useState({
     fecha: initialDate,
     paxMax: 0,
@@ -166,9 +170,9 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
     { value: '30+', label: '> 30m' }
   ];
 
-  // Filter yachts based on search criteria
+  // Filter and sort yachts based on search criteria
   const filteredYachts = useMemo(() => {
-    return yachtsData.filter(yacht => {
+    const filtered = yachtsData.filter(yacht => {
       const matchPax = searchFilters.paxMax === 0 || (yacht.pax_max || 0) >= searchFilters.paxMax;
       const matchAmarre = searchFilters.amarre === 'All' || yacht.amarre === searchFilters.amarre;
       const matchPrice = searchFilters.priceMax === 0 || (yacht.price_min_day || 0) <= searchFilters.priceMax;
@@ -190,7 +194,25 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
 
       return matchPax && matchAmarre && matchPrice && matchLocation && matchMeters;
     });
-  }, [searchFilters, yachtsData]);
+
+    // Apply sorting
+    if (sortBy === 'default') return filtered;
+
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'price-asc':
+          return (a.price_min_day || 0) - (b.price_min_day || 0);
+        case 'price-desc':
+          return (b.price_min_day || 0) - (a.price_min_day || 0);
+        case 'size-asc':
+          return (a.metros || 0) - (b.metros || 0);
+        case 'size-desc':
+          return (b.metros || 0) - (a.metros || 0);
+        default:
+          return 0;
+      }
+    });
+  }, [searchFilters, yachtsData, sortBy]);
 
   return (
     <div className="pt-40 pb-12" style={{ backgroundColor: '#0B1C26' }}>
@@ -295,6 +317,21 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                   <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Localidad</span>
                 </div>
               </div>
+              {/* Sort By */}
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                >
+                  <option value="default" className="bg-luxury-blue">Default Order</option>
+                  <option value="price-asc" className="bg-luxury-blue">Price: Low to High</option>
+                  <option value="price-desc" className="bg-luxury-blue">Price: High to Low</option>
+                  <option value="size-asc" className="bg-luxury-blue">Size: Small to Large</option>
+                  <option value="size-desc" className="bg-luxury-blue">Size: Large to Small</option>
+                </select>
+                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Sort By</span>
+              </div>
               {/* Search Button */}
               <button
                 className="w-full py-3 rounded-xl text-[10px] uppercase tracking-widest font-semibold transition-all bg-luxury-gold text-luxury-blue border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold"
@@ -383,17 +420,36 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                   <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Localidad</span>
                 </div>
               </div>
-              {/* Bottom row with buttons */}
+              {/* Bottom row with sort and buttons */}
               <div className="flex justify-between items-center">
-                <span className="text-xs text-white/40">
-                  <span className="text-luxury-gold font-medium">{filteredYachts.length}</span>
-                  <span className="mx-1">/</span>
-                  <span>{yachtsData.length}</span>
-                  <span className="ml-1">yachts available</span>
-                </span>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs text-white/40">
+                    <span className="text-luxury-gold font-medium">{filteredYachts.length}</span>
+                    <span className="mx-1">/</span>
+                    <span>{yachtsData.length}</span>
+                    <span className="ml-1">yachts available</span>
+                  </span>
+                  {/* Sort dropdown */}
+                  <div className="relative">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as SortOption)}
+                      className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-[10px] focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer pr-8"
+                    >
+                      <option value="default" className="bg-luxury-blue">Default Order</option>
+                      <option value="price-asc" className="bg-luxury-blue">Price: Low → High</option>
+                      <option value="price-desc" className="bg-luxury-blue">Price: High → Low</option>
+                      <option value="size-asc" className="bg-luxury-blue">Size: Small → Large</option>
+                      <option value="size-desc" className="bg-luxury-blue">Size: Large → Small</option>
+                    </select>
+                    <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setSearchFilters({ fecha: '', paxMax: 0, amarre: 'All', priceMax: 0, metros: 'All', localidad: 'All' })}
+                    onClick={() => { setSearchFilters({ fecha: '', paxMax: 0, amarre: 'All', priceMax: 0, metros: 'All', localidad: 'All' }); setSortBy('default'); }}
                     className="px-6 py-2.5 rounded-xl text-[9px] uppercase tracking-widest font-medium transition-all border border-white/10 text-white/40 hover:text-white hover:border-white/30"
                   >
                     Clear
