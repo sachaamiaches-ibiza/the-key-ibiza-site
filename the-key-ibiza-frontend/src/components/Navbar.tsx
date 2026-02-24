@@ -32,6 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [hoveredSubItem, setHoveredSubItem] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   
   const t = translations[lang].nav;
@@ -61,15 +62,35 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
     setExpandedSection(null);
   };
 
-  // Using real villa photos from the website portfolio (same images used in villa listings)
+  // Images for menu items and sub-items
   const menuImages = {
-    home: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=1200', // Can Kef - villa from portfolio
-    villas: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=1200', // Casa Cigala - villa from portfolio
-    boats: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200', // Yacht from services
-    services: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=1200', // Private Chef from services
-    blog: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80&w=1200', // Nui Blau - villa from portfolio
-    about: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200', // Luxury property from portfolio
-    contact: 'https://images.unsplash.com/photo-1551135049-8a33b5883817?auto=format&fit=crop&q=80&w=1200', // Spa/wellness from services
+    home: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=1200',
+    villas: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=1200',
+    boats: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
+    services: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=1200',
+    blog: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80&w=1200',
+    about: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200',
+    contact: 'https://images.unsplash.com/photo-1551135049-8a33b5883817?auto=format&fit=crop&q=80&w=1200',
+    // Villas sub-items
+    'villas-holiday': 'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?auto=format&fit=crop&q=80&w=1200',
+    'villas-longterm': 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200',
+    'villas-sale': 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1200',
+    // Boats sub-items
+    'boats-yachts': 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
+    'boats-catamarans': 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&q=80&w=1200',
+    // Services sub-items
+    'service-events': 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&q=80&w=1200',
+    'service-nightlife': 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&q=80&w=1200',
+    'service-catering': 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=1200',
+    'service-furniture': 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+    'service-health': 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=1200',
+    'service-yoga': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1200',
+    'photographer': 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&q=80&w=1200',
+    'service-security': 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80&w=1200',
+    'service-cleaning': 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=1200',
+    'service-driver': 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=1200',
+    'service-deliveries': 'https://images.unsplash.com/photo-1586880244406-556ebe35f282?auto=format&fit=crop&q=80&w=1200',
+    'service-babysitting': 'https://images.unsplash.com/photo-1587616211892-f743fcca64f9?auto=format&fit=crop&q=80&w=1200',
   };
 
   const menuItems = [
@@ -80,9 +101,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
       isView: true,
       img: menuImages.villas,
       subItems: [
-        { label: t.holiday, target: 'villas-holiday' },
-        { label: t.longterm, target: 'villas-longterm' },
-        { label: t.sale, target: 'villas-sale' }
+        { label: t.holiday, target: 'villas-holiday', img: menuImages['villas-holiday'] },
+        { label: t.longterm, target: 'villas-longterm', img: menuImages['villas-longterm'] },
+        { label: t.sale, target: 'villas-sale', img: menuImages['villas-sale'] }
       ]
     },
     {
@@ -91,8 +112,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
       isView: true,
       img: menuImages.boats,
       subItems: [
-        { label: 'Yates', target: 'boats-yachts' },
-        { label: 'Catamaranes', target: 'boats-catamarans' }
+        { label: 'Yates', target: 'boats-yachts', img: menuImages['boats-yachts'] },
+        { label: 'Catamaranes', target: 'boats-catamarans', img: menuImages['boats-catamarans'] }
       ]
     },
     {
@@ -101,18 +122,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
       isView: true,
       img: menuImages.services,
       subItems: [
-        { label: 'Personalized events', target: 'service-events' },
-        { label: 'Night life', target: 'service-nightlife' },
-        { label: 'Catering & Bottle service', target: 'service-catering' },
-        { label: 'Furniture', target: 'service-furniture' },
-        { label: 'Health & Beauty program', target: 'service-health' },
-        { label: 'Yoga & Personal growth', target: 'service-yoga' },
-        { label: 'Professional photographer', target: 'photographer' },
-        { label: 'Security services', target: 'service-security' },
-        { label: 'Cleaning services', target: 'service-cleaning' },
-        { label: 'Driver services', target: 'service-driver' },
-        { label: 'Deliveries', target: 'service-deliveries' },
-        { label: 'Babysitting', target: 'service-babysitting' }
+        { label: 'Personalized events', target: 'service-events', img: menuImages['service-events'] },
+        { label: 'Night life', target: 'service-nightlife', img: menuImages['service-nightlife'] },
+        { label: 'Catering & Bottle service', target: 'service-catering', img: menuImages['service-catering'] },
+        { label: 'Furniture', target: 'service-furniture', img: menuImages['service-furniture'] },
+        { label: 'Health & Beauty program', target: 'service-health', img: menuImages['service-health'] },
+        { label: 'Yoga & Personal growth', target: 'service-yoga', img: menuImages['service-yoga'] },
+        { label: 'Professional photographer', target: 'photographer', img: menuImages['photographer'] },
+        { label: 'Security services', target: 'service-security', img: menuImages['service-security'] },
+        { label: 'Cleaning services', target: 'service-cleaning', img: menuImages['service-cleaning'] },
+        { label: 'Driver services', target: 'service-driver', img: menuImages['service-driver'] },
+        { label: 'Deliveries', target: 'service-deliveries', img: menuImages['service-deliveries'] },
+        { label: 'Babysitting', target: 'service-babysitting', img: menuImages['service-babysitting'] }
       ]
     },
     { label: t.blog, target: 'blog', isView: true, img: menuImages.blog },
@@ -229,18 +250,34 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
         <div className="absolute inset-0 bg-luxury-blue/98 backdrop-blur-xl" onClick={() => setIsMenuOpen(false)}></div>
         
         <div className="absolute inset-0 z-0 pointer-events-none transition-all duration-1000 overflow-hidden">
+          {/* Main menu item images */}
           {menuItems.map((item) => (
             <img
               key={item.label}
               src={item.img}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-                hoveredItem === item.label || expandedSection === item.label
+                !hoveredSubItem && (hoveredItem === item.label || expandedSection === item.label)
                   ? 'opacity-20 scale-105'
                   : 'opacity-0 scale-100'
               }`}
               alt=""
             />
           ))}
+          {/* Sub-item images */}
+          {menuItems.flatMap((item) =>
+            item.subItems?.map((sub) => (
+              <img
+                key={sub.target}
+                src={sub.img}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                  hoveredSubItem === sub.target
+                    ? 'opacity-20 scale-105'
+                    : 'opacity-0 scale-100'
+                }`}
+                alt=""
+              />
+            )) || []
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-luxury-blue via-transparent to-luxury-blue"></div>
         </div>
 
@@ -299,6 +336,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                     {item.subItems.map(sub => (
                       <button
                         key={sub.label}
+                        onMouseEnter={() => setHoveredSubItem(sub.target)}
+                        onMouseLeave={() => setHoveredSubItem(null)}
                         onClick={() => handleNavClick(sub.target, true)}
                         className="text-center md:text-left text-base sm:text-lg md:text-xl font-serif text-white/30 hover:text-luxury-gold transition-colors italic"
                       >
