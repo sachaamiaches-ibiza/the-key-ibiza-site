@@ -1,18 +1,20 @@
 /**
  * Cloudinary Watermark Utility
- * Transforms Cloudinary URLs to include the logo watermark overlay
+ * Transforms Cloudinary URLs to include a watermark overlay
  * The watermark is embedded in the image, so downloads include it
  */
 
-// Logo configuration - using uploaded logo from "THE KEY IBIZA LOGO" folder
-// The public_id format for folders is: folder_name/image_name (spaces become underscores in some cases)
-const LOGO_PUBLIC_ID = 'THE_KEY_IBIZA_LOGO/logo'; // Adjust if the actual filename is different
+// Watermark configuration - using Cloudinary text overlay
+// To use a logo image instead, upload it to Cloudinary and use: l_<public_id>
+const WATERMARK_TEXT = 'THE KEY IBIZA';
+const WATERMARK_FONT = 'Playfair Display';
+const WATERMARK_OPACITY = 40; // 0-100
 
 /**
- * Add logo watermark to a Cloudinary URL
+ * Add watermark transformation to a Cloudinary URL
  * @param url - Original Cloudinary image URL
- * @param size - Size of watermark: 'small', 'medium', 'large', 'gallery'
- * @returns URL with logo watermark transformation
+ * @param size - Size of watermark: 'small', 'medium', 'large'
+ * @returns URL with watermark transformation
  */
 export function addCloudinaryWatermark(
   url: string,
@@ -22,20 +24,19 @@ export function addCloudinaryWatermark(
     return url; // Return unchanged if not a Cloudinary URL
   }
 
-  // Size configurations - width of logo and opacity
+  // Size configurations for text
   const sizeConfig = {
-    small: { width: 100, opacity: 50 },
-    medium: { width: 180, opacity: 50 },
-    large: { width: 280, opacity: 50 },
-    gallery: { width: 220, opacity: 50 },
+    small: { fontSize: 30, spacing: 8 },
+    medium: { fontSize: 50, spacing: 12 },
+    large: { fontSize: 80, spacing: 16 },
+    gallery: { fontSize: 60, spacing: 14 },
   };
 
   const config = sizeConfig[size];
 
-  // Logo overlay transformation
-  // Format: l_<public_id>,w_<width>,o_<opacity>,g_center
-  // fl_layer_apply applies the overlay
-  const watermarkTransform = `l_${LOGO_PUBLIC_ID.replace(/\//g, ':')},w_${config.width},o_${config.opacity},g_center,fl_layer_apply`;
+  // Cloudinary text overlay transformation
+  // Format: l_text:<font>_<size>:<text>,co_rgb:ffffff,o_<opacity>,g_center
+  const watermarkTransform = `l_text:${encodeURIComponent(WATERMARK_FONT)}_${config.fontSize}_bold:${encodeURIComponent(WATERMARK_TEXT)},co_rgb:ffffff,o_${WATERMARK_OPACITY},g_center`;
 
   // Find the upload/ part of the URL and insert transformation after it
   const uploadIndex = url.indexOf('/upload/');
@@ -46,8 +47,63 @@ export function addCloudinaryWatermark(
   const beforeUpload = url.substring(0, uploadIndex + 8); // includes '/upload/'
   const afterUpload = url.substring(uploadIndex + 8);
 
-  // Insert watermark transformation
-  return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
+  // Check if there are already transformations
+  if (afterUpload.startsWith('v') && /^v\d+\//.test(afterUpload)) {
+    // Has version, insert before version
+    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
+  } else if (afterUpload.includes('/')) {
+    // Has other transformations, append to them
+    const firstSlash = afterUpload.indexOf('/');
+    const existingTransforms = afterUpload.substring(0, firstSlash);
+    const rest = afterUpload.substring(firstSlash + 1);
+    return `${beforeUpload}${existingTransforms},${watermarkTransform}/${rest}`;
+  } else {
+    // No transformations, just add it
+    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
+  }
+}
+
+/**
+ * Add watermark with logo overlay (requires logo uploaded to Cloudinary)
+ * @param url - Original Cloudinary image URL
+ * @param logoPublicId - Public ID of the logo in Cloudinary
+ * @param size - Size of watermark
+ * @returns URL with logo watermark
+ */
+export function addCloudinaryLogoWatermark(
+  url: string,
+  logoPublicId: string = 'the-key-ibiza-watermark',
+  size: 'small' | 'medium' | 'large' | 'gallery' = 'medium'
+): string {
+  if (!url || !url.includes('cloudinary.com')) {
+    return url;
+  }
+
+  const sizeConfig = {
+    small: { width: 80, opacity: 50 },
+    medium: { width: 150, opacity: 45 },
+    large: { width: 250, opacity: 40 },
+    gallery: { width: 200, opacity: 45 },
+  };
+
+  const config = sizeConfig[size];
+
+  // Logo overlay transformation
+  const watermarkTransform = `l_${logoPublicId},w_${config.width},o_${config.opacity},g_center`;
+
+  const uploadIndex = url.indexOf('/upload/');
+  if (uploadIndex === -1) {
+    return url;
+  }
+
+  const beforeUpload = url.substring(0, uploadIndex + 8);
+  const afterUpload = url.substring(uploadIndex + 8);
+
+  if (afterUpload.startsWith('v') && /^v\d+\//.test(afterUpload)) {
+    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
+  } else {
+    return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
+  }
 }
 
 export default addCloudinaryWatermark;

@@ -5,7 +5,6 @@ import { translations } from '../translations';
 import { LogoTheKey } from './Navbar';
 import { useIsMobile } from './useIsMobile';
 import FooterSEO from './FooterSEO';
-import { addCloudinaryWatermark } from '../utils/cloudinaryWatermark';
 
 // Watermark overlay component for images and videos
 const WatermarkOverlay = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' | 'gallery' }) => {
@@ -205,13 +204,10 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
           setHeaderVideo(null);
         }
 
-        // Apply watermark to images for download protection
-        const watermarkedHeader = headerMedia.images.map(img => addCloudinaryWatermark(img, 'large'));
-        setSlideshowImages(watermarkedHeader);
+        setSlideshowImages(headerMedia.images);
         // Use gallery images, or fall back to header images if no gallery
         const galleryImgs = galleryMedia.images.length > 0 ? galleryMedia.images : headerMedia.images;
-        const watermarkedGallery = galleryImgs.map(img => addCloudinaryWatermark(img, 'gallery'));
-        setAllGalleryImages(watermarkedGallery);
+        setAllGalleryImages(galleryImgs);
       } catch (e) {
         console.error('Error loading yacht media:', e);
       } finally {

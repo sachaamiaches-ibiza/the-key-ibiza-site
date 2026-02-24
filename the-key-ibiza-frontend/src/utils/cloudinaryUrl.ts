@@ -3,9 +3,6 @@
 
 const CLOUDINARY_CLOUD_NAME = 'drxf80sho';
 
-// Logo for watermark - uploaded to THE KEY IBIZA LOGO folder
-const LOGO_PUBLIC_ID = 'THE_KEY_IBIZA_LOGO:logo';
-
 interface CloudinaryOptions {
   width?: number;
   height?: number;
@@ -51,68 +48,43 @@ export function getOptimizedImageUrl(
   return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/fetch/${transformString}/${encodeURIComponent(originalUrl)}`;
 }
 
-// Helper to add watermark transformation for fetch URLs
-function addWatermarkTransform(baseUrl: string, logoWidth: number = 180): string {
-  // For fetch URLs, add watermark as overlay transformation
-  // The format is: /l_<public_id>,w_<width>,o_<opacity>,g_center/fl_layer_apply/
-  const watermarkTransform = `l_${LOGO_PUBLIC_ID},w_${logoWidth},o_50,g_center/fl_layer_apply`;
-
-  // Insert watermark after /fetch/ part
-  const fetchIndex = baseUrl.indexOf('/fetch/');
-  if (fetchIndex === -1) return baseUrl;
-
-  const beforeTransform = baseUrl.substring(0, fetchIndex + 7); // includes '/fetch/'
-  const afterFetch = baseUrl.substring(fetchIndex + 7);
-
-  // Find where the original transform ends (before the encoded URL)
-  const parts = afterFetch.split('/http');
-  if (parts.length < 2) return baseUrl;
-
-  return `${beforeTransform}${parts[0]}/${watermarkTransform}/http${parts.slice(1).join('/http')}`;
-}
-
 // Preset for villa card thumbnails (listing page)
 export function getCardImageUrl(url: string): string {
-  const optimized = getOptimizedImageUrl(url, {
+  return getOptimizedImageUrl(url, {
     width: 600,
     quality: 'auto',
     format: 'auto',
     crop: 'limit'
   });
-  return addWatermarkTransform(optimized, 100);
 }
 
 // Preset for villa detail header/slideshow
 export function getHeaderImageUrl(url: string): string {
-  const optimized = getOptimizedImageUrl(url, {
+  return getOptimizedImageUrl(url, {
     width: 1400,
     quality: 'auto:good',
     format: 'auto',
     crop: 'limit'
   });
-  return addWatermarkTransform(optimized, 280);
 }
 
 // Preset for gallery images
 export function getGalleryImageUrl(url: string): string {
-  const optimized = getOptimizedImageUrl(url, {
+  return getOptimizedImageUrl(url, {
     width: 1000,
     quality: 'auto',
     format: 'auto',
     crop: 'limit'
   });
-  return addWatermarkTransform(optimized, 220);
 }
 
 // Preset for gallery thumbnails
 export function getThumbnailUrl(url: string): string {
-  const optimized = getOptimizedImageUrl(url, {
+  return getOptimizedImageUrl(url, {
     width: 150,
     height: 100,
     quality: 'auto:eco',
     format: 'auto',
     crop: 'fill'
   });
-  // No watermark on tiny thumbnails - too small
-  return optimized;
 }
