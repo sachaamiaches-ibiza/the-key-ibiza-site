@@ -268,7 +268,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             </button>
           </div>
 
-          <div className="flex flex-col space-y-4 md:space-y-6 w-full max-w-4xl max-h-[60vh] overflow-y-auto no-scrollbar py-6">
+          <div className="flex flex-col space-y-2 md:space-y-3 w-full max-w-4xl py-4">
             {menuItems.map((item, idx) => (
               <div key={item.label} className="flex flex-col items-center md:items-start">
                 <button 
@@ -281,26 +281,26 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                       handleNavClick(item.target, item.isView);
                     }
                   }} 
-                  className="group relative flex items-center md:items-baseline text-3xl sm:text-4xl md:text-7xl font-serif text-white/40 hover:text-white transition-all text-left"
+                  className="group relative flex items-center md:items-baseline text-2xl sm:text-3xl md:text-5xl font-serif text-white/40 hover:text-white transition-all text-left"
                   style={{ transitionDelay: `${idx * 40}ms` }}
                 >
                   <span className={`italic transition-all duration-500 block ${hoveredItem === item.label || expandedSection === item.label ? 'translate-x-4 md:translate-x-8 text-luxury-gold' : ''}`}>
                     {item.label}
                   </span>
                   {item.subItems && (
-                    <span className={`ml-4 text-xs md:text-xl transition-transform duration-500 ${expandedSection === item.label ? 'rotate-180' : ''}`}>
-                      <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeWidth="1"></path></svg>
+                    <span className={`ml-3 text-xs md:text-lg transition-transform duration-500 ${expandedSection === item.label ? 'rotate-180' : ''}`}>
+                      <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeWidth="1"></path></svg>
                     </span>
                   )}
                 </button>
                 
                 {item.subItems && (
-                  <div className={`flex flex-col items-center md:items-start space-y-3 md:space-y-4 md:pl-20 overflow-hidden transition-all duration-700 ${expandedSection === item.label ? 'max-h-[600px] mt-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <div className={`flex flex-col items-center md:items-start space-y-2 md:space-y-2 md:pl-16 overflow-hidden transition-all duration-700 ${expandedSection === item.label ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
                     {item.subItems.map(sub => (
-                      <button 
+                      <button
                         key={sub.label}
                         onClick={() => handleNavClick(sub.target, true)}
-                        className="text-center md:text-left text-lg sm:text-xl md:text-3xl font-serif text-white/30 hover:text-luxury-gold transition-colors italic"
+                        className="text-center md:text-left text-base sm:text-lg md:text-xl font-serif text-white/30 hover:text-luxury-gold transition-colors italic"
                       >
                         {sub.label}
                       </button>
