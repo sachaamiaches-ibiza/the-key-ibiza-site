@@ -259,7 +259,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             {/* Empty spacer for desktop to keep close button on right */}
             <div className="hidden lg:block"></div>
 
-            <button onClick={() => setIsMenuOpen(false)} className="text-white/40 hover:text-luxury-gold transition-colors p-2 focus:outline-none">
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(false)}
+              className="relative z-50 text-white/40 hover:text-luxury-gold transition-colors p-2 focus:outline-none cursor-pointer"
+            >
               <svg className="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="1"></path></svg>
             </button>
           </div>
