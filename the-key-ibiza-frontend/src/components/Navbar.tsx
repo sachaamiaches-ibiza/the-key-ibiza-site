@@ -248,12 +248,16 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
           
           {/* Header of Full Screen Menu */}
           <div className="w-full flex justify-between items-center mb-10 max-w-7xl mx-auto">
-             {/* Language Selection - All 10 languages */}
-            <LanguageSelector
-              currentLang={lang}
-              onLanguageChange={onLanguageChange}
-              variant="fullscreen"
-            />
+             {/* Language Selection - Only visible on mobile (hidden on lg and up since navbar has it) */}
+            <div className="lg:hidden">
+              <LanguageSelector
+                currentLang={lang}
+                onLanguageChange={onLanguageChange}
+                variant="fullscreen"
+              />
+            </div>
+            {/* Empty spacer for desktop to keep close button on right */}
+            <div className="hidden lg:block"></div>
 
             <button onClick={() => setIsMenuOpen(false)} className="text-white/40 hover:text-luxury-gold transition-colors p-2 focus:outline-none">
               <svg className="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="1"></path></svg>
