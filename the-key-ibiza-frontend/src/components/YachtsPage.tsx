@@ -29,9 +29,50 @@ const BACKEND_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001'
   : 'https://the-key-ibiza-backend.vercel.app';
 
+// Video file extensions
+const VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov', '.avi', '.m4v'];
+
+// Check if URL is a video
+function isVideoUrl(url: string): boolean {
+  const lowerUrl = url.toLowerCase();
+  return VIDEO_EXTENSIONS.some(ext => lowerUrl.includes(ext)) || lowerUrl.includes('/video/');
+}
+
+// Cache for yacht header media
+const yachtMediaCache: { [name: string]: { image: string | null; video: string | null } } = {};
+
+// Fetch first header media for a yacht
+async function fetchYachtHeaderMedia(yachtName: string): Promise<{ image: string | null; video: string | null }> {
+  if (yachtMediaCache[yachtName]) {
+    return yachtMediaCache[yachtName];
+  }
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent(`Yates/${yachtName}/Header`)}`);
+    if (!res.ok) {
+      return { image: null, video: null };
+    }
+    const data = await res.json();
+    const allMedia = data.images || [];
+
+    const videos = allMedia.filter((url: string) => isVideoUrl(url));
+    const images = allMedia.filter((url: string) => !isVideoUrl(url));
+
+    const result = {
+      image: images[0] || null,
+      video: videos[0] || null
+    };
+    yachtMediaCache[yachtName] = result;
+    return result;
+  } catch {
+    return { image: null, video: null };
+  }
+}
+
 const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate = '', onDateChange }) => {
   const [yachtsData, setYachtsData] = useState<Yacht[]>([]);
   const [loading, setLoading] = useState(true);
+  const [yachtMedia, setYachtMedia] = useState<{ [name: string]: { image: string | null; video: string | null } }>({});
   const [searchFilters, setSearchFilters] = useState({
     fecha: initialDate,
     paxMax: 0,
@@ -57,6 +98,17 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
         // Handle both array and { data: [] } formats
         const yachts = Array.isArray(json) ? json : (json.data || []);
         setYachtsData(yachts);
+
+        // Fetch media for each yacht from Cloudinary
+        const mediaPromises = yachts.map((yacht: Yacht) =>
+          fetchYachtHeaderMedia(yacht.nombre).then(media => ({ name: yacht.nombre, media }))
+        );
+        const mediaResults = await Promise.all(mediaPromises);
+        const mediaMap: { [name: string]: { image: string | null; video: string | null } } = {};
+        mediaResults.forEach(({ name, media }) => {
+          mediaMap[name] = media;
+        });
+        setYachtMedia(mediaMap);
       } catch (error) {
         console.error('Error fetching yachts:', error);
       }
@@ -347,11 +399,22 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                 className="group luxury-card rounded-[24px] overflow-hidden border border-white/5 hover:border-luxury-gold/20 transition-all duration-500"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={yacht.header_images?.split('|')[0] || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
-                    alt={yacht.nombre}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                  />
+                  {yachtMedia[yacht.nombre]?.video ? (
+                    <video
+                      src={yachtMedia[yacht.nombre].video!}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                  ) : (
+                    <img
+                      src={yachtMedia[yacht.nombre]?.image || yacht.header_images?.split('|')[0] || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
+                      alt={yacht.nombre}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/80 via-transparent to-transparent"></div>
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-xl font-serif text-white mb-1">{yacht.nombre}</h3>

@@ -10,11 +10,20 @@ import FooterSEO from './FooterSEO';
 // Backend URL for Cloudinary API
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 
-// Cache for Cloudinary folder images
-const cloudinaryCache: { [folder: string]: string[] } = {};
+// Video file extensions
+const VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov', '.avi', '.m4v'];
 
-// Fetch images from Cloudinary folder
-async function fetchCloudinaryFolder(folderPath: string): Promise<string[]> {
+// Check if URL is a video
+function isVideoUrl(url: string): boolean {
+  const lowerUrl = url.toLowerCase();
+  return VIDEO_EXTENSIONS.some(ext => lowerUrl.includes(ext)) || lowerUrl.includes('/video/');
+}
+
+// Cache for Cloudinary folder media
+const cloudinaryCache: { [folder: string]: { images: string[]; videos: string[] } } = {};
+
+// Fetch media (images + videos) from Cloudinary folder
+async function fetchCloudinaryMedia(folderPath: string): Promise<{ images: string[]; videos: string[] }> {
   if (cloudinaryCache[folderPath]) {
     return cloudinaryCache[folderPath];
   }
@@ -23,16 +32,22 @@ async function fetchCloudinaryFolder(folderPath: string): Promise<string[]> {
     const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent(folderPath)}`);
     if (!res.ok) {
       console.warn(`⚠️ Cloudinary folder not found: ${folderPath}`);
-      return [];
+      return { images: [], videos: [] };
     }
     const data = await res.json();
-    const images = data.images || [];
-    cloudinaryCache[folderPath] = images;
-    console.log(`📁 Cloudinary folder ${folderPath}: ${images.length} images`);
-    return images;
+    const allMedia = data.images || [];
+
+    // Separate videos from images
+    const videos = allMedia.filter((url: string) => isVideoUrl(url));
+    const images = allMedia.filter((url: string) => !isVideoUrl(url));
+
+    const result = { images, videos };
+    cloudinaryCache[folderPath] = result;
+    console.log(`📁 Cloudinary folder ${folderPath}: ${images.length} images, ${videos.length} videos`);
+    return result;
   } catch (e) {
     console.error(`❌ Error fetching Cloudinary folder ${folderPath}:`, e);
-    return [];
+    return { images: [], videos: [] };
   }
 }
 
@@ -136,14 +151,15 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   // Touch swipe
   const touchStartX = useRef(0);
 
-  // Images from Cloudinary (fetched on mount)
+  // Media from Cloudinary (fetched on mount)
   const [slideshowImages, setSlideshowImages] = useState<string[]>([]);
+  const [headerVideo, setHeaderVideo] = useState<string | null>(null);
   const [allGalleryImages, setAllGalleryImages] = useState<string[]>([]);
   const [imagesLoading, setImagesLoading] = useState(true);
 
-  // Fetch images from Cloudinary folders on mount
+  // Fetch media from Cloudinary folders on mount
   useEffect(() => {
-    async function loadImages() {
+    async function loadMedia() {
       if (!yacht.nombre) {
         setImagesLoading(false);
         return;
@@ -152,22 +168,30 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
       setImagesLoading(true);
       try {
         // Folder structure: Yates/{yacht name}/Header and Yates/{yacht name}/Gallery
-        const [headerImages, galleryImages] = await Promise.all([
-          fetchCloudinaryFolder(`Yates/${yacht.nombre}/Header`),
-          fetchCloudinaryFolder(`Yates/${yacht.nombre}/Gallery`)
+        const [headerMedia, galleryMedia] = await Promise.all([
+          fetchCloudinaryMedia(`Yates/${yacht.nombre}/Header`),
+          fetchCloudinaryMedia(`Yates/${yacht.nombre}/Gallery`)
         ]);
 
-        setSlideshowImages(headerImages);
+        // If there's a video in Header folder, use it as header
+        if (headerMedia.videos.length > 0) {
+          setHeaderVideo(headerMedia.videos[0]);
+        } else {
+          setHeaderVideo(null);
+        }
+
+        setSlideshowImages(headerMedia.images);
         // Use gallery images, or fall back to header images if no gallery
-        setAllGalleryImages(galleryImages.length > 0 ? galleryImages : headerImages);
+        const galleryImgs = galleryMedia.images.length > 0 ? galleryMedia.images : headerMedia.images;
+        setAllGalleryImages(galleryImgs);
       } catch (e) {
-        console.error('Error loading yacht images:', e);
+        console.error('Error loading yacht media:', e);
       } finally {
         setImagesLoading(false);
       }
     }
 
-    loadImages();
+    loadMedia();
   }, [yacht.nombre]);
 
   // Parse daily rates
@@ -487,16 +511,30 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
 
   return (
     <div style={{ backgroundColor: '#0B1C26' }}>
-      {/* ===== HEADER SLIDESHOW ===== */}
+      {/* ===== HEADER VIDEO/SLIDESHOW ===== */}
       <div className="relative w-full h-[60vh] md:h-[80vh] overflow-hidden group">
         {imagesLoading ? (
           <div className="absolute inset-0 bg-luxury-slate flex items-center justify-center">
             <div className="flex flex-col items-center gap-4">
               <div className="w-8 h-8 border-2 border-luxury-gold/30 border-t-luxury-gold rounded-full animate-spin"></div>
-              <span className="text-white/40 text-sm">Loading images...</span>
+              <span className="text-white/40 text-sm">Loading media...</span>
             </div>
           </div>
+        ) : headerVideo ? (
+          /* Video Header */
+          <div className="absolute inset-0 w-full h-full">
+            <video
+              src={headerVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0B1C26]/60 via-transparent to-[#0B1C26]"></div>
+          </div>
         ) : slideshowImages.length > 0 ? (
+          /* Image Slideshow */
           slideshowImages.map((img, index) => (
             <div
               key={index}
@@ -509,12 +547,12 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
           ))
         ) : (
           <div className="absolute inset-0 bg-luxury-slate flex items-center justify-center">
-            <span className="text-white/30 text-lg">No images available</span>
+            <span className="text-white/30 text-lg">No media available</span>
           </div>
         )}
 
-        {/* Navigation Arrows */}
-        {slideshowImages.length > 1 && (
+        {/* Navigation Arrows (only for images, not video) */}
+        {!headerVideo && slideshowImages.length > 1 && (
           <>
             <button
               onClick={() => setCurrentSlide((currentSlide - 1 + slideshowImages.length) % slideshowImages.length)}
@@ -531,8 +569,8 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
           </>
         )}
 
-        {/* Dot Indicators */}
-        {slideshowImages.length > 1 && (
+        {/* Dot Indicators (only for images, not video) */}
+        {!headerVideo && slideshowImages.length > 1 && (
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
             {slideshowImages.map((_, index) => (
               <button
