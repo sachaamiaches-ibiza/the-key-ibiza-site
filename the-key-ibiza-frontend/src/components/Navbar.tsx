@@ -185,7 +185,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
               </div>
             </div>
 
-            <div className="hidden lg:flex space-x-6 items-center text-xs uppercase tracking-[0.3em] font-semibold text-white/40 overflow-visible">
+            <div className="hidden lg:flex space-x-6 items-center text-sm uppercase tracking-[0.25em] font-semibold text-white/40 overflow-visible">
             {menuItems.slice(0, 6).map((item) => (
               <div key={item.label} className="relative group/item">
                 <button 
@@ -206,7 +206,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                           <button 
                             key={sub.label}
                             onClick={() => handleNavClick(sub.target, true)}
-                            className="text-left hover:text-luxury-gold transition-colors whitespace-nowrap text-white/60 hover:text-white text-xs tracking-wider"
+                            className="text-left hover:text-luxury-gold transition-colors whitespace-nowrap text-white/60 hover:text-white text-sm tracking-wider"
                           >
                             {sub.label}
                           </button>
@@ -229,7 +229,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
 
             <button
               onClick={() => handleNavClick('contact')}
-              className="border border-luxury-gold/40 text-luxury-gold px-5 py-1.5 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all font-normal tracking-[0.2em] uppercase text-[9px] ml-2"
+              className="border border-luxury-gold/40 text-luxury-gold px-5 py-2 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all font-normal tracking-[0.2em] uppercase text-xs ml-2"
             >
               {t.contact}
             </button>

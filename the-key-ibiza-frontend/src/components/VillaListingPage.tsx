@@ -137,14 +137,97 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
     return ['All', ...Array.from(new Set(villasOfType.map(v => v.location)))];
   }, [villasOfType]);
 
-  // Get all unique amenities from villas automatically
+  // Curated amenities organized by category
+  const amenitiesByCategory = useMemo(() => ({
+    'Views': [
+      'Sea view',
+      'Country view',
+      'Town view',
+      'Sunrise view',
+      'Sunset view',
+      'Views of Es Vedrà',
+      'Views of Formentera',
+      'Views of Ibiza Old Town',
+      'Front Line'
+    ],
+    'Pools & Water': [
+      'Swimming pool',
+      'Heated swimming pool',
+      'Infinity pool',
+      'Indoor pool',
+      'Saltwater pool',
+      'Indoor jacuzzi',
+      'Outdoor jacuzzi',
+      'Sea access'
+    ],
+    'Sports & Fitness': [
+      'Gym',
+      'Tennis court',
+      'Padel court',
+      'Basketball hoop',
+      'Football pitch',
+      'Volleyball court',
+      'Yoga area',
+      'Pool/Snooker table'
+    ],
+    'Entertainment': [
+      'Cinema room',
+      'Outdoor cinema',
+      'Disco/Club room',
+      'Sound system',
+      'Satellite TV'
+    ],
+    'Outdoor Spaces': [
+      'Garden',
+      'Lawn area',
+      'Terraces',
+      'Al fresco dining',
+      'BBQ',
+      'Child play area'
+    ],
+    'Kitchen & Dining': [
+      'Professional kitchen',
+      'Preparation kitchen',
+      'Chef service'
+    ],
+    'Wellness': [
+      'Sauna/Steam room',
+      'Spa'
+    ],
+    'Climate & Comfort': [
+      'Air conditioning',
+      'Air con - Bedrooms only',
+      'Central heating',
+      'Underfloor heating',
+      'Ceiling fans',
+      'Fireplace'
+    ],
+    'Events': [
+      'Weddings',
+      'Events',
+      'Retreats'
+    ],
+    'Security & Access': [
+      'Alarm',
+      'Safe',
+      'Gated community',
+      'Fenced',
+      'Wheelchair friendly',
+      'Facilities for disabled'
+    ],
+    'Extras': [
+      'Smart home',
+      'Solar panels',
+      'Helicopter pad',
+      'Boat mooring',
+      'No neighbors'
+    ]
+  }), []);
+
+  // Flat list of all amenities for filtering
   const allAmenities = useMemo(() => {
-    const amenitiesSet = new Set<string>();
-    villasOfType.forEach(villa => {
-      (villa.amenities || villa.features)?.forEach((feature: string) => amenitiesSet.add(feature));
-    });
-    return Array.from(amenitiesSet).sort();
-  }, [villasOfType]);
+    return Object.values(amenitiesByCategory).flat();
+  }, [amenitiesByCategory]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -328,21 +411,21 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   <button
                     type="button"
                     onClick={() => setMobileDatePickerOpen(true)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer text-left"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer text-left"
                   >
                     {searchFilters.checkIn || 'Select date'}
                   </button>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-in</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-in</span>
                 </div>
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setMobileDatePickerOpen(true)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer text-left"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer text-left"
                   >
                     {searchFilters.checkOut || 'Select date'}
                   </button>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-out</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Check-out</span>
                 </div>
               </div>
 
@@ -352,14 +435,14 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   <select
                     value={searchFilters.minBedrooms}
                     onChange={(e) => setSearchFilters({...searchFilters, minBedrooms: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     <option value={0} className="bg-luxury-blue">Any</option>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                       <option key={n} value={n} className="bg-luxury-blue">{n}+</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Bedrooms</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Bedrooms</span>
                 </div>
                 <div className="relative">
                   <input
@@ -367,9 +450,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     placeholder="€ / Week"
                     value={searchFilters.minPrice || ''}
                     onChange={(e) => setSearchFilters({...searchFilters, minPrice: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price From</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price From</span>
                 </div>
               </div>
 
@@ -381,19 +464,19 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     placeholder="€ / Week"
                     value={searchFilters.maxPrice === 200000 ? '' : searchFilters.maxPrice}
                     onChange={(e) => setSearchFilters({...searchFilters, maxPrice: parseInt(e.target.value) || 200000})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price To</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Price To</span>
                 </div>
                 <div className="relative">
                   <select
                     value={searchFilters.location}
                     onChange={(e) => setSearchFilters({...searchFilters, location: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueLocations.map((l: string) => <option key={l} value={l} className="bg-luxury-blue">{l === 'All' ? 'All Locations' : l}</option>)}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Location</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Location</span>
                 </div>
               </div>
 
@@ -404,9 +487,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   placeholder="Search villa name..."
                   value={searchFilters.searchText}
                   onChange={(e) => setSearchFilters({...searchFilters, searchText: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                 />
-                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Search</span>
+                <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1">Search</span>
               </div>
 
               {/* Row 5: Filters + Numbering */}
@@ -433,20 +516,24 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   </button>
                   {/* Mobile Filters Dropdown */}
                   {isFiltersOpen && (
-                    <div className="absolute bottom-full left-0 mb-2 z-[60] w-[220px] bg-[#0A0E14] border border-white/10 rounded-2xl p-3 shadow-2xl">
-                      <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold mb-2">Amenities</p>
-                      <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
-                        {allAmenities.map((amenity: string) => (
-                          <button
-                            key={amenity}
-                            onClick={() => toggleAmenity(amenity)}
-                            className={`flex items-center justify-between w-full px-2 py-1.5 rounded-lg text-[9px] transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/10 text-white/50'}`}
-                          >
-                            <span className="truncate">{amenity}</span>
-                            {searchFilters.selectedAmenities.includes(amenity) && (
-                              <svg className="w-2.5 h-2.5 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-                            )}
-                          </button>
+                    <div className="absolute bottom-full left-0 mb-2 z-[60] w-[280px] bg-[#0A0E14] border border-white/10 rounded-2xl p-3 shadow-2xl">
+                      <p className="text-[10px] uppercase tracking-widest text-luxury-gold font-bold mb-3">Amenities</p>
+                      <div className="flex flex-col gap-3 max-h-[320px] overflow-y-auto pr-1">
+                        {Object.entries(amenitiesByCategory).map(([category, amenities]) => (
+                          <div key={category}>
+                            <p className="text-[8px] uppercase tracking-widest text-white/40 font-semibold mb-1.5 sticky top-0 bg-[#0A0E14] py-1">{category}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {amenities.map((amenity: string) => (
+                                <button
+                                  key={amenity}
+                                  onClick={() => toggleAmenity(amenity)}
+                                  className={`px-2 py-1 rounded-full text-[9px] transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/15 text-white/50 hover:border-white/30'}`}
+                                >
+                                  {amenity}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -505,10 +592,10 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                       setTimeout(() => checkOutRef.current?.showPicker?.(), 100);
                     }}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-in</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-in</span>
                 </div>
                 <div className="relative">
                   <input
@@ -518,23 +605,23 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     min={searchFilters.checkIn}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-out</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-out</span>
                 </div>
                 <div className="relative">
                   <select
                     value={searchFilters.minBedrooms}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSearchFilters({...searchFilters, minBedrooms: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     <option value={0} className="bg-luxury-blue">Any</option>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                       <option key={n} value={n} className="bg-luxury-blue">{n}+</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Bedrooms</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Bedrooms</span>
                 </div>
                 <div className="relative">
                   <input
@@ -542,9 +629,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     placeholder="Min"
                     value={searchFilters.minPrice || ''}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, minPrice: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Price From</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Price From</span>
                 </div>
                 <div className="relative">
                   <input
@@ -552,19 +639,19 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     placeholder="Max"
                     value={searchFilters.maxPrice === 200000 ? '' : searchFilters.maxPrice}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, maxPrice: parseInt(e.target.value) || 200000})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Price Till</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Price Till</span>
                 </div>
                 <div className="relative">
                   <select
                     value={searchFilters.location}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSearchFilters({...searchFilters, location: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueLocations.map((l: string) => <option key={l} value={l} className="bg-luxury-blue">{l === 'All' ? 'All Locations' : l}</option>)}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Location</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Location</span>
                 </div>
                 <div className="relative">
                   <input
@@ -572,9 +659,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     placeholder="Villa name..."
                     value={searchFilters.searchText}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, searchText: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Search</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Search</span>
                 </div>
               </div>
               {/* Buttons row for tablet/desktop */}
@@ -602,24 +689,36 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                       <svg className={`w-3 h-3 transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     {isFiltersOpen && (
-                      <div className="absolute top-full left-0 mt-2 z-[60] min-w-[280px] bg-[#0A0E14] border border-white/10 rounded-2xl p-4 shadow-2xl">
-                        <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold mb-3">Amenities</p>
-                        <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
-                          {allAmenities.map((amenity: string) => (
-                            <button
-                              key={amenity}
-                              onClick={() => toggleAmenity(amenity)}
-                              className={`flex items-center justify-between w-full px-3 py-1.5 rounded-lg text-[10px] transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/10 text-white/50 hover:text-white hover:border-white/30'}`}
-                            >
-                              <span>{amenity}</span>
-                              {searchFilters.selectedAmenities.includes(amenity) && (
-                                <svg className="w-3 h-3 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-                              )}
-                            </button>
+                      <div className="absolute top-full left-0 mt-2 z-[60] w-[520px] bg-[#0A0E14] border border-white/10 rounded-2xl p-5 shadow-2xl">
+                        <p className="text-[10px] uppercase tracking-widest text-luxury-gold font-bold mb-4">Filter by Amenities</p>
+                        <div className="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
+                          {Object.entries(amenitiesByCategory).map(([category, amenities]) => (
+                            <div key={category} className="space-y-2">
+                              <p className="text-[9px] uppercase tracking-widest text-white/50 font-semibold border-b border-white/10 pb-1">{category}</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {amenities.map((amenity: string) => (
+                                  <button
+                                    key={amenity}
+                                    onClick={() => toggleAmenity(amenity)}
+                                    className={`px-2.5 py-1 rounded-full text-[10px] transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/15 text-white/50 hover:text-white hover:border-white/30'}`}
+                                  >
+                                    {amenity}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
                           ))}
                         </div>
-                        {allAmenities.length === 0 && (
-                          <p className="text-white/30 text-xs italic">No amenities available</p>
+                        {searchFilters.selectedAmenities.length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center">
+                            <span className="text-[10px] text-white/40">{searchFilters.selectedAmenities.length} selected</span>
+                            <button
+                              onClick={() => setSearchFilters({...searchFilters, selectedAmenities: []})}
+                              className="text-[10px] text-luxury-gold hover:text-white uppercase tracking-wider"
+                            >
+                              Clear all
+                            </button>
+                          </div>
                         )}
                       </div>
                     )}

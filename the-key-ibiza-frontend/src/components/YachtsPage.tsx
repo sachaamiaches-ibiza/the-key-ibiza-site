@@ -255,24 +255,24 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                     type="date"
                     value={searchFilters.fecha}
                     onChange={(e) => setSearchFilters({...searchFilters, fecha: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Fecha</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Fecha</span>
                 </div>
                 {/* Pax Max */}
                 <div className="relative">
                   <select
                     value={searchFilters.paxMax}
                     onChange={(e) => setSearchFilters({...searchFilters, paxMax: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     <option value={0} className="bg-luxury-blue">Any</option>
                     {[2, 4, 6, 8, 10, 12, 15, 20, 30].map(n => (
                       <option key={n} value={n} className="bg-luxury-blue">{n}+ pax</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Pax Max</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Pax Max</span>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -281,13 +281,13 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                   <select
                     value={searchFilters.amarre}
                     onChange={(e) => setSearchFilters({...searchFilters, amarre: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueAmarres.map(a => (
                       <option key={a} value={a} className="bg-luxury-blue">{a === 'All' ? 'All Moorings' : a}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Amarre</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Amarre</span>
                 </div>
                 {/* Price Max */}
                 <div className="relative">
@@ -296,9 +296,9 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                     placeholder="Max €"
                     value={searchFilters.priceMax || ''}
                     onChange={(e) => setSearchFilters({...searchFilters, priceMax: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Price Max</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Price Max</span>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -307,26 +307,26 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                   <select
                     value={searchFilters.metros}
                     onChange={(e) => setSearchFilters({...searchFilters, metros: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {meterRanges.map(r => (
                       <option key={r.value} value={r.value} className="bg-luxury-blue">{r.label}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Metros</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Metros</span>
                 </div>
                 {/* Localidad */}
                 <div className="relative">
                   <select
                     value={searchFilters.localidad}
                     onChange={(e) => setSearchFilters({...searchFilters, localidad: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueLocations.map(l => (
                       <option key={l} value={l} className="bg-luxury-blue">{l === 'All' ? 'All Locations' : l}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Localidad</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Localidad</span>
                 </div>
               </div>
               {/* Sort By */}
@@ -334,7 +334,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                 >
                   <option value="default" className="bg-luxury-blue">Default Order</option>
                   <option value="price-asc" className="bg-luxury-blue">Price: Low to High</option>
@@ -342,11 +342,11 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                   <option value="size-asc" className="bg-luxury-blue">Size: Small to Large</option>
                   <option value="size-desc" className="bg-luxury-blue">Size: Large to Small</option>
                 </select>
-                <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Sort By</span>
+                <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Sort By</span>
               </div>
               {/* Search Button */}
               <button
-                className="w-full py-3 rounded-xl text-[10px] uppercase tracking-widest font-semibold transition-all bg-luxury-gold text-luxury-blue border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold"
+                className="w-full py-3 rounded-xl text-xs uppercase tracking-widest font-semibold transition-all bg-luxury-gold text-luxury-blue border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold"
               >
                 Search Yachts
               </button>
@@ -362,37 +362,37 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                     value={searchFilters.fecha}
                     onChange={(e) => setSearchFilters({...searchFilters, fecha: e.target.value})}
                     onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Fecha</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Fecha</span>
                 </div>
                 {/* Pax Max */}
                 <div className="relative">
                   <select
                     value={searchFilters.paxMax}
                     onChange={(e) => setSearchFilters({...searchFilters, paxMax: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     <option value={0} className="bg-luxury-blue">Any</option>
                     {[2, 4, 6, 8, 10, 12, 15, 20, 30].map(n => (
                       <option key={n} value={n} className="bg-luxury-blue">{n}+ passengers</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Pax Max</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Pax Max</span>
                 </div>
                 {/* Amarre */}
                 <div className="relative">
                   <select
                     value={searchFilters.amarre}
                     onChange={(e) => setSearchFilters({...searchFilters, amarre: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueAmarres.map(a => (
                       <option key={a} value={a} className="bg-luxury-blue">{a === 'All' ? 'All Moorings' : a}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Amarre</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Amarre</span>
                 </div>
                 {/* Price Max */}
                 <div className="relative">
@@ -401,35 +401,35 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                     placeholder="Max €/day"
                     value={searchFilters.priceMax || ''}
                     onChange={(e) => setSearchFilters({...searchFilters, priceMax: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Price Max</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Price Max</span>
                 </div>
                 {/* Metros */}
                 <div className="relative">
                   <select
                     value={searchFilters.metros}
                     onChange={(e) => setSearchFilters({...searchFilters, metros: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {meterRanges.map(r => (
                       <option key={r.value} value={r.value} className="bg-luxury-blue">{r.label}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Metros</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Metros</span>
                 </div>
                 {/* Localidad */}
                 <div className="relative">
                   <select
                     value={searchFilters.localidad}
                     onChange={(e) => setSearchFilters({...searchFilters, localidad: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueLocations.map(l => (
                       <option key={l} value={l} className="bg-luxury-blue">{l === 'All' ? 'All Locations' : l}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Localidad</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1.5">Localidad</span>
                 </div>
               </div>
               {/* Bottom row with sort and buttons */}
