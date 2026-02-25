@@ -52,7 +52,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
-                src="https://images.unsplash.com/photo-1565179500900-fa5e87e595f4?auto=format&fit=crop&q=80&w=1200"
+                src="/es-vedra-ibiza.jpg"
                 alt="Es Vedra Ibiza"
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
               />
