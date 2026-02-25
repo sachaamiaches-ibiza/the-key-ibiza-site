@@ -456,8 +456,8 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ serviceId, onNavigate, la
             <div className="grid grid-cols-2 gap-6 pt-8 border-t border-white/10">
               {data.features.map((feature: string, idx: number) => (
                 <div key={idx} className="flex items-center space-x-4">
-                  <div className="w-1.5 h-1.5 bg-luxury-gold rounded-full"></div>
-                  <span className="text-white text-[10px] uppercase tracking-wider font-bold">{feature}</span>
+                  <div className="w-2 h-2 bg-luxury-gold rounded-full flex-shrink-0"></div>
+                  <span className="text-white text-sm md:text-base tracking-wide font-medium">{feature}</span>
                 </div>
               ))}
             </div>
