@@ -75,7 +75,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
             </h2>
             <div className="w-12 h-px bg-luxury-gold/30 mb-6"></div>
             <p className="text-white/50 text-sm md:text-base font-light leading-relaxed mb-4">
-              Before bringing The Key Ibiza to life, we were proud to be part of <span className="text-white italic">La Villa</span>, a cherished family-run business renowned across multiple regions for its expertise in high-end interior and exterior design.
+              Before bringing The Key Ibiza to life, we were proud to be part of <a href="https://www.lavillagardendesign.com/es/" target="_blank" rel="noopener noreferrer" className="text-luxury-gold italic hover:text-white transition-colors cursor-pointer">La Villa</a>, a cherished family-run business renowned across multiple regions for its expertise in high-end interior and exterior design.
             </p>
             <p className="text-white/50 text-sm md:text-base font-light leading-relaxed">
               This foundational experience taught us the true value of craftsmanship, personalized service, and design excellence that we now bring to every client relationship.

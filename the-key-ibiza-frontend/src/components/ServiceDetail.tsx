@@ -407,7 +407,20 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ serviceId, onNavigate, la
           <div className="space-y-16 animate-slide-up">
             <div className="space-y-8">
               <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block">{data.badge}</span>
-              <h1 className="text-5xl md:text-8xl font-serif text-white leading-tight">{data.title}</h1>
+              <h1 className="text-5xl md:text-8xl font-serif text-white leading-tight">
+                {serviceId === 'furniture' ? (
+                  <a
+                    href="https://www.lavillagardendesign.com/es/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-luxury-gold transition-colors cursor-pointer"
+                  >
+                    {data.title}
+                  </a>
+                ) : (
+                  data.title
+                )}
+              </h1>
               <p className="text-2xl md:text-3xl font-serif italic text-white/80 leading-relaxed">
                 {data.subtitle}
               </p>
