@@ -63,22 +63,34 @@ function isVideoUrl(url: string): boolean {
   return VIDEO_EXTENSIONS.some(ext => lowerUrl.includes(ext)) || lowerUrl.includes('/video/');
 }
 
-// Cache for yacht header media
+// Cache for yacht listing media
 const yachtMediaCache: { [name: string]: { image: string | null; video: string | null } } = {};
 
-// Fetch first header media for a yacht
-async function fetchYachtHeaderMedia(yachtName: string): Promise<{ image: string | null; video: string | null }> {
+// Fetch media from Listado folder for yacht listing (fallback to Header if Listado is empty)
+async function fetchYachtListingMedia(yachtName: string): Promise<{ image: string | null; video: string | null }> {
   if (yachtMediaCache[yachtName]) {
     return yachtMediaCache[yachtName];
   }
 
   try {
-    const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent(`Yates/${yachtName}/Header`)}`);
-    if (!res.ok) {
-      return { image: null, video: null };
+    // First try Listado folder
+    const listadoRes = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent(`Yates/${yachtName}/Listado`)}`);
+
+    let allMedia: string[] = [];
+
+    if (listadoRes.ok) {
+      const listadoData = await listadoRes.json();
+      allMedia = listadoData.images || [];
     }
-    const data = await res.json();
-    const allMedia = data.images || [];
+
+    // Fallback to Header folder if Listado is empty
+    if (allMedia.length === 0) {
+      const headerRes = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent(`Yates/${yachtName}/Header`)}`);
+      if (headerRes.ok) {
+        const headerData = await headerRes.json();
+        allMedia = headerData.images || [];
+      }
+    }
 
     const videos = allMedia.filter((url: string) => isVideoUrl(url));
     const images = allMedia.filter((url: string) => !isVideoUrl(url));
@@ -130,7 +142,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
 
         // Fetch media for each yacht from Cloudinary
         const mediaPromises = yachts.map((yacht: Yacht) =>
-          fetchYachtHeaderMedia(yacht.nombre).then(media => ({ name: yacht.nombre, media }))
+          fetchYachtListingMedia(yacht.nombre).then(media => ({ name: yacht.nombre, media }))
         );
         const mediaResults = await Promise.all(mediaPromises);
         const mediaMap: { [name: string]: { image: string | null; video: string | null } } = {};
