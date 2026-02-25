@@ -212,8 +212,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
       'Safe',
       'Gated community',
       'Fenced',
-      'Wheelchair friendly',
-      'Facilities for disabled'
+      'Wheelchair friendly'
     ],
     'Extras': [
       'Smart home',
