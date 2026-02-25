@@ -250,18 +250,18 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
             <div className="md:hidden space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 {/* Fecha */}
-                <div className="relative min-w-0">
+                <div className="relative overflow-hidden">
                   <input
                     type="date"
                     value={searchFilters.fecha}
                     onChange={(e) => setSearchFilters({...searchFilters, fecha: e.target.value})}
-                    className="w-full min-w-0 bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer appearance-none"
-                    style={{ colorScheme: 'dark' }}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    style={{ colorScheme: 'dark', maxWidth: '100%', boxSizing: 'border-box' }}
                   />
                   <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Fecha</span>
                 </div>
                 {/* Pax Max */}
-                <div className="relative">
+                <div className="relative overflow-hidden">
                   <select
                     value={searchFilters.paxMax}
                     onChange={(e) => setSearchFilters({...searchFilters, paxMax: parseInt(e.target.value) || 0})}
