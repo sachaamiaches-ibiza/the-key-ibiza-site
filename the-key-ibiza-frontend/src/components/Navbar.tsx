@@ -53,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
   useEffect(() => {
     const fetchDarkKnightMedia = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent('Yates/Dark Knight/Header')}`);
+        const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent('Yates/102 LEOPARD (DARK KNIGHT)/Header')}`);
         if (res.ok) {
           const data = await res.json();
           const videos = (data.images || []).filter((url: string) =>
