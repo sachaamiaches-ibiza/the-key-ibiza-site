@@ -83,7 +83,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               <img
                 src="/la-villa-furniture.jpg"
                 alt="La Villa Garden Design"
-                className="w-full h-[300px] md:h-[450px] object-contain bg-[#0B1C26] transition-transform duration-1000 group-hover:scale-105"
+                className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
             </div>
