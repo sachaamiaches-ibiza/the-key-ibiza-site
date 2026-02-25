@@ -296,8 +296,24 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
         <div className="absolute inset-0 bg-luxury-blue/98 backdrop-blur-xl" onClick={() => setIsMenuOpen(false)}></div>
         
         <div className="absolute inset-0 z-0 pointer-events-none transition-all duration-1000 overflow-hidden">
-          {/* Main menu item images */}
-          {menuItems.map((item) => (
+          {/* Welcome logo - shows when hovering over Welcome */}
+          <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${
+            !hoveredSubItem && (hoveredItem === t.welcome || expandedSection === t.welcome)
+              ? 'opacity-100 scale-100'
+              : 'opacity-0 scale-90'
+          }`}>
+            <div className="flex flex-col items-center">
+              <LogoTheKey className="w-32 h-48 md:w-48 md:h-72" color="#C4A461" />
+              <span className="text-2xl md:text-4xl tracking-[0.4em] mt-6" style={{ fontFamily: 'Playfair Display, serif', color: '#C4A461' }}>
+                THE KEY
+              </span>
+              <span className="text-lg md:text-xl tracking-[0.5em] mt-2 italic" style={{ fontFamily: 'Playfair Display, serif', color: 'rgba(196,164,97,0.7)' }}>
+                Ibiza
+              </span>
+            </div>
+          </div>
+          {/* Main menu item images (except Welcome) */}
+          {menuItems.filter(item => item.label !== t.welcome).map((item) => (
             <img
               key={item.label}
               src={item.img}
