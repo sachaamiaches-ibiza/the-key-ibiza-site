@@ -126,85 +126,87 @@ const CatamaransPage: React.FC<CatamaransPageProps> = ({ onNavigate, lang }) => 
 
             {/* Mobile Layout */}
             <div className="md:hidden space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex gap-3">
                 {/* Fecha */}
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={searchFilters.fecha}
-                    onChange={(e) => setSearchFilters({...searchFilters, fecha: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
-                    style={{ colorScheme: 'dark' }}
-                  />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Fecha</span>
+                <div className="relative flex-1 min-w-0">
+                  <div className="overflow-hidden rounded-xl">
+                    <input
+                      type="date"
+                      value={searchFilters.fecha}
+                      onChange={(e) => setSearchFilters({...searchFilters, fecha: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                      style={{ colorScheme: 'dark' }}
+                    />
+                  </div>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Fecha</span>
                 </div>
                 {/* Pax Max */}
-                <div className="relative">
+                <div className="relative flex-1 min-w-0">
                   <select
                     value={searchFilters.paxMax}
                     onChange={(e) => setSearchFilters({...searchFilters, paxMax: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     <option value={0} className="bg-luxury-blue">Any</option>
                     {[2, 4, 6, 8, 10, 12, 15, 20, 30].map(n => (
                       <option key={n} value={n} className="bg-luxury-blue">{n}+ pax</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Pax Max</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Pax Max</span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex gap-3">
                 {/* Amarre */}
-                <div className="relative">
+                <div className="relative flex-1 min-w-0">
                   <select
                     value={searchFilters.amarre}
                     onChange={(e) => setSearchFilters({...searchFilters, amarre: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueAmarres.map(a => (
                       <option key={a} value={a} className="bg-luxury-blue">{a === 'All' ? 'All Moorings' : a}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Amarre</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Amarre</span>
                 </div>
                 {/* Price Max */}
-                <div className="relative">
+                <div className="relative flex-1 min-w-0">
                   <input
                     type="number"
                     placeholder="Max €"
                     value={searchFilters.priceMax || ''}
                     onChange={(e) => setSearchFilters({...searchFilters, priceMax: parseInt(e.target.value) || 0})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors"
                   />
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Price Max</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Price Max</span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex gap-3">
                 {/* Metros */}
-                <div className="relative">
+                <div className="relative flex-1 min-w-0">
                   <select
                     value={searchFilters.metros}
                     onChange={(e) => setSearchFilters({...searchFilters, metros: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {meterRanges.map(r => (
                       <option key={r.value} value={r.value} className="bg-luxury-blue">{r.label}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Metros</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Metros</span>
                 </div>
                 {/* Localidad */}
-                <div className="relative">
+                <div className="relative flex-1 min-w-0">
                   <select
                     value={searchFilters.localidad}
                     onChange={(e) => setSearchFilters({...searchFilters, localidad: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     {uniqueLocations.map(l => (
                       <option key={l} value={l} className="bg-luxury-blue">{l === 'All' ? 'All Locations' : l}</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[8px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Localidad</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Localidad</span>
                 </div>
               </div>
               {/* Search Button */}
