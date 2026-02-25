@@ -177,9 +177,9 @@ const SERVICE_DATA: Record<string, any> = {
       "🤝 Preferred Partner: As a preferred partner of The Key Ibiza, La Villa Garden offers clients refined living experiences through family-driven values and a commitment to excellence down to the very last detail."
     ],
     features: ["Family Business", "Resilient Teak & Aluminum", "Bespoke Outdoor Styling", "Premium Craftsmanship", "Trusted Ibiza Partner", "Timeless Aesthetics"],
-    imageMain: "https://res.cloudinary.com/drxf80sho/image/upload/f_auto,q_auto/Website_Content/La%20Villa",
-    imageGrid1: "https://res.cloudinary.com/drxf80sho/image/upload/f_auto,q_auto/Website_Content/La%20Villa",
-    imageGrid2: "https://res.cloudinary.com/drxf80sho/image/upload/f_auto,q_auto/Website_Content/La%20Villa"
+    imageMain: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg",
+    imageGrid1: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg",
+    imageGrid2: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg"
   },
   health: {
     badge: "Vitality & Holistic Health",

@@ -52,7 +52,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
-                src="https://res.cloudinary.com/drxf80sho/image/upload/f_auto,q_auto/Website_Content/Sunset"
+                src="https://res.cloudinary.com/drxf80sho/image/upload/v1772058228/IMG_0418_h4zpbo.jpg"
                 alt="Es Vedra Ibiza"
                 className="w-full h-[300px] md:h-[450px] object-cover object-[center_85%] transition-transform duration-1000 group-hover:scale-110"
               />
@@ -81,7 +81,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
-                src="https://res.cloudinary.com/drxf80sho/image/upload/f_auto,q_auto/Website_Content/La%20Villa"
+                src="https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg"
                 alt="La Villa Garden Design"
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-105"
               />
