@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 import { translations } from '../translations';
 import LanguageSelector from './LanguageSelector';
+import { fetchVillas } from '../services/villaService';
+import { getHeaderImageUrl } from '../utils/cloudinaryUrl';
 
 export const LogoTheKey = ({ className = "w-8 h-8", color = "#C4A461" }) => (
   <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -40,6 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
   const [hoveredSubItem, setHoveredSubItem] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [darkKnightVideo, setDarkKnightVideo] = useState<string | null>(null);
+  const [villaImages, setVillaImages] = useState<string[]>([]);
 
   const t = translations[lang].nav;
 
@@ -70,6 +73,22 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
     fetchDarkKnightMedia();
   }, []);
 
+  // Fetch villa images for menu (same as VillasPage)
+  useEffect(() => {
+    fetchVillas().then(villas => {
+      const images: string[] = [];
+      for (let i = 0; i < Math.min(3, villas.length); i++) {
+        const villa = villas[i * 10] || villas[i];
+        if (villa?.imageUrl) {
+          images.push(getHeaderImageUrl(villa.imageUrl));
+        }
+      }
+      if (images.length >= 3) {
+        setVillaImages(images);
+      }
+    }).catch(err => console.error('Error fetching villa images:', err));
+  }, []);
+
   const handleNavClick = (target: string, isView: boolean = false) => {
     if (isView) {
       onNavigate(target);
@@ -98,10 +117,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
     blog: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80&w=1200',
     about: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200',
     contact: 'https://images.unsplash.com/photo-1551135049-8a33b5883817?auto=format&fit=crop&q=80&w=1200',
-    // Villas sub-items
-    'villas-holiday': 'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?auto=format&fit=crop&q=80&w=1200',
-    'villas-longterm': 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200',
-    'villas-sale': 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1200',
+    // Villas sub-items (use dynamic images if loaded, fallback to Unsplash)
+    'villas-holiday': villaImages[0] || 'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?auto=format&fit=crop&q=80&w=1200',
+    'villas-longterm': villaImages[1] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200',
+    'villas-sale': villaImages[2] || 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1200',
     // Boats sub-items
     'boats-yachts': 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
     'boats-catamarans': 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&q=80&w=1200',
