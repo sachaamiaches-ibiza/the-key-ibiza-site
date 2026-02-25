@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { vipAuth } from '../services/vipAuth';
-import VipUserManagement from './VipUserManagement';
 
 interface VipLoginProps {
   onAuthChange?: (isVip: boolean) => void;
@@ -21,7 +20,6 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [userName, setUserName] = useState('');
-  const [showUserManagement, setShowUserManagement] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -106,19 +104,6 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
           <p className="text-white/50 text-xs leading-relaxed mb-5">
             Please enjoy the journey and feel free to contact us if you have any questions.
           </p>
-          {isAdmin && (
-            <>
-              <p className="text-luxury-gold/60 text-[10px] uppercase tracking-wider mb-4">
-                Admin Access
-              </p>
-              <button
-                onClick={() => setShowUserManagement(true)}
-                className="w-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-luxury-gold hover:text-luxury-blue transition-all mb-3"
-              >
-                Manage Users
-              </button>
-            </>
-          )}
           <button
             onClick={handleLogout}
             className="w-full bg-transparent border border-white/30 text-white/70 py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:border-luxury-gold hover:text-luxury-gold transition-all"
@@ -126,7 +111,6 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
             Sign Out
           </button>
         </div>
-        {showUserManagement && <VipUserManagement onClose={() => setShowUserManagement(false)} />}
       </div>
     );
   }
