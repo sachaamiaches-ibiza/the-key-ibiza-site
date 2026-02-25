@@ -52,8 +52,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
-                src={villaImages[0] || "https://images.unsplash.com/photo-1558384216-3694038a8341?auto=format&fit=crop&q=80&w=1200"}
-                alt="Luxury Villa Ibiza"
+                src="https://images.unsplash.com/photo-1533671706648-73c4a51b4dab?auto=format&fit=crop&q=80&w=1200"
+                alt="Es Vedra Ibiza"
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
