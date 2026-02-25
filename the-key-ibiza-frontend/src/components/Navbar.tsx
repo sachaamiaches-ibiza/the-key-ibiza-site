@@ -111,12 +111,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
   // Images for menu items and sub-items
   const menuImages = {
     home: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=1200',
-    villas: 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=1200',
-    boats: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
+    villas: villaImages[0] || 'https://images.unsplash.com/photo-1600585154526-990dcea4db0d?auto=format&fit=crop&q=80&w=1200',
+    boats: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200', // Fallback, video used instead
     services: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=1200',
-    blog: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&q=80&w=1200',
-    about: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200',
-    contact: 'https://images.unsplash.com/photo-1551135049-8a33b5883817?auto=format&fit=crop&q=80&w=1200',
+    blog: 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?auto=format&fit=crop&q=80&w=1200', // Ibiza beach/lifestyle
+    about: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1200', // Ibiza coast
+    contact: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=1200', // Ibiza sunset beach
     // Villas sub-items (use dynamic images if loaded, fallback to Unsplash)
     'villas-holiday': villaImages[0] || 'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?auto=format&fit=crop&q=80&w=1200',
     'villas-longterm': villaImages[1] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200',
@@ -314,16 +314,32 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
           </div>
           {/* Main menu item images (except Welcome) */}
           {menuItems.filter(item => item.label !== t.welcome).map((item) => (
-            <img
-              key={item.label}
-              src={item.img}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-                !hoveredSubItem && (hoveredItem === item.label || expandedSection === item.label)
-                  ? 'opacity-20 scale-105'
-                  : 'opacity-0 scale-100'
-              }`}
-              alt=""
-            />
+            item.label === t.boats && darkKnightVideo ? (
+              <video
+                key={item.label}
+                src={darkKnightVideo}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                  !hoveredSubItem && (hoveredItem === item.label || expandedSection === item.label)
+                    ? 'opacity-20 scale-105'
+                    : 'opacity-0 scale-100'
+                }`}
+              />
+            ) : (
+              <img
+                key={item.label}
+                src={item.img}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                  !hoveredSubItem && (hoveredItem === item.label || expandedSection === item.label)
+                    ? 'opacity-20 scale-105'
+                    : 'opacity-0 scale-100'
+                }`}
+                alt=""
+              />
+            )
           ))}
           {/* Sub-item images/videos */}
           {menuItems.flatMap((item) =>
