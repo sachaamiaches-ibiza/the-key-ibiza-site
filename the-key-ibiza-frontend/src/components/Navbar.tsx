@@ -28,19 +28,46 @@ interface NavbarProps {
   canGoBack?: boolean;
 }
 
+// Auto-detect environment
+const BACKEND_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5001'
+  : 'https://the-key-ibiza-backend.vercel.app';
+
 const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLanguageChange, onGoBack, canGoBack }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [hoveredSubItem, setHoveredSubItem] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  
+  const [darkKnightVideo, setDarkKnightVideo] = useState<string | null>(null);
+
   const t = translations[lang].nav;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fetch Dark Knight video for menu background
+  useEffect(() => {
+    const fetchDarkKnightMedia = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent('Yates/Dark Knight/Header')}`);
+        if (res.ok) {
+          const data = await res.json();
+          const videos = (data.images || []).filter((url: string) =>
+            url.toLowerCase().includes('.mp4') || url.toLowerCase().includes('.webm') || url.toLowerCase().includes('/video/')
+          );
+          if (videos.length > 0) {
+            setDarkKnightVideo(videos[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching Dark Knight media:', error);
+      }
+    };
+    fetchDarkKnightMedia();
   }, []);
 
   const handleNavClick = (target: string, isView: boolean = false) => {
@@ -263,19 +290,35 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
               alt=""
             />
           ))}
-          {/* Sub-item images */}
+          {/* Sub-item images/videos */}
           {menuItems.flatMap((item) =>
             item.subItems?.map((sub) => (
-              <img
-                key={sub.target}
-                src={sub.img}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-                  hoveredSubItem === sub.target
-                    ? 'opacity-20 scale-105'
-                    : 'opacity-0 scale-100'
-                }`}
-                alt=""
-              />
+              sub.target === 'boats-yachts' && darkKnightVideo ? (
+                <video
+                  key={sub.target}
+                  src={darkKnightVideo}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                    hoveredSubItem === sub.target
+                      ? 'opacity-20 scale-105'
+                      : 'opacity-0 scale-100'
+                  }`}
+                />
+              ) : (
+                <img
+                  key={sub.target}
+                  src={sub.img}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
+                    hoveredSubItem === sub.target
+                      ? 'opacity-20 scale-105'
+                      : 'opacity-0 scale-100'
+                  }`}
+                  alt=""
+                />
+              )
             )) || []
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-luxury-blue via-transparent to-luxury-blue"></div>

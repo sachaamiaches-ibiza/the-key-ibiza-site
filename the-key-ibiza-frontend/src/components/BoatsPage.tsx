@@ -1,33 +1,62 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
+
+// Auto-detect environment
+const BACKEND_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5001'
+  : 'https://the-key-ibiza-backend.vercel.app';
 
 interface BoatsPageProps {
   onNavigate: (view: string) => void;
   lang: Language;
 }
 
-const boatCategories = [
-  {
-    id: 'yachts',
-    title: 'Yates',
-    subtitle: 'Luxury Yachts',
-    description: 'Experience the Mediterranean in unparalleled style aboard our exclusive selection of luxury yachts. From intimate day charters to week-long adventures, our fleet offers the ultimate in privacy, comfort, and sophistication. Each vessel comes with experienced crew, ensuring an impeccable journey through the crystal waters of Ibiza and Formentera.',
-    image: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
-    view: 'boats-yachts',
-  },
-  {
-    id: 'catamarans',
-    title: 'Catamaranes',
-    subtitle: 'Premium Catamarans',
-    description: 'Discover the freedom of sailing with our premium catamaran collection. Perfect for groups and families, these spacious vessels offer stability, comfort, and elegance. Enjoy panoramic views from multiple decks, swim in secluded coves, and create unforgettable memories as you explore the Balearic coastline in absolute luxury.',
-    image: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&q=80&w=1200',
-    view: 'boats-catamarans',
-  },
-];
-
 const BoatsPage: React.FC<BoatsPageProps> = ({ onNavigate, lang }) => {
+  const [darkKnightVideo, setDarkKnightVideo] = useState<string | null>(null);
+
+  // Fetch Dark Knight video from Cloudinary
+  useEffect(() => {
+    const fetchDarkKnightMedia = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent('Yates/Dark Knight/Header')}`);
+        if (res.ok) {
+          const data = await res.json();
+          const videos = (data.images || []).filter((url: string) =>
+            url.toLowerCase().includes('.mp4') || url.toLowerCase().includes('.webm') || url.toLowerCase().includes('/video/')
+          );
+          if (videos.length > 0) {
+            setDarkKnightVideo(videos[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching Dark Knight media:', error);
+      }
+    };
+    fetchDarkKnightMedia();
+  }, []);
+
+  const boatCategories = [
+    {
+      id: 'yachts',
+      title: 'Yates',
+      subtitle: 'Luxury Yachts',
+      description: 'Experience the Mediterranean in unparalleled style aboard our exclusive selection of luxury yachts. From intimate day charters to week-long adventures, our fleet offers the ultimate in privacy, comfort, and sophistication. Each vessel comes with experienced crew, ensuring an impeccable journey through the crystal waters of Ibiza and Formentera.',
+      video: darkKnightVideo,
+      image: 'https://images.unsplash.com/photo-1567899378494-47b22a2bb96a?auto=format&fit=crop&q=80&w=1200',
+      view: 'boats-yachts',
+    },
+    {
+      id: 'catamarans',
+      title: 'Catamaranes',
+      subtitle: 'Premium Catamarans',
+      description: 'Discover the freedom of sailing with our premium catamaran collection. Perfect for groups and families, these spacious vessels offer stability, comfort, and elegance. Enjoy panoramic views from multiple decks, swim in secluded coves, and create unforgettable memories as you explore the Balearic coastline in absolute luxury.',
+      video: null,
+      image: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&q=80&w=1200',
+      view: 'boats-catamarans',
+    },
+  ];
   return (
     <div className="pt-40 pb-12" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
@@ -51,14 +80,25 @@ const BoatsPage: React.FC<BoatsPageProps> = ({ onNavigate, lang }) => {
               key={category.id}
               className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-10 md:gap-16 items-center`}
             >
-              {/* Image */}
+              {/* Image/Video */}
               <div className="w-full md:w-1/2">
                 <div className="relative overflow-hidden rounded-[32px] group">
-                  <img
-                    src={category.image}
-                    alt={category.title}
-                    className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
-                  />
+                  {category.video ? (
+                    <video
+                      src={category.video}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                  ) : (
+                    <img
+                      src={category.image}
+                      alt={category.title}
+                      className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
                 </div>
               </div>
