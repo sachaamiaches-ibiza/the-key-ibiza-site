@@ -248,20 +248,20 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
 
             {/* Mobile Layout */}
             <div className="md:hidden space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3" style={{ gridTemplateColumns: '1fr 1fr' }}>
                 {/* Fecha */}
-                <div className="relative overflow-hidden">
+                <div className="relative min-w-0">
                   <input
                     type="date"
                     value={searchFilters.fecha}
                     onChange={(e) => setSearchFilters({...searchFilters, fecha: e.target.value})}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
-                    style={{ colorScheme: 'dark', maxWidth: '100%', boxSizing: 'border-box' }}
+                    style={{ colorScheme: 'dark' }}
                   />
-                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Fecha</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Fecha</span>
                 </div>
                 {/* Pax Max */}
-                <div className="relative overflow-hidden">
+                <div className="relative min-w-0">
                   <select
                     value={searchFilters.paxMax}
                     onChange={(e) => setSearchFilters({...searchFilters, paxMax: parseInt(e.target.value) || 0})}
@@ -272,7 +272,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                       <option key={n} value={n} className="bg-luxury-blue">{n}+ pax</option>
                     ))}
                   </select>
-                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1">Pax Max</span>
+                  <span className="absolute left-3 -top-2 text-[10px] uppercase tracking-wider text-white/40 bg-[#0B1C26] px-1 z-10">Pax Max</span>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
