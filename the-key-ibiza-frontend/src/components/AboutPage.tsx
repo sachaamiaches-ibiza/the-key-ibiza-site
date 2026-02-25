@@ -54,7 +54,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               <img
                 src="/es-vedra-ibiza.jpg"
                 alt="Es Vedra Ibiza"
-                className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="w-full h-[300px] md:h-[450px] object-cover object-[center_30%] transition-transform duration-1000 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
             </div>
