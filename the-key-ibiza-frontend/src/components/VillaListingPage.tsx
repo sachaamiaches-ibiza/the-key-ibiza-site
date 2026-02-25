@@ -671,9 +671,9 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   <div ref={filtersRefDesktop} className="relative">
                     <button
                       onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs uppercase tracking-widest font-medium transition-all border ${isFiltersOpen || searchFilters.selectedAmenities.length > 0 ? 'border-luxury-gold/50 text-luxury-gold' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm uppercase tracking-widest font-medium transition-all border ${isFiltersOpen || searchFilters.selectedAmenities.length > 0 ? 'border-luxury-gold/50 text-luxury-gold' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                       <span>Filters</span>
                       {searchFilters.selectedAmenities.length > 0 && (
                         <>
@@ -689,18 +689,18 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                       <svg className={`w-3 h-3 transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     {isFiltersOpen && (
-                      <div className="absolute top-full left-0 mt-2 z-[60] w-[520px] bg-[#0A0E14] border border-white/10 rounded-2xl p-5 shadow-2xl">
-                        <p className="text-xs uppercase tracking-widest text-luxury-gold font-bold mb-4">Filter by Amenities</p>
-                        <div className="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
+                      <div className="absolute top-full left-0 mt-2 z-[60] w-[700px] bg-[#0A0E14] border border-white/10 rounded-2xl p-6 shadow-2xl">
+                        <p className="text-sm uppercase tracking-widest text-luxury-gold font-bold mb-5">Filter by Amenities</p>
+                        <div className="grid grid-cols-2 gap-5 max-h-[450px] overflow-y-auto pr-2">
                           {Object.entries(amenitiesByCategory).map(([category, amenities]) => (
-                            <div key={category} className="space-y-2">
-                              <p className="text-xs uppercase tracking-widest text-white/50 font-semibold border-b border-white/10 pb-1">{category}</p>
-                              <div className="flex flex-wrap gap-1.5">
+                            <div key={category} className="space-y-2.5">
+                              <p className="text-sm uppercase tracking-widest text-white/50 font-semibold border-b border-white/10 pb-1.5">{category}</p>
+                              <div className="flex flex-wrap gap-2">
                                 {amenities.map((amenity: string) => (
                                   <button
                                     key={amenity}
                                     onClick={() => toggleAmenity(amenity)}
-                                    className={`px-2.5 py-1 rounded-full text-xs transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/15 text-white/50 hover:text-white hover:border-white/30'}`}
+                                    className={`px-3 py-1.5 rounded-full text-sm transition-all border ${searchFilters.selectedAmenities.includes(amenity) ? 'bg-luxury-gold text-luxury-blue border-luxury-gold font-medium' : 'border-white/15 text-white/50 hover:text-white hover:border-white/30'}`}
                                   >
                                     {amenity}
                                   </button>
@@ -710,11 +710,11 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                           ))}
                         </div>
                         {searchFilters.selectedAmenities.length > 0 && (
-                          <div className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center">
-                            <span className="text-xs text-white/40">{searchFilters.selectedAmenities.length} selected</span>
+                          <div className="mt-5 pt-4 border-t border-white/10 flex justify-between items-center">
+                            <span className="text-sm text-white/40">{searchFilters.selectedAmenities.length} selected</span>
                             <button
                               onClick={() => setSearchFilters({...searchFilters, selectedAmenities: []})}
-                              className="text-xs text-luxury-gold hover:text-white uppercase tracking-wider"
+                              className="text-sm text-luxury-gold hover:text-white uppercase tracking-wider"
                             >
                               Clear all
                             </button>
@@ -728,7 +728,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'price-asc' | 'price-desc' | 'size-asc' | 'size-desc')}
-                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors appearance-none cursor-pointer"
                   >
                     <option value="price-asc" className="bg-luxury-blue">Price: Low to High</option>
                     <option value="price-desc" className="bg-luxury-blue">Price: High to Low</option>
@@ -737,7 +737,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                   </select>
 
                   {/* Villa count */}
-                  <span className="text-xs text-white/40">
+                  <span className="text-sm text-white/40">
                     <span className="text-luxury-gold font-medium">{filteredVillas.length}</span>
                     <span className="mx-1">/</span>
                     <span>{villasOfType.length}</span>
@@ -748,12 +748,12 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                 <div className="flex gap-3">
                   <button
                     onClick={clearFilters}
-                    className="px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest font-medium transition-all border border-white/10 text-white/40 hover:text-white hover:border-white/30"
+                    className="px-6 py-2.5 rounded-xl text-sm uppercase tracking-widest font-medium transition-all border border-white/10 text-white/40 hover:text-white hover:border-white/30"
                   >
                     Clear
                   </button>
                   <button
-                    className="px-8 py-2.5 rounded-xl text-xs uppercase tracking-widest font-medium transition-all bg-luxury-gold text-luxury-blue border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold"
+                    className="px-8 py-2.5 rounded-xl text-sm uppercase tracking-widest font-medium transition-all bg-luxury-gold text-luxury-blue border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold"
                   >
                     Search
                   </button>
@@ -770,11 +770,11 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
           searchFilters.location !== 'All' || searchFilters.searchText ||
           searchFilters.selectedAmenities.length > 0) && (
           <div className="mb-8 mr-20 flex flex-wrap gap-2 items-center">
-            <span className="text-white/40 text-xs uppercase tracking-wider mr-2">Active filters:</span>
+            <span className="text-white/40 text-sm uppercase tracking-wider mr-2">Active filters:</span>
 
             {/* Check-in date */}
             {searchFilters.checkIn && (
-              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 Check-in: {searchFilters.checkIn}
                 <button
                   onClick={() => setSearchFilters({...searchFilters, checkIn: ''})}
@@ -787,7 +787,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* Check-out date */}
             {searchFilters.checkOut && (
-              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 Check-out: {searchFilters.checkOut}
                 <button
                   onClick={() => setSearchFilters({...searchFilters, checkOut: ''})}
@@ -800,7 +800,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* Bedrooms */}
             {searchFilters.minBedrooms > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 {searchFilters.minBedrooms}+ Bedrooms
                 <button
                   onClick={() => setSearchFilters({...searchFilters, minBedrooms: 0})}
@@ -813,7 +813,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* Min Price */}
             {searchFilters.minPrice > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 From €{searchFilters.minPrice.toLocaleString()}
                 <button
                   onClick={() => setSearchFilters({...searchFilters, minPrice: 0})}
@@ -826,7 +826,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* Max Price */}
             {searchFilters.maxPrice < 200000 && (
-              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 Up to €{searchFilters.maxPrice.toLocaleString()}
                 <button
                   onClick={() => setSearchFilters({...searchFilters, maxPrice: 200000})}
@@ -839,7 +839,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* Location */}
             {searchFilters.location !== 'All' && (
-              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 {searchFilters.location}
                 <button
                   onClick={() => setSearchFilters({...searchFilters, location: 'All'})}
@@ -852,7 +852,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* Search text */}
             {searchFilters.searchText && (
-              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 "{searchFilters.searchText}"
                 <button
                   onClick={() => setSearchFilters({...searchFilters, searchText: ''})}
@@ -865,7 +865,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* Amenities */}
             {searchFilters.selectedAmenities.map(amenity => (
-              <span key={amenity} className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-wider">
+              <span key={amenity} className="inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-luxury-gold/20 border border-luxury-gold/30 text-luxury-gold text-sm uppercase tracking-wider">
                 {amenity}
                 <button
                   onClick={() => toggleAmenity(amenity)}
@@ -879,7 +879,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
             {/* Clear All button */}
             <button
               onClick={clearFilters}
-              className="ml-2 text-white/40 hover:text-luxury-gold text-xs uppercase tracking-wider underline underline-offset-2 transition-colors"
+              className="ml-2 text-white/40 hover:text-luxury-gold text-sm uppercase tracking-wider underline underline-offset-2 transition-colors"
             >
               Clear all
             </button>
@@ -890,7 +890,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
         <div className="flex justify-center mb-6">
           <button
             onClick={() => setShowMap(!showMap)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-semibold transition-all border cursor-pointer ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm uppercase tracking-[0.2em] font-semibold transition-all border cursor-pointer ${
               showMap
                 ? 'bg-luxury-gold text-luxury-blue border-luxury-gold'
                 : 'bg-transparent text-luxury-gold border-luxury-gold/50 hover:border-luxury-gold hover:bg-luxury-gold/10'
