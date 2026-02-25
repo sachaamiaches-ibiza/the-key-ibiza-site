@@ -119,7 +119,7 @@ const SERVICE_DATA: Record<string, any> = {
     ],
     imageMain: "https://images.unsplash.com/photo-1551135049-8a33b5883817?auto=format&fit=crop&q=80&w=1200",
     imageGrid1: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=800",
-    imageGrid2: "https://images.unsplash.com/photo-1614713568397-b30b779d0031?auto=format&fit=crop&q=80&w=800"
+    imageGrid2: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=800"
   },
   nightlife: {
     badge: "VIP & Concierge",
@@ -133,8 +133,8 @@ const SERVICE_DATA: Record<string, any> = {
     ],
     features: ["VIP Club Tables", "Backstage Access", "Private Villa Parties", "Luxury Transport", "Guest List Management", "Iconic Venue Access"],
     imageMain: "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&q=80&w=1200",
-    imageGrid1: "https://images.unsplash.com/photo-1574391884720-38528073d6dd?auto=format&fit=crop&q=80&w=800",
-    imageGrid2: "https://images.unsplash.com/photo-1514525253440-b393452e8d26?auto=format&fit=crop&q=80&w=1200"
+    imageGrid1: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=800",
+    imageGrid2: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=1200"
   },
   events: {
     badge: "Celebrations & Events",
@@ -178,8 +178,8 @@ const SERVICE_DATA: Record<string, any> = {
     ],
     features: ["Family Business", "Resilient Teak & Aluminum", "Bespoke Outdoor Styling", "Premium Craftsmanship", "Trusted Ibiza Partner", "Timeless Aesthetics"],
     imageMain: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg",
-    imageGrid1: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg",
-    imageGrid2: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg"
+    imageGrid1: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058850/1-3_xlugf0.jpg",
+    imageGrid2: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058857/1-4-263x300_rgbiqw.jpg"
   },
   health: {
     badge: "Vitality & Holistic Health",
@@ -209,7 +209,7 @@ const SERVICE_DATA: Record<string, any> = {
     features: ["Yoga & Reiki Healing", "Valérie: Inner Alignment", "Francesca: Ayurveda", "Custom Wellness Programs", "Nature-surrounded Sessions", "Beginner to Advanced"],
     imageMain: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1200",
     imageGrid1: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=800",
-    imageGrid2: "https://images.unsplash.com/photo-1593811167562-9cef47bffca4?auto=format&fit=crop&q=80&w=1200",
+    imageGrid2: "https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&q=80&w=1200",
     profiles: [
       {
         id: 'valerie-detail',
@@ -244,9 +244,9 @@ const SERVICE_DATA: Record<string, any> = {
         "High-end Products", 
         "Filter Inspections"
     ],
-    imageMain: "https://images.unsplash.com/photo-1581578731548-c64695cc6954?auto=format&fit=crop&q=80&w=1200",
+    imageMain: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&q=80&w=1200",
     imageGrid1: "https://images.unsplash.com/photo-1562133567-b6a0a9c7e6eb?auto=format&fit=crop&q=80&w=800",
-    imageGrid2: "https://images.unsplash.com/photo-1558904541-efa8c1965f1e?auto=format&fit=crop&q=80&w=800"
+    imageGrid2: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800"
   },
   driver: {
     badge: "Mobility",
@@ -290,9 +290,9 @@ const SERVICE_DATA: Record<string, any> = {
       "100% Discretion", 
       "Artisanal Shop Sourcing"
     ],
-    imageMain: "https://images.unsplash.com/photo-1520038410233-7141f77e47aa?auto=format&fit=crop&q=80&w=1200",
+    imageMain: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=1200",
     imageGrid1: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&q=80&w=800",
-    imageGrid2: "https://images.unsplash.com/photo-1566576721346-d4a3b4eaad5b?auto=format&fit=crop&q=80&w=1200"
+    imageGrid2: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&q=80&w=1200"
   },
   babysitting: {
     badge: "Family",
@@ -313,9 +313,9 @@ const SERVICE_DATA: Record<string, any> = {
         "Private Event Childcare", 
         "Full-day or Hourly Support"
     ],
-    imageMain: "https://images.unsplash.com/photo-1587532939404-9aa3c1f82d1f?auto=format&fit=crop&q=80&w=1200",
+    imageMain: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200",
     imageGrid1: "https://images.unsplash.com/photo-1510154221590-ff63e90a136f?auto=format&fit=crop&q=80&w=800",
-    imageGrid2: "https://images.unsplash.com/photo-1536640712247-c575393a86c9?auto=format&fit=crop&q=80&w=1200"
+    imageGrid2: "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?auto=format&fit=crop&q=80&w=1200"
   }
 };
 
