@@ -407,7 +407,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                   onMouseLeave={() => setHoveredItem(null)}
                   onClick={() => {
                     if(item.subItems) {
-                      setExpandedSection(expandedSection === item.label ? null : item.label);
+                      const newExpanded = expandedSection === item.label ? null : item.label;
+                      setExpandedSection(newExpanded);
+                      setHoveredItem(newExpanded); // For mobile: show background when expanding
+                      setHoveredSubItem(null);
                     } else {
                       handleNavClick(item.target, item.isView);
                     }
@@ -432,6 +435,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                         key={sub.label}
                         onMouseEnter={() => setHoveredSubItem(sub.target)}
                         onMouseLeave={() => setHoveredSubItem(null)}
+                        onTouchStart={() => setHoveredSubItem(sub.target)}
                         onClick={() => handleNavClick(sub.target, true)}
                         className="text-center md:text-left text-base sm:text-lg md:text-xl font-serif text-white/30 hover:text-luxury-gold transition-colors italic"
                       >
