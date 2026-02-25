@@ -59,8 +59,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
-                src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200"
-                alt="Interior Design"
+                src="/la-villa-furniture.jpg"
+                alt="La Villa Garden Design"
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
