@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
+import { fetchVillas } from '../services/villaService';
 
 interface AboutPageProps {
   onNavigate: (view: any) => void;
@@ -9,6 +10,27 @@ interface AboutPageProps {
 }
 
 const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
+  const [villaImages, setVillaImages] = useState<string[]>([]);
+
+  // Fetch villa images for the about page sections
+  useEffect(() => {
+    fetchVillas().then(villas => {
+      const images: string[] = [];
+      // Get header images from different villas
+      for (let i = 0; i < Math.min(3, villas.length); i++) {
+        const villa = villas[i];
+        if (villa?.headerImages && villa.headerImages.length > 0) {
+          images.push(villa.headerImages[0]);
+        } else if (villa?.imageUrl) {
+          images.push(villa.imageUrl);
+        }
+      }
+      if (images.length >= 2) {
+        setVillaImages(images);
+      }
+    }).catch(err => console.error('Error fetching villa images:', err));
+  }, []);
+
   return (
     <div className="pt-40 pb-12" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
@@ -30,8 +52,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
-                src="https://images.unsplash.com/photo-1558384216-3694038a8341?auto=format&fit=crop&q=80&w=1200"
-                alt="Ibiza Sunset"
+                src={villaImages[0] || "https://images.unsplash.com/photo-1558384216-3694038a8341?auto=format&fit=crop&q=80&w=1200"}
+                alt="Luxury Villa Ibiza"
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
@@ -61,7 +83,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               <img
                 src="/la-villa-furniture.jpg"
                 alt="La Villa Garden Design"
-                className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="w-full h-[300px] md:h-[450px] object-contain bg-[#0B1C26] transition-transform duration-1000 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
             </div>
@@ -88,7 +110,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
-                src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200"
+                src={villaImages[1] || villaImages[0] || "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200"}
                 alt="Luxury Villa"
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-110"
               />
