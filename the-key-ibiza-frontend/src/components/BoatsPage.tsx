@@ -20,7 +20,7 @@ const BoatsPage: React.FC<BoatsPageProps> = ({ onNavigate, lang }) => {
   useEffect(() => {
     const fetchDarkKnightMedia = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent('Yates/102 LEOPARD (DARK KNIGHT)/Header')}`);
+        const res = await fetch(`${BACKEND_URL}/cloudinary/images?folder=${encodeURIComponent('Yates/102 LEOPARD (DARK KNIGHT)/Listado')}`);
         if (res.ok) {
           const data = await res.json();
           const videos = (data.images || []).filter((url: string) =>
