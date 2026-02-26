@@ -64,8 +64,8 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate, lang }) => {
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mb-24 animate-slide-up">
           <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block mb-6">Magazine</span>
-          <h1 className="text-6xl md:text-9xl font-serif text-white leading-tight mb-8">
-            The Key <br/> <span className="italic text-white/50">Insights.</span>
+          <h1 className="text-5xl md:text-7xl font-serif text-white leading-tight mb-8">
+            The Key <span className="italic text-white/50">Insights.</span>
           </h1>
           <p className="text-xl text-white/40 font-light max-w-2xl leading-relaxed">
             Curated narratives on island architecture, gastronomy, and the invisible threads of luxury that define the Ibiza season.
