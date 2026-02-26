@@ -82,7 +82,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
             <div className="relative overflow-hidden rounded-[32px] group">
               <img
                 src="https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg"
-                alt="La Villa Garden Design"
+                alt="La Villa Garden & Design"
                 className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/60 via-transparent to-transparent"></div>
@@ -93,11 +93,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               Our Heritage
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-6 italic">
-              The Legacy of La Villa
+              The Legacy of La Villa Garden & Design
             </h2>
             <div className="w-12 h-px bg-luxury-gold/30 mb-6"></div>
             <p className="text-white/50 text-sm md:text-base font-light leading-relaxed mb-4">
-              Before bringing The Key Ibiza to life, we were proud to be part of <a href="https://www.lavillagardendesign.com/es/" target="_blank" rel="noopener noreferrer" className="text-luxury-gold italic hover:text-white transition-colors cursor-pointer">La Villa</a>, a cherished family-run business renowned across multiple regions for its expertise in high-end interior and exterior design.
+              Before bringing The Key Ibiza to life, we were proud to be part of <a href="https://www.lavillagardendesign.com/es/" target="_blank" rel="noopener noreferrer" className="text-luxury-gold italic hover:text-white transition-colors cursor-pointer">La Villa Garden & Design</a>, a cherished family-run business renowned across multiple regions for its expertise in high-end interior and exterior design.
             </p>
             <p className="text-white/50 text-sm md:text-base font-light leading-relaxed">
               This foundational experience taught us the true value of craftsmanship, personalized service, and design excellence that we now bring to every client relationship.

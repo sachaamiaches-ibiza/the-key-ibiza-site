@@ -196,7 +196,7 @@ export const translations: Record<Language, {
       title: "About Us",
       subtitle: "Our Identity",
       whoWeAre: "Who We Are",
-      legacy: "The Legacy of La Villa",
+      legacy: "The Legacy of La Villa Garden & Design",
       excellence: "Excellence & Discretion",
       founders: "The Founders"
     },
@@ -303,7 +303,7 @@ export const translations: Record<Language, {
       title: "Sobre Nosotros",
       subtitle: "Nuestra Identidad",
       whoWeAre: "Quiénes Somos",
-      legacy: "El Legado de La Villa",
+      legacy: "El Legado de La Villa Garden & Design",
       excellence: "Excelencia y Discreción",
       founders: "Los Fundadores"
     },
@@ -410,7 +410,7 @@ export const translations: Record<Language, {
       title: "À Propos",
       subtitle: "Notre Identité",
       whoWeAre: "Qui Nous Sommes",
-      legacy: "L'Héritage de La Villa",
+      legacy: "L'Héritage de La Villa Garden & Design",
       excellence: "Excellence & Discrétion",
       founders: "Les Fondateurs"
     },
@@ -517,7 +517,7 @@ export const translations: Record<Language, {
       title: "Über Uns",
       subtitle: "Unsere Identität",
       whoWeAre: "Wer Wir Sind",
-      legacy: "Das Vermächtnis von La Villa",
+      legacy: "Das Vermächtnis von La Villa Garden & Design",
       excellence: "Exzellenz & Diskretion",
       founders: "Die Gründer"
     },
@@ -624,7 +624,7 @@ export const translations: Record<Language, {
       title: "Chi Siamo",
       subtitle: "La Nostra Identità",
       whoWeAre: "Chi Siamo",
-      legacy: "L'Eredità di La Villa",
+      legacy: "L'Eredità di La Villa Garden & Design",
       excellence: "Eccellenza & Discrezione",
       founders: "I Fondatori"
     },
@@ -731,7 +731,7 @@ export const translations: Record<Language, {
       title: "Sobre Nós",
       subtitle: "Nossa Identidade",
       whoWeAre: "Quem Somos",
-      legacy: "O Legado de La Villa",
+      legacy: "O Legado de La Villa Garden & Design",
       excellence: "Excelência & Discrição",
       founders: "Os Fundadores"
     },
@@ -838,7 +838,7 @@ export const translations: Record<Language, {
       title: "关于我们",
       subtitle: "我们的身份",
       whoWeAre: "我们是谁",
-      legacy: "La Villa的传承",
+      legacy: "La Villa Garden & Design的传承",
       excellence: "卓越与谨慎",
       founders: "创始人"
     },
@@ -945,7 +945,7 @@ export const translations: Record<Language, {
       title: "من نحن",
       subtitle: "هويتنا",
       whoWeAre: "من نحن",
-      legacy: "إرث لا فيلا",
+      legacy: "إرث La Villa Garden & Design",
       excellence: "التميز والسرية",
       founders: "المؤسسون"
     },
@@ -1052,7 +1052,7 @@ export const translations: Record<Language, {
       title: "हमारे बारे में",
       subtitle: "हमारी पहचान",
       whoWeAre: "हम कौन हैं",
-      legacy: "ला विला की विरासत",
+      legacy: "La Villa Garden & Design की विरासत",
       excellence: "उत्कृष्टता और विवेक",
       founders: "संस्थापक"
     },
@@ -1159,7 +1159,7 @@ export const translations: Record<Language, {
       title: "О нас",
       subtitle: "Наша идентичность",
       whoWeAre: "Кто мы",
-      legacy: "Наследие La Villa",
+      legacy: "Наследие La Villa Garden & Design",
       excellence: "Совершенство и конфиденциальность",
       founders: "Основатели"
     },

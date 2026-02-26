@@ -13,6 +13,7 @@ import VillaListingPage from './components/VillaListingPage';
 import ValerieDetail from './components/ValerieDetail';
 import FrancescaDetail from './components/FrancescaDetail';
 import BlogPage from './components/BlogPage';
+import BlogArticlePage from './components/BlogArticlePage';
 import FooterSEO from './components/FooterSEO';
 import VipLogin from './components/VipLogin';
 import ComingSoon from './components/ComingSoon';
@@ -392,11 +393,17 @@ const App: React.FC = () => {
       }
     }
 
+    // Blog article page
+    if (view.startsWith('blog-')) {
+      const slug = view.replace('blog-', '');
+      return <BlogArticlePage slug={slug} onNavigate={setView} lang={lang} />;
+    }
+
     switch (view) {
       case 'services': return <ServicesPageNew onNavigate={setView} lang={lang} />;
       case 'photographer': return <PhotographerPage onNavigate={setView} lang={lang} />;
       case 'about': return <AboutPage onNavigate={setView} lang={lang} />;
-      case 'blog': return <ComingSoon title="Blog" onNavigate={setView} lang={lang} />;
+      case 'blog': return <BlogPage onNavigate={setView} lang={lang} />;
       case 'valerie-detail': return <ValerieDetail onNavigate={setView} lang={lang} />;
       case 'francesca-detail': return <FrancescaDetail onNavigate={setView} lang={lang} />;
       case 'villas-holiday':

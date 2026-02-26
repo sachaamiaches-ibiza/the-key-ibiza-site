@@ -168,13 +168,13 @@ const SERVICE_DATA: Record<string, any> = {
   },
   furniture: {
     badge: "Furniture & Interior Design",
-    title: "La Villa Garden",
+    title: "La Villa Garden & Design",
     subtitle: "Timeless Outdoor Elegance & Bespoke Design",
     description: [
-      "Founded in 2010, La Villa Garden is a family story built around a shared passion for design and the art of outdoor living. They are a trusted benchmark in luxury outdoor furniture, combining modern aesthetics with exceptional durability.",
+      "Founded in 2010, La Villa Garden & Design is a family story built around a shared passion for design and the art of outdoor living. They are a trusted benchmark in luxury outdoor furniture, combining modern aesthetics with exceptional durability.",
       "🌿 A Family Passion: Each piece designed—from contemporary lounges to artisanal teak sets—tells a story of quality and sustainability, aimed at bringing harmony and timeless beauty to every terrace, garden, or poolside retreat.",
       "🔨 Masterful Materials: Resilience and charm are ensured through top-tier materials: Teak for natural warmth, Aluminum for modernity, and Ceramic or stone finishes for a sophisticated touch.",
-      "🤝 Preferred Partner: As a preferred partner of The Key Ibiza, La Villa Garden offers clients refined living experiences through family-driven values and a commitment to excellence down to the very last detail."
+      "🤝 Preferred Partner: As a preferred partner of The Key Ibiza, La Villa Garden & Design offers clients refined living experiences through family-driven values and a commitment to excellence down to the very last detail."
     ],
     features: ["Family Business", "Resilient Teak & Aluminum", "Bespoke Outdoor Styling", "Premium Craftsmanship", "Trusted Ibiza Partner", "Timeless Aesthetics"],
     imageMain: "https://res.cloudinary.com/drxf80sho/image/upload/v1772058209/la-villa-furniture_tx2dci.jpg",
