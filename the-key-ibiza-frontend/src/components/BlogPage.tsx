@@ -26,6 +26,15 @@ const BACKEND_URL = window.location.hostname === 'localhost'
 const BlogPage: React.FC<BlogPageProps> = ({ onNavigate, lang }) => {
   const [articles, setArticles] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Extract unique categories from articles
+  const categories = Array.from(new Set(articles.map(a => a.category).filter(Boolean)));
+
+  // Filter articles by selected category
+  const filteredArticles = selectedCategory
+    ? articles.filter(a => a.category === selectedCategory)
+    : articles;
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -63,14 +72,45 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate, lang }) => {
           </p>
         </div>
 
+        {/* Category Filter Bubbles */}
+        {!loading && categories.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-16">
+            {/* All Categories Button */}
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`px-6 py-3 rounded-full text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium transition-all duration-300 ${
+                selectedCategory === null
+                  ? 'bg-luxury-gold text-luxury-blue border border-luxury-gold'
+                  : 'bg-transparent text-white/60 border border-white/20 hover:border-luxury-gold/50 hover:text-luxury-gold'
+              }`}
+            >
+              All
+            </button>
+            {/* Category Buttons */}
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-6 py-3 rounded-full text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium transition-all duration-300 ${
+                  selectedCategory === category
+                    ? 'bg-luxury-gold text-luxury-blue border border-luxury-gold'
+                    : 'bg-transparent text-white/60 border border-white/20 hover:border-luxury-gold/50 hover:text-luxury-gold'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center py-20">
             <div className="w-8 h-8 border-2 border-luxury-gold border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-white/40 text-sm">Loading articles...</p>
           </div>
-        ) : articles.length > 0 ? (
+        ) : filteredArticles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-32">
-            {articles.map((article) => (
+            {filteredArticles.map((article) => (
               <div
                 key={article.id}
                 className="group cursor-pointer"
@@ -93,7 +133,19 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate, lang }) => {
               </div>
             ))}
           </div>
+        ) : articles.length > 0 ? (
+          /* No articles for selected category */
+          <div className="text-center py-20 mb-32">
+            <p className="text-white/40 text-lg mb-6">No articles found in this category.</p>
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="px-8 py-3 rounded-full bg-luxury-gold text-luxury-blue text-xs uppercase tracking-wider font-medium hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all"
+            >
+              View All Articles
+            </button>
+          </div>
         ) : (
+          /* No articles at all - Coming Soon */
           <div className="luxury-card rounded-[60px] p-20 text-center border border-luxury-gold/20 mb-32">
             <h3 className="text-3xl md:text-5xl font-serif text-white mb-8 italic">Coming Soon</h3>
             <p className="text-white/40 text-lg mb-12 max-w-xl mx-auto font-light">
