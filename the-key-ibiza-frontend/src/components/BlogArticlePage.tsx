@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Language } from '../types';
 
 interface BlogArticlePageProps {
@@ -57,16 +58,7 @@ const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNavigate, lan
     return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
-  // Parse content into paragraphs
-  const renderContent = (content: string) => {
-    if (!content) return null;
-    return content.split('\n\n').map((paragraph, idx) => (
-      <p key={idx} className="text-white/70 text-lg leading-relaxed mb-6">
-        {paragraph}
-      </p>
-    ));
-  };
-
+  
   if (loading) {
     return (
       <div className="pt-40 pb-24 min-h-screen">
@@ -153,8 +145,47 @@ const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNavigate, lan
             </p>
           )}
 
-          <div className="prose prose-invert prose-lg">
-            {renderContent(article.content)}
+          <div className="prose prose-invert prose-lg max-w-none">
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => (
+                  <p className="text-white/70 text-lg leading-relaxed mb-6">{children}</p>
+                ),
+                strong: ({ children }) => (
+                  <strong className="text-white font-semibold">{children}</strong>
+                ),
+                em: ({ children }) => (
+                  <em className="text-luxury-gold italic">{children}</em>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-2xl md:text-3xl font-serif text-white mt-12 mb-6">{children}</h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-xl md:text-2xl font-serif text-white mt-10 mb-4">{children}</h3>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc list-inside text-white/70 mb-6 space-y-2">{children}</ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-inside text-white/70 mb-6 space-y-2">{children}</ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-lg leading-relaxed">{children}</li>
+                ),
+                a: ({ href, children }) => (
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-luxury-gold hover:text-white underline transition-colors">
+                    {children}
+                  </a>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-2 border-luxury-gold pl-6 italic text-white/60 my-8">
+                    {children}
+                  </blockquote>
+                ),
+              }}
+            >
+              {article.content}
+            </ReactMarkdown>
           </div>
 
           {/* Share / Contact Section */}
