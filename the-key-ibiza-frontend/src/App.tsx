@@ -40,6 +40,17 @@ export type View =
   | 'service-babysitting'
   | string;
 
+// Helper to convert villa name to URL-friendly slug
+function nameToUrlSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-') // Spaces to hyphens
+    .replace(/-+/g, '-') // Multiple hyphens to single
+    .trim();
+}
+
 // URL routing helpers
 function viewToPath(view: View): string {
   if (view === 'home') return '/';
@@ -49,11 +60,7 @@ function viewToPath(view: View): string {
   if (view === 'service-villas') return '/villas';
   if (view === 'boats-yachts') return '/boats';
   if (view === 'boats-catamarans') return '/catamarans';
-  // Strip "invenio-" prefix from villa URLs for cleaner paths
-  if (view.startsWith('villa-')) {
-    const villaSlug = view.replace('villa-', '').replace(/^invenio-/, '');
-    return `/villa-${villaSlug}`;
-  }
+  if (view.startsWith('villa-')) return `/${view}`;
   if (view.startsWith('yacht-')) return `/${view}`;
   if (view.startsWith('blog-')) return `/${view}`;
   if (view.startsWith('service-')) return `/${view.replace('service-', '')}`;
@@ -297,19 +304,19 @@ const App: React.FC = () => {
   // Fetch single villa directly from Backend when needed
   useEffect(() => {
     if (view.startsWith('villa-') && !villasLoading) {
-      const villaSlug = view.replace('villa-', '');
-      // Try to find with exact slug or with "invenio-" prefix
-      const villaInState = allVillas.find(v => v.id === villaSlug || v.id === `invenio-${villaSlug}`);
+      const villaUrlSlug = view.replace('villa-', '');
+      // Try to find by URL slug matching the name
+      const villaInState = allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
+        || allVillas.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`);
 
       if (!villaInState && !directVilla) {
-        // Villa not in state, fetch directly from Backend
-        // Try with "invenio-" prefix first (most common), then without
-        fetchVillaBySlug(`invenio-${villaSlug}`).then(villa => {
+        // Villa not in state, fetch directly from Backend by name slug
+        fetchVillaBySlug(villaUrlSlug).then(villa => {
           if (villa) {
             setDirectVilla(villa);
           } else {
-            // Try without prefix
-            fetchVillaBySlug(villaSlug).then(v => {
+            // Try with "invenio-" prefix for backwards compatibility
+            fetchVillaBySlug(`invenio-${villaUrlSlug}`).then(v => {
               if (v) setDirectVilla(v);
             });
           }
@@ -423,10 +430,13 @@ const App: React.FC = () => {
 
     // Villa detail page
     if (view.startsWith('villa-')) {
-      const villaSlug = view.replace('villa-', '');
-      // Try to find villa with exact slug or with "invenio-" prefix
-      const villa = VILLAS.find(v => v.id === villaSlug || v.id === `invenio-${villaSlug}`)
-        || allVillas.find(v => v.id === villaSlug || v.id === `invenio-${villaSlug}`)
+      const villaUrlSlug = view.replace('villa-', '');
+      // Try to find villa by URL slug matching the name
+      const villa = VILLAS.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
+        || allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
+        // Fallback: try matching by id (for backwards compatibility)
+        || VILLAS.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`)
+        || allVillas.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`)
         || directVilla;
 
       if (villa) {

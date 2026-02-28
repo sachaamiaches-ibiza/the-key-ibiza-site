@@ -6,6 +6,17 @@ import { IconBed, IconBath, IconGuests } from './ServiceIcons';
 import WatermarkedImage from './WatermarkedImage';
 import { getCardImageUrl } from '../utils/cloudinaryUrl';
 
+// Helper to convert villa name to URL-friendly slug
+function nameToUrlSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-') // Spaces to hyphens
+    .replace(/-+/g, '-') // Multiple hyphens to single
+    .trim();
+}
+
 interface VillaCardProps {
   villa: Villa;
   onNavigate?: (view: any) => void;
@@ -36,7 +47,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
   return (
     <div
       className="group relative flex flex-col h-full luxury-card rounded-[24px] md:rounded-[40px] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:shadow-luxury-gold/10 hover:-translate-y-2 cursor-pointer border border-white/5"
-      onClick={() => onNavigate && onNavigate(`villa-${villa.id?.replace(/^invenio-/, '')}`)}
+      onClick={() => onNavigate && onNavigate(`villa-${nameToUrlSlug(villa.name)}`)}
     >
       {/* Photo Section */}
       <div className="relative aspect-[4/3] overflow-hidden">

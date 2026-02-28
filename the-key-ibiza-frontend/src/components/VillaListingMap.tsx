@@ -6,6 +6,17 @@ import { Villa, Language } from '../types';
 import { vipAuth } from '../services/vipAuth';
 import { getThumbnailUrl } from '../utils/cloudinaryUrl';
 
+// Helper to convert villa name to URL-friendly slug
+function nameToUrlSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-') // Spaces to hyphens
+    .replace(/-+/g, '-') // Multiple hyphens to single
+    .trim();
+}
+
 // Custom gold marker icon
 const goldIcon = L.divIcon({
   html: `
@@ -141,7 +152,7 @@ const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, l
 
                     {/* View Button */}
                     <button
-                      onClick={() => onNavigate(`villa-${villa.id?.replace(/^invenio-/, '')}`)}
+                      onClick={() => onNavigate(`villa-${nameToUrlSlug(villa.name)}`)}
                       style={{ 
                         width: '100%', 
                         padding: '8px', 
