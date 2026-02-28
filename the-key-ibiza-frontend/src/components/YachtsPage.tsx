@@ -113,7 +113,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
   const [yachtsData, setYachtsData] = useState<Yacht[]>([]);
   const [loading, setLoading] = useState(true);
   const [yachtMedia, setYachtMedia] = useState<{ [name: string]: { image: string | null; video: string | null } }>({});
-  const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [searchFilters, setSearchFilters] = useState({
     fecha: initialDate,
     paxMax: 0,
