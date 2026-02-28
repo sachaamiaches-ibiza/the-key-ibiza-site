@@ -49,7 +49,11 @@ function viewToPath(view: View): string {
   if (view === 'service-villas') return '/villas';
   if (view === 'boats-yachts') return '/boats';
   if (view === 'boats-catamarans') return '/catamarans';
-  if (view.startsWith('villa-')) return `/${view}`;
+  // Strip "invenio-" prefix from villa URLs for cleaner paths
+  if (view.startsWith('villa-')) {
+    const villaSlug = view.replace('villa-', '').replace(/^invenio-/, '');
+    return `/villa-${villaSlug}`;
+  }
   if (view.startsWith('yacht-')) return `/${view}`;
   if (view.startsWith('blog-')) return `/${view}`;
   if (view.startsWith('service-')) return `/${view.replace('service-', '')}`;
@@ -293,14 +297,21 @@ const App: React.FC = () => {
   // Fetch single villa directly from Backend when needed
   useEffect(() => {
     if (view.startsWith('villa-') && !villasLoading) {
-      const villaId = view.replace('villa-', '');
-      const villaInState = allVillas.find(v => v.id === villaId);
+      const villaSlug = view.replace('villa-', '');
+      // Try to find with exact slug or with "invenio-" prefix
+      const villaInState = allVillas.find(v => v.id === villaSlug || v.id === `invenio-${villaSlug}`);
 
       if (!villaInState && !directVilla) {
         // Villa not in state, fetch directly from Backend
-        fetchVillaBySlug(villaId).then(villa => {
+        // Try with "invenio-" prefix first (most common), then without
+        fetchVillaBySlug(`invenio-${villaSlug}`).then(villa => {
           if (villa) {
             setDirectVilla(villa);
+          } else {
+            // Try without prefix
+            fetchVillaBySlug(villaSlug).then(v => {
+              if (v) setDirectVilla(v);
+            });
           }
         });
       } else if (villaInState) {
@@ -412,9 +423,11 @@ const App: React.FC = () => {
 
     // Villa detail page
     if (view.startsWith('villa-')) {
-      const villaId = view.replace('villa-', '');
-      // First check in filtered VILLAS, then in all villas, then in directly fetched villa
-      const villa = VILLAS.find(v => v.id === villaId) || allVillas.find(v => v.id === villaId) || directVilla;
+      const villaSlug = view.replace('villa-', '');
+      // Try to find villa with exact slug or with "invenio-" prefix
+      const villa = VILLAS.find(v => v.id === villaSlug || v.id === `invenio-${villaSlug}`)
+        || allVillas.find(v => v.id === villaSlug || v.id === `invenio-${villaSlug}`)
+        || directVilla;
 
       if (villa) {
         return (

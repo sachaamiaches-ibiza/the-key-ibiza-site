@@ -36,7 +36,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
   return (
     <div
       className="group relative flex flex-col h-full luxury-card rounded-[24px] md:rounded-[40px] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:shadow-luxury-gold/10 hover:-translate-y-2 cursor-pointer border border-white/5"
-      onClick={() => onNavigate && onNavigate(`villa-${villa.id}`)}
+      onClick={() => onNavigate && onNavigate(`villa-${villa.id?.replace(/^invenio-/, '')}`)}
     >
       {/* Photo Section */}
       <div className="relative aspect-[4/3] overflow-hidden">

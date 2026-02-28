@@ -141,7 +141,7 @@ const VillaListingMap: React.FC<VillaListingMapProps> = ({ villas, onNavigate, l
 
                     {/* View Button */}
                     <button
-                      onClick={() => onNavigate(`villa-${villa.id}`)}
+                      onClick={() => onNavigate(`villa-${villa.id?.replace(/^invenio-/, '')}`)}
                       style={{ 
                         width: '100%', 
                         padding: '8px', 
