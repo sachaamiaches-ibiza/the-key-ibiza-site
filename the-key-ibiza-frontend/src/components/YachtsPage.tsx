@@ -64,10 +64,10 @@ function isVideoUrl(url: string): boolean {
 }
 
 // Cache for yacht listing media
-const yachtMediaCache: { [name: string]: { image: string | null; video: string | null } } = {};
+const yachtMediaCache: { [name: string]: { images: string[]; video: string | null } } = {};
 
 // Fetch media from Listado folder for yacht listing (fallback to Header if Listado is empty)
-async function fetchYachtListingMedia(yachtName: string): Promise<{ image: string | null; video: string | null }> {
+async function fetchYachtListingMedia(yachtName: string): Promise<{ images: string[]; video: string | null }> {
   if (yachtMediaCache[yachtName]) {
     return yachtMediaCache[yachtName];
   }
@@ -96,13 +96,13 @@ async function fetchYachtListingMedia(yachtName: string): Promise<{ image: strin
     const images = allMedia.filter((url: string) => !isVideoUrl(url));
 
     const result = {
-      image: images[0] || null,
+      images: images,
       video: videos[0] || null
     };
     yachtMediaCache[yachtName] = result;
     return result;
   } catch {
-    return { image: null, video: null };
+    return { images: [], video: null };
   }
 }
 
@@ -112,7 +112,8 @@ type SortOption = 'default' | 'price-asc' | 'price-desc' | 'size-asc' | 'size-de
 const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate = '', onDateChange }) => {
   const [yachtsData, setYachtsData] = useState<Yacht[]>([]);
   const [loading, setLoading] = useState(true);
-  const [yachtMedia, setYachtMedia] = useState<{ [name: string]: { image: string | null; video: string | null } }>({});
+  const [yachtMedia, setYachtMedia] = useState<{ [name: string]: { images: string[]; video: string | null } }>({});
+  const [yachtImageIndex, setYachtImageIndex] = useState<{ [name: string]: number }>({});
   const [sortBy, setSortBy] = useState<SortOption>('price-asc');
   const [searchFilters, setSearchFilters] = useState({
     fecha: initialDate,
@@ -145,7 +146,7 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
           fetchYachtListingMedia(yacht.nombre).then(media => ({ name: yacht.nombre, media }))
         );
         const mediaResults = await Promise.all(mediaPromises);
-        const mediaMap: { [name: string]: { image: string | null; video: string | null } } = {};
+        const mediaMap: { [name: string]: { images: string[]; video: string | null } } = {};
         mediaResults.forEach(({ name, media }) => {
           mediaMap[name] = media;
         });
@@ -504,15 +505,61 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
                   ) : (
-                    <img
-                      src={yachtMedia[yacht.nombre]?.image || yacht.header_images?.split('|')[0] || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
-                      alt={yacht.nombre}
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                    />
+                    <>
+                      <img
+                        src={yachtMedia[yacht.nombre]?.images?.[yachtImageIndex[yacht.nombre] || 0] || yacht.header_images?.split('|')[0] || 'https://res.cloudinary.com/drxf80sho/image/upload/v1770384558/yacht-placeholder.jpg'}
+                        alt={yacht.nombre}
+                        className="w-full h-full object-cover transition-transform duration-500"
+                      />
+                      {/* Navigation Arrows - only show if multiple images */}
+                      {(yachtMedia[yacht.nombre]?.images?.length || 0) > 1 && (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const images = yachtMedia[yacht.nombre]?.images || [];
+                              const currentIndex = yachtImageIndex[yacht.nombre] || 0;
+                              const newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
+                              setYachtImageIndex(prev => ({ ...prev, [yacht.nombre]: newIndex }));
+                            }}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-luxury-gold/80 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                          >
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const images = yachtMedia[yacht.nombre]?.images || [];
+                              const currentIndex = yachtImageIndex[yacht.nombre] || 0;
+                              const newIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
+                              setYachtImageIndex(prev => ({ ...prev, [yacht.nombre]: newIndex }));
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-luxury-gold/80 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                          >
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                          {/* Dots indicator */}
+                          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                            {yachtMedia[yacht.nombre]?.images?.map((_, idx) => (
+                              <div
+                                key={idx}
+                                className={`w-1.5 h-1.5 rounded-full transition-all ${
+                                  idx === (yachtImageIndex[yacht.nombre] || 0) ? 'bg-luxury-gold w-3' : 'bg-white/50'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
                   )}
                   <WatermarkOverlay size="small" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/80 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue/80 via-transparent to-transparent pointer-events-none"></div>
+                  <div className="absolute bottom-4 left-4 right-4 pointer-events-none">
                     <h3 className="text-xl font-serif text-white mb-1">{yacht.nombre}</h3>
                     <p className="text-luxury-gold text-sm">{yacht.metros}m | {yacht.pax_max} pax</p>
                   </div>
