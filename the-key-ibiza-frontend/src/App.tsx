@@ -31,14 +31,48 @@ import { fetchVillas, fetchVillaBySlug, getPublicVillas, getAllVillas } from './
 import { vipAuth } from './services/vipAuth';
 import { usePageTracking } from './hooks/useAudit';
 
-export type View = 
+export type View =
   | 'home' | 'services' | 'photographer' | 'about' | 'blog' | 'valerie-detail' | 'francesca-detail'
   | 'service-villas' | 'villas-holiday' | 'villas-longterm' | 'villas-sale'
   | 'service-yacht' | 'service-security' | 'service-wellness' | 'service-nightlife'
-  | 'service-events' | 'service-catering' | 'service-furniture' | 'service-health' 
-  | 'service-yoga' | 'service-cleaning' | 'service-driver' | 'service-deliveries' 
+  | 'service-events' | 'service-catering' | 'service-furniture' | 'service-health'
+  | 'service-yoga' | 'service-cleaning' | 'service-driver' | 'service-deliveries'
   | 'service-babysitting'
   | string;
+
+// URL routing helpers
+function viewToPath(view: View): string {
+  if (view === 'home') return '/';
+  if (view === 'villas-holiday') return '/holiday-rentals';
+  if (view === 'villas-longterm') return '/long-term';
+  if (view === 'villas-sale') return '/for-sale';
+  if (view === 'service-villas') return '/villas';
+  if (view === 'boats-yachts') return '/boats';
+  if (view === 'boats-catamarans') return '/catamarans';
+  if (view.startsWith('villa-')) return `/${view}`;
+  if (view.startsWith('yacht-')) return `/${view}`;
+  if (view.startsWith('blog-')) return `/${view}`;
+  if (view.startsWith('service-')) return `/${view.replace('service-', '')}`;
+  return `/${view}`;
+}
+
+function pathToView(path: string): View {
+  const cleanPath = path.replace(/^\//, '').toLowerCase();
+  if (cleanPath === '' || cleanPath === 'home') return 'home';
+  if (cleanPath === 'holiday-rentals') return 'villas-holiday';
+  if (cleanPath === 'long-term') return 'villas-longterm';
+  if (cleanPath === 'for-sale') return 'villas-sale';
+  if (cleanPath === 'villas') return 'service-villas';
+  if (cleanPath === 'boats') return 'boats-yachts';
+  if (cleanPath === 'catamarans') return 'boats-catamarans';
+  if (cleanPath.startsWith('villa-')) return cleanPath;
+  if (cleanPath.startsWith('yacht-')) return cleanPath;
+  if (cleanPath.startsWith('blog-')) return cleanPath;
+  if (['yacht', 'security', 'wellness', 'nightlife', 'events', 'catering', 'furniture', 'health', 'yoga', 'cleaning', 'driver', 'deliveries', 'babysitting'].includes(cleanPath)) {
+    return `service-${cleanPath}` as View;
+  }
+  return cleanPath as View;
+}
 
 interface ContactFormProps {
   lang: Language;
@@ -172,7 +206,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
 };
 
 const App: React.FC = () => {
-  const [view, setView] = useState<View>('home');
+  // Initialize view from URL
+  const [view, setViewState] = useState<View>(() => {
+    return pathToView(window.location.pathname);
+  });
   const [lang, setLang] = useState<Language>(() => {
     // Load language from localStorage on initial render
     const savedLang = localStorage.getItem('thekey-language');
@@ -181,6 +218,28 @@ const App: React.FC = () => {
     }
     return 'en';
   });
+
+  // Custom setView that also updates the URL
+  const setView = (newView: View) => {
+    setViewState(newView);
+    const newPath = viewToPath(newView);
+    if (window.location.pathname !== newPath) {
+      window.history.pushState({ view: newView }, '', newPath);
+    }
+  };
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.view) {
+        setViewState(event.state.view);
+      } else {
+        setViewState(pathToView(window.location.pathname));
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
   const [mobileVillaIndex, setMobileVillaIndex] = useState(0);
