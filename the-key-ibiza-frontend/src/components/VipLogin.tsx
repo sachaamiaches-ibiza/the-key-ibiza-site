@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { vipAuth } from '../services/vipAuth';
+import { linkAuditToVip, trackAction } from '../hooks/useAudit';
 
 interface VipLoginProps {
   onAuthChange?: (isVip: boolean) => void;
@@ -62,6 +63,16 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
         } else {
           localStorage.removeItem('vip_remember');
         }
+
+        // Link audit session to VIP user
+        if (data.user?.id) {
+          linkAuditToVip(data.user.id);
+          trackAction('vip_login', '/vip-login', {
+            vipEmail: data.user.email,
+            vipName: data.user.name
+          });
+        }
+
         setIsVip(true);
         setIsAdmin(data.user?.role === 'admin');
         setUserName(data.user?.name || 'VIP Guest');

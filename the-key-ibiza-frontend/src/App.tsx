@@ -28,6 +28,7 @@ import { translations } from './translations';
 import { Language, Villa } from './types';
 import { fetchVillas, fetchVillaBySlug, getPublicVillas, getAllVillas } from './services/villaService';
 import { vipAuth } from './services/vipAuth';
+import { usePageTracking } from './hooks/useAudit';
 
 export type View = 
   | 'home' | 'services' | 'photographer' | 'about' | 'blog' | 'valerie-detail' | 'francesca-detail'
@@ -203,6 +204,9 @@ const App: React.FC = () => {
   const [selectedYacht, setSelectedYacht] = useState<any>(null);
   const [yachtLoading, setYachtLoading] = useState(false);
   const [yachtSearchDate, setYachtSearchDate] = useState<string>('');
+
+  // Audit tracking - tracks page views automatically
+  usePageTracking(view);
 
   // Handler to update search dates from any component
   const handleSearchDatesChange = (checkIn: string, checkOut: string) => {
