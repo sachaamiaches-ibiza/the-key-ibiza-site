@@ -22,6 +22,7 @@ import YachtsPage from './components/YachtsPage';
 import YachtDetailPage from './components/YachtDetailPage';
 import CatamaransPage from './components/CatamaransPage';
 import VillasPage from './components/VillasPage';
+import AdminDashboard from './components/AdminDashboard';
 import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
 import { getServices } from './constants';
 import { translations } from './translations';
@@ -403,6 +404,11 @@ const App: React.FC = () => {
       return <BlogArticlePage slug={slug} onNavigate={setView} lang={lang} />;
     }
 
+    // Admin dashboard (protected - only for admins)
+    if (view === 'admin-dashboard') {
+      return <AdminDashboard onNavigate={setView} />;
+    }
+
     switch (view) {
       case 'services': return <ServicesPageNew onNavigate={setView} lang={lang} />;
       case 'photographer': return <PhotographerPage onNavigate={setView} lang={lang} />;
@@ -772,7 +778,7 @@ const App: React.FC = () => {
           </div>
 
           {/* MIDDLE - VIP Access */}
-          <VipLogin onAuthChange={handleVipAuthChange} />
+          <VipLogin onAuthChange={handleVipAuthChange} onNavigate={setView} />
 
           {/* RIGHT - Contact Form */}
           <div className="text-center md:text-left">

@@ -5,6 +5,7 @@ import { linkAuditToVip, trackAction } from '../hooks/useAudit';
 
 interface VipLoginProps {
   onAuthChange?: (isVip: boolean) => void;
+  onNavigate?: (view: string) => void;
 }
 
 // Auto-detect environment
@@ -12,7 +13,7 @@ const BACKEND_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001'
   : 'https://the-key-ibiza-backend.vercel.app';
 
-const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
+const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange, onNavigate }) => {
   const [isVip, setIsVip] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState('');
@@ -115,6 +116,14 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange }) => {
           <p className="text-white/50 text-xs leading-relaxed mb-5">
             Please enjoy the journey and feel free to contact us if you have any questions.
           </p>
+          {isAdmin && onNavigate && (
+            <button
+              onClick={() => onNavigate('admin-dashboard')}
+              className="w-full bg-luxury-gold/20 border border-luxury-gold/50 text-luxury-gold py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-luxury-gold hover:text-luxury-blue transition-all mb-3"
+            >
+              Admin Dashboard
+            </button>
+          )}
           <button
             onClick={handleLogout}
             className="w-full bg-transparent border border-white/30 text-white/70 py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:border-luxury-gold hover:text-luxury-gold transition-all"
