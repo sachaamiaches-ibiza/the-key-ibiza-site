@@ -181,32 +181,6 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const [allGalleryImages, setAllGalleryImages] = useState<string[]>([]);
   const [imagesLoading, setImagesLoading] = useState(true);
 
-  // Share functionality
-  const [shareTooltip, setShareTooltip] = useState(false);
-
-  const handleShare = async () => {
-    // Use backend OG endpoint for social media preview support
-    const shareUrl = `https://the-key-ibiza-backend.vercel.app/og/yacht/${yacht.slug || yacht.id}`;
-    const shareData = {
-      title: `${yacht.nombre} | The Key Ibiza Yacht Charter`,
-      text: yacht.descripcion || `Luxury yacht charter in Ibiza`,
-      url: shareUrl
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        // User cancelled or error
-      }
-    } else {
-      // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(shareUrl);
-      setShareTooltip(true);
-      setTimeout(() => setShareTooltip(false), 2000);
-    }
-  };
-
   // Fetch media from Cloudinary folders on mount
   useEffect(() => {
     async function loadMedia() {
@@ -619,25 +593,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
         {/* ===== NAME + PRICE ===== */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between py-8 md:py-10 border-b border-white/5">
           <div className="mb-4 md:mb-0">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl md:text-5xl lg:text-6xl font-serif text-white">{yacht.nombre}</h1>
-              <div className="relative">
-                <button
-                  onClick={handleShare}
-                  className="p-2 rounded-full border border-white/20 hover:border-luxury-gold hover:bg-luxury-gold/10 transition-all group"
-                  title="Share"
-                >
-                  <svg className="w-5 h-5 text-white/50 group-hover:text-luxury-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                </button>
-                {shareTooltip && (
-                  <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-luxury-gold text-luxury-blue text-xs px-2 py-1 rounded whitespace-nowrap">
-                    Link copied!
-                  </div>
-                )}
-              </div>
-            </div>
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-serif text-white">{yacht.nombre}</h1>
             <p className="text-white/40 text-sm md:text-base mt-2 font-light">
               {yacht.amarre || yacht.localidad || 'Ibiza'}
             </p>
