@@ -20,7 +20,7 @@ interface WatermarkedImageProps {
   src: string;
   alt?: string;
   className?: string;
-  watermarkSize?: 'small' | 'medium' | 'large' | 'gallery';
+  watermarkSize?: 'small' | 'medium' | 'large' | 'gallery' | 'card';
   fullBleed?: boolean;
 }
 
@@ -63,6 +63,10 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
     gallery: {
       logo: isVertical ? 'w-12 h-16 md:w-16 md:h-22' : 'w-16 h-22 md:w-24 md:h-32',
       text: isVertical ? 'text-sm md:text-base tracking-[0.2em] mt-2' : 'text-base md:text-xl tracking-[0.25em] mt-3',
+    },
+    card: {
+      logo: 'w-8 h-12 md:w-12 md:h-16',
+      text: 'text-[9px] md:text-xs tracking-[0.15em] mt-1',
     },
   };
 
