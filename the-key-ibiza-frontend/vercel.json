@@ -1,5 +1,32 @@
 {
+  "functions": {
+    "api/*.ts": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/villa-:slug*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Pinterest|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ],
+      "destination": "/api/og-villa?slug=:slug*"
+    },
+    {
+      "source": "/yacht-:slug*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Pinterest|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ],
+      "destination": "/api/og-yacht?slug=:slug*"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
