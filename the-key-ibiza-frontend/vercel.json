@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/*.ts": {
-      "runtime": "@vercel/node@3"
-    }
-  },
   "rewrites": [
     {
       "source": "/villa-:slug*",
@@ -14,7 +9,7 @@
           "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Pinterest|Slackbot|TelegramBot|Discordbot).*"
         }
       ],
-      "destination": "/api/og-villa?slug=:slug*"
+      "destination": "https://the-key-ibiza-backend.vercel.app/og/villa/:slug*"
     },
     {
       "source": "/yacht-:slug*",
@@ -25,7 +20,7 @@
           "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Pinterest|Slackbot|TelegramBot|Discordbot).*"
         }
       ],
-      "destination": "/api/og-yacht?slug=:slug*"
+      "destination": "https://the-key-ibiza-backend.vercel.app/og/yacht/:slug*"
     },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
