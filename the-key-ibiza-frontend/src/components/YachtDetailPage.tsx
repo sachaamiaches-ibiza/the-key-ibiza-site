@@ -185,7 +185,8 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   const [shareTooltip, setShareTooltip] = useState(false);
 
   const handleShare = async () => {
-    const shareUrl = `${BACKEND_URL}/og/yacht/${yacht.slug || yacht.id}`;
+    // Use frontend URL directly for sharing
+    const shareUrl = `https://thekey-ibiza.com/yacht-${yacht.slug || yacht.id}`;
     const shareData = {
       title: `${yacht.nombre} | The Key Ibiza Yacht Charter`,
       text: yacht.descripcion || `Luxury yacht charter in Ibiza`,

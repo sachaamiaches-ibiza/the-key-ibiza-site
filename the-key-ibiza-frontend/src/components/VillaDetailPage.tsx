@@ -101,12 +101,10 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
 
   // Share functionality
   const [shareTooltip, setShareTooltip] = useState(false);
-  const BACKEND_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:5001'
-    : 'https://the-key-ibiza-backend.vercel.app';
 
   const handleShare = async () => {
-    const shareUrl = `${BACKEND_URL}/og/villa/${villa.id}`;
+    // Use frontend URL directly for sharing
+    const shareUrl = `https://thekey-ibiza.com/villa-${villa.id}`;
     const shareData = {
       title: `${villa.name} | The Key Ibiza`,
       text: villa.shortDescription || `Luxury villa in ${villa.location}`,
