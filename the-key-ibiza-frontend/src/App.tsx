@@ -60,7 +60,7 @@ function viewToPath(view: View): string {
   if (view === 'villas-longterm') return '/long-term';
   if (view === 'villas-sale') return '/for-sale';
   if (view === 'service-villas') return '/villas';
-  if (view === 'boats-yachts') return '/boats';
+  if (view === 'boats-yachts') return '/yachts';
   if (view === 'boats-catamarans') return '/catamarans';
   if (view.startsWith('villa-')) return `/${view}`;
   if (view.startsWith('yacht-')) return `/${view}`;
@@ -77,7 +77,7 @@ function pathToView(path: string): View {
   if (cleanPath === 'long-term') return 'villas-longterm';
   if (cleanPath === 'for-sale') return 'villas-sale';
   if (cleanPath === 'villas') return 'service-villas';
-  if (cleanPath === 'boats') return 'boats-yachts';
+  if (cleanPath === 'yachts' || cleanPath === 'boats' || cleanPath === 'charters') return 'boats-yachts';
   if (cleanPath === 'catamarans') return 'boats-catamarans';
   if (cleanPath.startsWith('villa-')) return cleanPath;
   if (cleanPath.startsWith('yacht-')) return cleanPath;
