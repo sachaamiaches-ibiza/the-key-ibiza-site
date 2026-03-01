@@ -22,6 +22,9 @@
       ],
       "destination": "https://the-key-ibiza-backend.vercel.app/og/yacht/:slug*"
     },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
+      "destination": "/index.html"
+    }
   ]
 }
