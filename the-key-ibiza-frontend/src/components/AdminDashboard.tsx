@@ -5,6 +5,16 @@ const BACKEND_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001'
   : 'https://the-key-ibiza-backend.vercel.app';
 
+// Convert country code to flag emoji
+const getCountryFlag = (countryCode: string | null): string => {
+  if (!countryCode) return '';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+};
+
 interface AuditStats {
   totalSessions: number;
   totalActions: number;
@@ -12,6 +22,7 @@ interface AuditStats {
   vipSessions: number;
   byBrowser: Record<string, number>;
   byDevice: Record<string, number>;
+  byCountry: Record<string, number>;
   byAction: Record<string, number>;
   topPages: Record<string, number>;
   recentSessions: any[];
@@ -207,7 +218,34 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             </div>
 
             {/* Charts Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {/* By Country */}
+              <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+                <h3 className="text-white text-lg font-serif mb-4">By Country</h3>
+                <div className="space-y-3">
+                  {Object.entries(stats.byCountry || {})
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 8)
+                    .map(([country, count]) => {
+                      const percentage = Math.round((count / stats.totalSessions) * 100);
+                      return (
+                        <div key={country}>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-white/60 text-sm">{country}</span>
+                            <span className="text-luxury-gold text-sm">{count} ({percentage}%)</span>
+                          </div>
+                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-luxury-gold to-amber-400 rounded-full transition-all"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
               {/* By Browser */}
               <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
                 <h3 className="text-white text-lg font-serif mb-4">By Browser</h3>
@@ -313,10 +351,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         {activeTab === 'sessions' && stats && (
           <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10 overflow-x-auto">
             <h3 className="text-white text-lg font-serif mb-4">Recent Sessions</h3>
-            <table className="w-full min-w-[600px]">
+            <table className="w-full min-w-[700px]">
               <thead>
                 <tr className="text-white/50 text-[10px] uppercase tracking-wider border-b border-white/10">
                   <th className="text-left pb-3 pr-4">Date</th>
+                  <th className="text-left pb-3 pr-4">Country</th>
                   <th className="text-left pb-3 pr-4">Browser</th>
                   <th className="text-left pb-3 pr-4">Device</th>
                   <th className="text-left pb-3 pr-4">IP</th>
@@ -327,6 +366,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 {stats.recentSessions.map((session: any) => (
                   <tr key={session.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="py-3 pr-4 text-white/60 text-sm">{formatDate(session.created_at)}</td>
+                    <td className="py-3 pr-4 text-white/60 text-sm">
+                      {session.country ? (
+                        <span className="flex items-center gap-1">
+                          <span className="text-lg">{getCountryFlag(session.country_code)}</span>
+                          <span>{session.country}</span>
+                        </span>
+                      ) : (
+                        <span className="text-white/30">-</span>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 text-white/60 text-sm">{session.browser}</td>
                     <td className="py-3 pr-4 text-white/60 text-sm">{session.device}</td>
                     <td className="py-3 pr-4 text-white/40 text-sm font-mono">{session.ip}</td>
