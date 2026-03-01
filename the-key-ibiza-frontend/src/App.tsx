@@ -281,26 +281,29 @@ const App: React.FC = () => {
   // Contact modal state
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  // Open contact modal when view is 'contact'
+  // Sync contact modal with view state
   useEffect(() => {
     if (view === 'contact') {
       setIsContactModalOpen(true);
+    } else {
+      setIsContactModalOpen(false);
     }
   }, [view]);
 
   const handleOpenContact = () => {
     setIsContactModalOpen(true);
-    window.history.pushState({}, '', '/contact');
+    setViewState('contact');
+    window.history.pushState({ view: 'contact' }, '', '/contact');
   };
 
   const handleCloseContact = () => {
-    setIsContactModalOpen(false);
-    // Go back in history or set to home
-    if (window.history.length > 1) {
+    // Go back in history - this will trigger popstate which updates view
+    if (window.history.length > 2) {
       window.history.back();
     } else {
-      window.history.pushState({}, '', '/');
+      // No history to go back to, navigate to home
       setViewState('home');
+      window.history.pushState({ view: 'home' }, '', '/');
     }
   };
   const [yachtSearchDate, setYachtSearchDate] = useState<string>('');
