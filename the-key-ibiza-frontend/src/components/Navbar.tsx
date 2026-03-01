@@ -5,6 +5,7 @@ import { translations } from '../translations';
 import LanguageSelector from './LanguageSelector';
 import { fetchVillas } from '../services/villaService';
 import { getHeaderImageUrl } from '../utils/cloudinaryUrl';
+import ContactModal from './ContactModal';
 
 export const LogoTheKey = ({ className = "w-8 h-8", color = "#C4A461" }) => (
   <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -43,6 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [darkKnightVideo, setDarkKnightVideo] = useState<string | null>(null);
   const [villaImages, setVillaImages] = useState<string[]>([]);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const t = translations[lang].nav;
 
@@ -184,7 +186,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
     },
     { label: t.blog, target: 'blog', isView: true, img: menuImages.blog },
     { label: t.about, target: 'about', isView: true, img: menuImages.about },
-    { label: t.contact, target: 'contact', isView: false, img: menuImages.contact },
+    { label: t.contact, target: 'contact-modal', isView: false, isModal: true, img: menuImages.contact },
   ];
 
   return (
@@ -274,7 +276,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             </div>
 
             <button
-              onClick={() => handleNavClick('contact')}
+              onClick={() => setIsContactModalOpen(true)}
               className="border border-luxury-gold/40 text-luxury-gold px-5 py-2 rounded-full hover:border-luxury-gold hover:bg-luxury-gold/5 transition-all font-normal tracking-[0.2em] uppercase text-xs ml-2"
             >
               {t.contact}
@@ -411,6 +413,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                       setExpandedSection(newExpanded);
                       setHoveredItem(newExpanded); // For mobile: show background when expanding
                       setHoveredSubItem(null);
+                    } else if ((item as any).isModal) {
+                      setIsMenuOpen(false);
+                      setIsContactModalOpen(true);
                     } else {
                       handleNavClick(item.target, item.isView);
                     }
@@ -461,6 +466,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
           </div>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
     </>
   );
 };
