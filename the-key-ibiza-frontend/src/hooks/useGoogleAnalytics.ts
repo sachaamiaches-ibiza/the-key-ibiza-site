@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || '';
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-BC9HMV6WSN';
 
 // Initialize Google Analytics
 export function initGA() {
