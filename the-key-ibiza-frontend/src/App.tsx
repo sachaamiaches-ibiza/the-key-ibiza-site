@@ -30,6 +30,7 @@ import { Language, Villa } from './types';
 import { fetchVillas, fetchVillaBySlug, getPublicVillas, getAllVillas } from './services/villaService';
 import { vipAuth } from './services/vipAuth';
 import { usePageTracking } from './hooks/useAudit';
+import { initGA, trackPageView } from './hooks/useGoogleAnalytics';
 
 export type View =
   | 'home' | 'services' | 'photographer' | 'about' | 'blog' | 'valerie-detail' | 'francesca-detail'
@@ -370,6 +371,17 @@ const App: React.FC = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [view]);
+
+  // Initialize Google Analytics on mount
+  useEffect(() => {
+    initGA();
+  }, []);
+
+  // Track page views with Google Analytics
+  useEffect(() => {
+    const path = viewToPath(view);
+    trackPageView(path, document.title);
   }, [view]);
 
   // Auto-transition slideshow
