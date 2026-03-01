@@ -15,7 +15,40 @@ const getCountryFlag = (countryCode: string | null): string => {
   return String.fromCodePoint(...codePoints);
 };
 
+// Format slug to readable name
+const formatSlug = (slug: string): string => {
+  return slug
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
+};
+
+interface BehavioralStats {
+  avgPagesPerSession: number;
+  bounceRate: number;
+  sessionsWithActions: number;
+}
+
+interface TopItem {
+  name: string;
+  views: number;
+}
+
+interface GeoIntelligence {
+  country: string;
+  sessions: number;
+  topVillas: string[];
+  topYachts: string[];
+}
+
+interface DailyTrend {
+  date: string;
+  sessions: number;
+  actions: number;
+  vipSessions: number;
+}
+
 interface AuditStats {
+  period: string;
   totalSessions: number;
   totalActions: number;
   uniqueIPs: number;
@@ -27,6 +60,11 @@ interface AuditStats {
   topPages: Record<string, number>;
   recentSessions: any[];
   recentActions: any[];
+  behavioral: BehavioralStats;
+  topVillas: TopItem[];
+  topYachts: TopItem[];
+  geoIntelligence: GeoIntelligence[];
+  dailyTrend: DailyTrend[];
 }
 
 interface VipUser {
@@ -39,11 +77,21 @@ interface AdminDashboardProps {
   onNavigate: (view: string) => void;
 }
 
+const PERIOD_OPTIONS = [
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '3m', label: 'Last 3 months' },
+  { value: '6m', label: 'Last 6 months' },
+  { value: '1y', label: 'Last year' },
+  { value: 'all', label: 'All time' }
+];
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'actions' | 'vip'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'advanced' | 'sessions' | 'actions' | 'vip'>('overview');
+  const [period, setPeriod] = useState('30d');
   const [vipUsers, setVipUsers] = useState<VipUser[]>([]);
   const [selectedVip, setSelectedVip] = useState<string | null>(null);
   const [vipHistory, setVipHistory] = useState<any[]>([]);
@@ -55,11 +103,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     }
   }, [onNavigate]);
 
-  // Fetch stats
+  // Fetch stats with period
   useEffect(() => {
     const fetchStats = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`${BACKEND_URL}/api/audit/stats`);
+        const res = await fetch(`${BACKEND_URL}/api/audit/stats?period=${period}`);
         if (res.ok) {
           const data = await res.json();
           setStats(data);
@@ -72,7 +121,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       setLoading(false);
     };
     fetchStats();
-  }, []);
+  }, [period]);
 
   // Fetch VIP users
   useEffect(() => {
@@ -123,6 +172,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     });
   };
 
+  const formatShortDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short'
+    });
+  };
+
   const formatAction = (action: string) => {
     return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
@@ -154,11 +210,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     );
   }
 
+  // Calculate max for trend chart
+  const maxSessions = stats?.dailyTrend?.reduce((max, d) => Math.max(max, d.sessions), 0) || 1;
+
   return (
     <div className="pt-40 pb-24 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <button
               onClick={() => onNavigate('home')}
@@ -170,16 +229,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               Back
             </button>
             <h1 className="text-4xl md:text-5xl font-serif text-white mb-2">Analytics Dashboard</h1>
-            <p className="text-white/40">Last 30 days activity</p>
+            <p className="text-white/40">Advanced insights and tracking</p>
           </div>
-          <div className="mt-4 md:mt-0 text-right">
-            <p className="text-luxury-gold text-sm">Admin: {vipAuth.getUserName()}</p>
+          <div className="mt-4 md:mt-0 flex items-center gap-4">
+            {/* Period Selector */}
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+              className="bg-luxury-slate/50 border border-white/20 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-luxury-gold"
+            >
+              {PERIOD_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <p className="text-luxury-gold text-sm">{vipAuth.getUserName()}</p>
           </div>
         </div>
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {(['overview', 'sessions', 'actions', 'vip'] as const).map((tab) => (
+          {(['overview', 'advanced', 'sessions', 'actions', 'vip'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -189,7 +258,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   : 'bg-transparent border border-white/20 text-white/60 hover:border-luxury-gold/50'
               }`}
             >
-              {tab === 'vip' ? 'VIP Tracking' : tab}
+              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab}
             </button>
           ))}
         </div>
@@ -216,6 +285,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <p className="text-3xl md:text-4xl text-luxury-gold font-serif">{stats.vipSessions.toLocaleString()}</p>
               </div>
             </div>
+
+            {/* Behavioral Stats */}
+            {stats.behavioral && (
+              <div className="grid grid-cols-3 gap-4 md:gap-6 mb-12">
+                <div className="bg-gradient-to-br from-green-900/30 to-green-900/10 rounded-2xl p-6 border border-green-500/20">
+                  <p className="text-green-400/70 text-[10px] uppercase tracking-wider mb-2">Avg Pages/Session</p>
+                  <p className="text-3xl md:text-4xl text-green-400 font-serif">{stats.behavioral.avgPagesPerSession}</p>
+                </div>
+                <div className="bg-gradient-to-br from-amber-900/30 to-amber-900/10 rounded-2xl p-6 border border-amber-500/20">
+                  <p className="text-amber-400/70 text-[10px] uppercase tracking-wider mb-2">Bounce Rate</p>
+                  <p className="text-3xl md:text-4xl text-amber-400 font-serif">{stats.behavioral.bounceRate}%</p>
+                </div>
+                <div className="bg-gradient-to-br from-blue-900/30 to-blue-900/10 rounded-2xl p-6 border border-blue-500/20">
+                  <p className="text-blue-400/70 text-[10px] uppercase tracking-wider mb-2">Active Sessions</p>
+                  <p className="text-3xl md:text-4xl text-blue-400 font-serif">{stats.behavioral.sessionsWithActions}</p>
+                </div>
+              </div>
+            )}
 
             {/* Charts Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -342,6 +429,138 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                       <span className="text-luxury-gold text-sm ml-4">{count}</span>
                     </div>
                   ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Advanced Analytics Tab */}
+        {activeTab === 'advanced' && stats && (
+          <>
+            {/* Daily Trend Chart */}
+            <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10 mb-8">
+              <h3 className="text-white text-lg font-serif mb-6">Sessions Trend</h3>
+              <div className="h-48 flex items-end gap-1">
+                {stats.dailyTrend?.map((day, i) => (
+                  <div
+                    key={day.date}
+                    className="flex-1 group relative"
+                  >
+                    <div
+                      className="bg-gradient-to-t from-luxury-gold to-amber-400 rounded-t transition-all hover:from-luxury-gold hover:to-yellow-300"
+                      style={{ height: `${(day.sessions / maxSessions) * 100}%`, minHeight: '4px' }}
+                    />
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-luxury-blue/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                      {formatShortDate(day.date)}: {day.sessions} sessions
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-white/40 text-xs">
+                  {stats.dailyTrend?.[0]?.date ? formatShortDate(stats.dailyTrend[0].date) : ''}
+                </span>
+                <span className="text-white/40 text-xs">
+                  {stats.dailyTrend?.[stats.dailyTrend.length - 1]?.date ? formatShortDate(stats.dailyTrend[stats.dailyTrend.length - 1].date) : ''}
+                </span>
+              </div>
+            </div>
+
+            {/* Top Content Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* Top Villas */}
+              <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+                <h3 className="text-white text-lg font-serif mb-4 flex items-center">
+                  <span className="w-3 h-3 bg-purple-500 rounded-full mr-3"></span>
+                  Top Villas
+                </h3>
+                <div className="space-y-3">
+                  {stats.topVillas?.length > 0 ? stats.topVillas.map((villa, i) => (
+                    <div key={villa.name} className="flex items-center justify-between py-2 border-b border-white/5">
+                      <div className="flex items-center">
+                        <span className="text-luxury-gold/50 text-sm w-6">{i + 1}.</span>
+                        <span className="text-white/70 text-sm">{formatSlug(villa.name)}</span>
+                      </div>
+                      <span className="text-purple-400 text-sm">{villa.views} views</span>
+                    </div>
+                  )) : (
+                    <p className="text-white/40 text-sm">No villa views recorded</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Yachts */}
+              <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+                <h3 className="text-white text-lg font-serif mb-4 flex items-center">
+                  <span className="w-3 h-3 bg-cyan-500 rounded-full mr-3"></span>
+                  Top Yachts
+                </h3>
+                <div className="space-y-3">
+                  {stats.topYachts?.length > 0 ? stats.topYachts.map((yacht, i) => (
+                    <div key={yacht.name} className="flex items-center justify-between py-2 border-b border-white/5">
+                      <div className="flex items-center">
+                        <span className="text-luxury-gold/50 text-sm w-6">{i + 1}.</span>
+                        <span className="text-white/70 text-sm">{formatSlug(yacht.name)}</span>
+                      </div>
+                      <span className="text-cyan-400 text-sm">{yacht.views} views</span>
+                    </div>
+                  )) : (
+                    <p className="text-white/40 text-sm">No yacht views recorded</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Geographic Intelligence */}
+            <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+              <h3 className="text-white text-lg font-serif mb-6">Geographic Intelligence</h3>
+              <p className="text-white/40 text-sm mb-4">What visitors from each country are interested in</p>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead>
+                    <tr className="text-white/50 text-[10px] uppercase tracking-wider border-b border-white/10">
+                      <th className="text-left pb-3 pr-4">Country</th>
+                      <th className="text-left pb-3 pr-4">Sessions</th>
+                      <th className="text-left pb-3 pr-4">Top Villas</th>
+                      <th className="text-left pb-3">Top Yachts</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.geoIntelligence?.map((geo) => (
+                      <tr key={geo.country} className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-3 pr-4 text-white text-sm font-medium">{geo.country}</td>
+                        <td className="py-3 pr-4 text-luxury-gold text-sm">{geo.sessions}</td>
+                        <td className="py-3 pr-4">
+                          {geo.topVillas.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {geo.topVillas.map(v => (
+                                <span key={v} className="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-xs rounded">
+                                  {formatSlug(v)}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-white/30 text-sm">-</span>
+                          )}
+                        </td>
+                        <td className="py-3">
+                          {geo.topYachts.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {geo.topYachts.map(y => (
+                                <span key={y} className="px-2 py-0.5 bg-cyan-500/20 text-cyan-300 text-xs rounded">
+                                  {formatSlug(y)}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-white/30 text-sm">-</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </>
