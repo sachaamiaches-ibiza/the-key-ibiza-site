@@ -27,10 +27,15 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
+  // Handle close - let parent handle URL navigation
+  const handleClose = () => {
+    onClose();
+  };
+
   // Close on Escape key
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
@@ -61,14 +66,14 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Modal */}
       <div className="relative w-full max-w-lg bg-gradient-to-br from-[#0B1C26] to-[#0a1419] rounded-3xl border border-luxury-gold/20 shadow-2xl overflow-hidden animate-fadeIn">
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 text-white/40 hover:text-luxury-gold transition-colors z-10"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -23,6 +23,7 @@ import YachtDetailPage from './components/YachtDetailPage';
 import CatamaransPage from './components/CatamaransPage';
 import VillasPage from './components/VillasPage';
 import AdminDashboard from './components/AdminDashboard';
+import ContactModal from './components/ContactModal';
 import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
 import { getServices } from './constants';
 import { translations } from './translations';
@@ -71,6 +72,7 @@ function viewToPath(view: View): string {
 function pathToView(path: string): View {
   const cleanPath = path.replace(/^\//, '').toLowerCase();
   if (cleanPath === '' || cleanPath === 'home') return 'home';
+  if (cleanPath === 'contact') return 'contact';
   if (cleanPath === 'holiday-rentals') return 'villas-holiday';
   if (cleanPath === 'long-term') return 'villas-longterm';
   if (cleanPath === 'for-sale') return 'villas-sale';
@@ -275,6 +277,32 @@ const App: React.FC = () => {
   // Yacht detail state
   const [selectedYacht, setSelectedYacht] = useState<any>(null);
   const [yachtLoading, setYachtLoading] = useState(false);
+
+  // Contact modal state
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  // Open contact modal when view is 'contact'
+  useEffect(() => {
+    if (view === 'contact') {
+      setIsContactModalOpen(true);
+    }
+  }, [view]);
+
+  const handleOpenContact = () => {
+    setIsContactModalOpen(true);
+    window.history.pushState({}, '', '/contact');
+  };
+
+  const handleCloseContact = () => {
+    setIsContactModalOpen(false);
+    // Go back in history or set to home
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.history.pushState({}, '', '/');
+      setViewState('home');
+    }
+  };
   const [yachtSearchDate, setYachtSearchDate] = useState<string>('');
 
   // Audit tracking - tracks page views automatically
@@ -826,7 +854,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </div>
-      <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} />
+      <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} onOpenContact={handleOpenContact} />
       <main className="animate-fade-in relative z-[1]">{renderView()}</main>
       <section id="contact" className="py-20 md:py-28 lg:py-32 relative overflow-hidden" style={{ backgroundColor: '#0B1C26' }}>
         <div className="container mx-auto px-6 lg:px-12 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 items-center">
@@ -1067,6 +1095,12 @@ const App: React.FC = () => {
       )}
 
       <AIConcierge lang={lang} />
+
+      {/* Contact Modal - Shareable via URL */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={handleCloseContact}
+      />
     </div>
   );
 };
