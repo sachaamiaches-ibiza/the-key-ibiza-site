@@ -3,17 +3,35 @@
     {
       "source": "/villa-:slug(.*)",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug",
-      "statusCode": 307
+      "statusCode": 307,
+      "missing": [
+        {
+          "type": "query",
+          "key": "loaded"
+        }
+      ]
     },
     {
       "source": "/yacht-:slug(.*)",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug",
-      "statusCode": 307
+      "statusCode": 307,
+      "missing": [
+        {
+          "type": "query",
+          "key": "loaded"
+        }
+      ]
     },
     {
       "source": "/blog-:slug(.*)",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug",
-      "statusCode": 307
+      "statusCode": 307,
+      "missing": [
+        {
+          "type": "query",
+          "key": "loaded"
+        }
+      ]
     }
   ],
   "rewrites": [
