@@ -2,18 +2,18 @@
   "rewrites": [
     {
       "source": "/villa-:slug*",
-      "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug*"
+      "destination": "/api/share/villa/:slug*"
     },
     {
       "source": "/yacht-:slug*",
-      "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug*"
+      "destination": "/api/share/yacht/:slug*"
     },
     {
       "source": "/blog-:slug*",
-      "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug*"
+      "destination": "/api/share/blog/:slug*"
     },
     {
-      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
+      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/|api/).*)",
       "destination": "/index.html"
     }
   ]
