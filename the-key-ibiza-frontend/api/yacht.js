@@ -1,18 +1,15 @@
-// Vercel Serverless Function to proxy share requests to backend
-// This ensures proper OG tag delivery for social media sharing
-
+// Vercel Serverless Function to proxy yacht share requests to backend
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 
 export default async function handler(req, res) {
-  const { path } = req.query;
-  const pathStr = Array.isArray(path) ? path.join('/') : path;
+  const slug = req.query.slug || '';
 
-  if (!pathStr) {
+  if (!slug) {
     return res.redirect(302, 'https://thekey-ibiza.com');
   }
 
   try {
-    const backendResponse = await fetch(`${BACKEND_URL}/share/${pathStr}`, {
+    const backendResponse = await fetch(`${BACKEND_URL}/share/yacht/${slug}`, {
       method: 'GET',
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
@@ -27,18 +24,9 @@ export default async function handler(req, res) {
       return res.status(200).send(html);
     }
 
-    // If backend returned a redirect, follow it
-    if (backendResponse.status >= 300 && backendResponse.status < 400) {
-      const location = backendResponse.headers.get('location');
-      if (location) {
-        return res.redirect(302, location);
-      }
-    }
-
-    // Fallback to homepage
     return res.redirect(302, 'https://thekey-ibiza.com');
   } catch (error) {
-    console.error('Share proxy error:', error);
+    console.error('Yacht proxy error:', error);
     return res.redirect(302, 'https://thekey-ibiza.com');
   }
 }

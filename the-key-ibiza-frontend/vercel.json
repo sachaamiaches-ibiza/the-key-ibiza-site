@@ -1,16 +1,21 @@
 {
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/villa-:slug*",
-      "destination": "/api/share/villa/:slug*"
+      "destination": "/api/villa?slug=:slug*"
     },
     {
       "source": "/yacht-:slug*",
-      "destination": "/api/share/yacht/:slug*"
+      "destination": "/api/yacht?slug=:slug*"
     },
     {
       "source": "/blog-:slug*",
-      "destination": "/api/share/blog/:slug*"
+      "destination": "/api/blog?slug=:slug*"
     },
     {
       "source": "/((?!sitemap\\.xml|robots\\.txt|assets/|api/).*)",
