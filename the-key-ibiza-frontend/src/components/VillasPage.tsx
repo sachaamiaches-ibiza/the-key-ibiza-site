@@ -120,7 +120,27 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
                   <div className="w-16 h-16 border-2 border-luxury-gold/30 rounded-full"></div>
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/40 via-transparent to-transparent rounded-2xl lg:rounded-3xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/60 via-transparent to-transparent rounded-2xl lg:rounded-3xl"></div>
+              {/* Button on image */}
+              <button
+                onClick={() => onNavigate(section.view)}
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 px-8 py-3.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold transition-all duration-500 backdrop-blur-sm"
+                style={{
+                  backgroundColor: 'rgba(196, 164, 97, 0.9)',
+                  color: '#0B1C26',
+                  border: '1px solid #C4A461',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(11, 28, 38, 0.9)';
+                  e.currentTarget.style.color = '#C4A461';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(196, 164, 97, 0.9)';
+                  e.currentTarget.style.color = '#0B1C26';
+                }}
+              >
+                {section.buttonText}
+              </button>
             </div>
 
             {/* Content Side */}
@@ -147,32 +167,11 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
 
                 {/* Description */}
                 <p
-                  className="text-sm md:text-base leading-relaxed mb-8"
+                  className="text-sm md:text-base leading-relaxed"
                   style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 300 }}
                 >
                   {section.description}
                 </p>
-
-                {/* Button */}
-                <button
-                  onClick={() => onNavigate(section.view)}
-                  className="px-8 py-3.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold transition-all duration-500"
-                  style={{
-                    backgroundColor: '#C4A461',
-                    color: '#0B1C26',
-                    border: '1px solid #C4A461',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0B1C26';
-                    e.currentTarget.style.color = '#C4A461';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#C4A461';
-                    e.currentTarget.style.color = '#0B1C26';
-                  }}
-                >
-                  {section.buttonText}
-                </button>
               </div>
             </div>
           </div>
