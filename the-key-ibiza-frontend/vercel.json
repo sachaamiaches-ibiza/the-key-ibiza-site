@@ -2,36 +2,15 @@
   "rewrites": [
     {
       "source": "/villa-:slug*",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(?:WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|TelegramBot|Slackbot).*"
-        }
-      ],
-      "destination": "https://the-key-ibiza-backend.vercel.app/og/villa/:slug*"
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug*"
     },
     {
       "source": "/yacht-:slug*",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(?:WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|TelegramBot|Slackbot).*"
-        }
-      ],
-      "destination": "https://the-key-ibiza-backend.vercel.app/og/yacht/:slug*"
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug*"
     },
     {
       "source": "/blog-:slug*",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(?:WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|TelegramBot|Slackbot).*"
-        }
-      ],
-      "destination": "https://the-key-ibiza-backend.vercel.app/og/blog/:slug*"
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug*"
     },
     {
       "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
