@@ -1,29 +1,40 @@
 {
-  "functions": {
-    "api/og/[...path].ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "routes": [
-    {
-      "src": "^/villa-(.*)$",
-      "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(whatsapp|facebook|twitter|linkedin|telegram|discord|slack|pinterest|bot|crawl|spider).*" }],
-      "dest": "/api/og/villa-$1"
-    },
-    {
-      "src": "^/yacht-(.*)$",
-      "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(whatsapp|facebook|twitter|linkedin|telegram|discord|slack|pinterest|bot|crawl|spider).*" }],
-      "dest": "/api/og/yacht-$1"
-    },
-    {
-      "src": "^/blog-(.*)$",
-      "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(whatsapp|facebook|twitter|linkedin|telegram|discord|slack|pinterest|bot|crawl|spider).*" }],
-      "dest": "/api/og/blog-$1"
-    }
-  ],
   "rewrites": [
     {
-      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/|api/).*)",
+      "source": "/villa-:slug*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?:WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|TelegramBot|Slackbot).*"
+        }
+      ],
+      "destination": "https://the-key-ibiza-backend.vercel.app/og/villa/:slug*"
+    },
+    {
+      "source": "/yacht-:slug*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?:WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|TelegramBot|Slackbot).*"
+        }
+      ],
+      "destination": "https://the-key-ibiza-backend.vercel.app/og/yacht/:slug*"
+    },
+    {
+      "source": "/blog-:slug*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?:WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|TelegramBot|Slackbot).*"
+        }
+      ],
+      "destination": "https://the-key-ibiza-backend.vercel.app/og/blog/:slug*"
+    },
+    {
+      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
       "destination": "/index.html"
     }
   ]
