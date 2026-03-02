@@ -23,6 +23,17 @@
       "destination": "https://the-key-ibiza-backend.vercel.app/og/yacht/:slug*"
     },
     {
+      "source": "/blog-:slug*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|Pinterest|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ],
+      "destination": "https://the-key-ibiza-backend.vercel.app/og/blog/:slug*"
+    },
+    {
       "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
       "destination": "/index.html"
     }
