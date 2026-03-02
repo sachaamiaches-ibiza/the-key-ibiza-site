@@ -1,27 +1,24 @@
 {
-  "buildCommand": "vite build",
-  "outputDirectory": "dist",
-  "framework": null,
-  "functions": {
-    "api/*.js": {
-      "runtime": "@vercel/node@3.0.0"
-    }
-  },
-  "rewrites": [
+  "redirects": [
     {
       "source": "/villa-:slug*",
-      "destination": "/api/villa?slug=:slug*"
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug*",
+      "statusCode": 307
     },
     {
       "source": "/yacht-:slug*",
-      "destination": "/api/yacht?slug=:slug*"
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug*",
+      "statusCode": 307
     },
     {
       "source": "/blog-:slug*",
-      "destination": "/api/blog?slug=:slug*"
-    },
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug*",
+      "statusCode": 307
+    }
+  ],
+  "rewrites": [
     {
-      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/|api/).*)",
+      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
       "destination": "/index.html"
     }
   ]
