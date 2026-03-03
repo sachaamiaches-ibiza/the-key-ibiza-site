@@ -280,6 +280,13 @@ const App: React.FC = () => {
   const [selectedYacht, setSelectedYacht] = useState<any>(null);
   const [yachtLoading, setYachtLoading] = useState(false);
 
+  // VIP villa password modal state
+  const [villaPasswordModalOpen, setVillaPasswordModalOpen] = useState(false);
+  const [villaPassword, setVillaPassword] = useState('');
+  const [villaPasswordError, setVillaPasswordError] = useState('');
+  const [villaPasswordVerifying, setVillaPasswordVerifying] = useState(false);
+  const [verifiedVillaSlugs, setVerifiedVillaSlugs] = useState<string[]>([]);
+
   // Contact modal state
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
@@ -477,48 +484,103 @@ const App: React.FC = () => {
     if (view.startsWith('villa-')) {
       const villaUrlSlug = view.replace('villa-', '');
 
-      // First: try to find in VIP-filtered list (VILLAS)
-      let villa = VILLAS.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
-        || VILLAS.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`);
-
-      // Second: check if villa exists but is private (requires VIP)
-      const privateVilla = !villa && (
-        allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug && v.isPrivate)
-        || allVillas.find(v => (v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`) && v.isPrivate)
-        || (directVilla?.isPrivate ? directVilla : null)
-      );
-
-      // If private villa and user is not VIP, show access required
-      if (privateVilla && !isVip) {
-        return (
-          <div className="pt-40 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
-            <div className="container mx-auto px-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-luxury-gold/20 flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h1 className="text-4xl font-serif text-white mb-4">VIP Access Required</h1>
-              <p className="text-white/60 mb-8 max-w-md mx-auto">This property is exclusively available to our VIP members. Please log in with your VIP credentials to view this villa.</p>
-              <button
-                onClick={() => setView('home')}
-                className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-sm uppercase tracking-wider hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all"
-              >
-                Back to Home
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      // If VIP user, they can see private villas too
-      if (!villa && isVip) {
-        villa = allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
-          || allVillas.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`)
-          || directVilla;
-      }
+      // Find villa - try directVilla first (has requiresPassword flag from API)
+      const villa = directVilla || allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
+        || allVillas.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`);
 
       if (villa) {
+        // Check if villa requires password and user hasn't verified yet
+        const requiresPasswordAccess = (villa as any).requiresPassword === true
+          && !verifiedVillaSlugs.includes(villaUrlSlug);
+
+        if (requiresPasswordAccess) {
+          // Show password modal for VIP villa
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}>
+              <div
+                className="relative w-full max-w-md p-8 rounded-[24px] border border-luxury-gold/20"
+                style={{ background: 'linear-gradient(145deg, #0B1C26 0%, #0A0E14 100%)' }}
+              >
+                <h2 className="text-2xl font-serif text-white mb-2 text-center">VIP Access Required</h2>
+                <p className="text-white/60 text-sm text-center mb-6">
+                  This property is exclusively available to our VIP clients. Please enter the access code.
+                </p>
+
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setVillaPasswordError('');
+                  setVillaPasswordVerifying(true);
+
+                  try {
+                    const res = await fetch('https://the-key-ibiza-backend.vercel.app/vip/verify-villa-password', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ password: villaPassword })
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                      setVerifiedVillaSlugs(prev => [...prev, villaUrlSlug]);
+                      setVillaPassword('');
+                      setVillaPasswordModalOpen(false);
+                    } else {
+                      setVillaPasswordError('Invalid access code. Please try again.');
+                    }
+                  } catch {
+                    setVillaPasswordError('Connection error. Please try again.');
+                  }
+                  setVillaPasswordVerifying(false);
+                }} className="space-y-4">
+                  <div>
+                    <input
+                      type="password"
+                      value={villaPassword}
+                      onChange={(e) => setVillaPassword(e.target.value)}
+                      placeholder="Enter VIP access code"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-luxury-gold/50"
+                      autoFocus
+                    />
+                    {villaPasswordError && (
+                      <p className="text-red-400 text-sm mt-2">{villaPasswordError}</p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVillaPassword('');
+                        setVillaPasswordError('');
+                        setView('villas-holiday');
+                      }}
+                      className="flex-1 px-4 py-3 border border-white/20 text-white/60 rounded-lg hover:bg-white/5 transition-colors"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={villaPasswordVerifying || !villaPassword}
+                      className="flex-1 px-4 py-3 bg-luxury-gold text-luxury-blue font-medium rounded-lg hover:bg-luxury-gold/90 transition-colors disabled:opacity-50"
+                    >
+                      {villaPasswordVerifying ? 'Verifying...' : 'Access Villa'}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="mt-6 pt-6 border-t border-white/10 text-center">
+                  <p className="text-white/40 text-xs mb-2">Already have a VIP account?</p>
+                  <button
+                    onClick={() => setView('vip-login')}
+                    className="text-luxury-gold text-sm hover:underline"
+                  >
+                    Login to VIP Area
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         return (
           <VillaDetailPage
             villa={villa}

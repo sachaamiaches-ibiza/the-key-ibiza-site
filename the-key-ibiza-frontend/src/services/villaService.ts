@@ -270,6 +270,11 @@ export async function fetchVillaBySlug(slug: string): Promise<Villa | null> {
     // Load Cloudinary images for manual villas
     const villaWithImages = await loadCloudinaryImagesForVilla(villa, data);
 
+    // Preserve requiresPassword flag from backend (for vip_only villas accessed by non-VIP users)
+    if (data.requiresPassword) {
+      (villaWithImages as any).requiresPassword = true;
+    }
+
     console.log('✅ VILLA FETCHED FROM BACKEND:', villaWithImages.name);
     return villaWithImages;
   } catch (e) {
