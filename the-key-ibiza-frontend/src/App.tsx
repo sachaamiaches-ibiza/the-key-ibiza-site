@@ -326,21 +326,21 @@ const App: React.FC = () => {
     setSearchCheckOut(checkOut);
   };
 
-  // Fetch villas from Backend
+  // Fetch villas from Backend (reload when VIP status changes)
   useEffect(() => {
     const loadVillas = async () => {
       setVillasLoading(true);
       try {
         const villas = await fetchVillas();
         setAllVillas(villas);
-        console.log('✅ ALL VILLAS FROM BACKEND:', villas.length);
+        console.log('✅ ALL VILLAS FROM BACKEND:', villas.length, isVip ? '(VIP)' : '(public)');
       } catch (error) {
         console.error('Failed to load villas:', error);
       }
       setVillasLoading(false);
     };
     loadVillas();
-  }, []);
+  }, [isVip]);
 
   // Fetch single villa directly from Backend when needed
   useEffect(() => {
