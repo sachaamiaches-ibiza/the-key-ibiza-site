@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AF37"/>
+      <stop offset="50%" style="stop-color:#C4A461"/>
+      <stop offset="100%" style="stop-color:#B8860B"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="#0B1C26"/>
+  <!-- Key - more vertical orientation -->
+  <g transform="translate(16, 16) rotate(-15) translate(-16, -16)">
+    <!-- Key head (circle with hole) -->
+    <circle cx="16" cy="8" r="5" fill="none" stroke="url(#gold)" stroke-width="2"/>
+    <circle cx="16" cy="8" r="2" fill="#0B1C26"/>
+    <!-- Key shaft -->
+    <rect x="15" y="12" width="2" height="14" fill="url(#gold)"/>
+    <!-- Key teeth -->
+    <rect x="17" y="20" width="4" height="2" fill="url(#gold)"/>
+    <rect x="17" y="24" width="3" height="2" fill="url(#gold)"/>
+  </g>
+</svg>
