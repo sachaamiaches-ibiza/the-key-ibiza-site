@@ -494,9 +494,9 @@ const App: React.FC = () => {
           && !verifiedVillaSlugs.includes(villaUrlSlug);
 
         if (requiresPasswordAccess) {
-          // Show password modal for VIP villa
+          // Show full-page password screen for VIP villa
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}>
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#0A0E14' }}>
               <div
                 className="relative w-full max-w-md p-8 rounded-[24px] border border-luxury-gold/20"
                 style={{ background: 'linear-gradient(145deg, #0B1C26 0%, #0A0E14 100%)' }}
