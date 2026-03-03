@@ -476,13 +476,47 @@ const App: React.FC = () => {
     // Villa detail page
     if (view.startsWith('villa-')) {
       const villaUrlSlug = view.replace('villa-', '');
-      // Try to find villa by URL slug matching the name
-      const villa = VILLAS.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
-        || allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
-        // Fallback: try matching by id (for backwards compatibility)
-        || VILLAS.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`)
-        || allVillas.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`)
-        || directVilla;
+
+      // First: try to find in VIP-filtered list (VILLAS)
+      let villa = VILLAS.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
+        || VILLAS.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`);
+
+      // Second: check if villa exists but is private (requires VIP)
+      const privateVilla = !villa && (
+        allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug && v.isPrivate)
+        || allVillas.find(v => (v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`) && v.isPrivate)
+        || (directVilla?.isPrivate ? directVilla : null)
+      );
+
+      // If private villa and user is not VIP, show access required
+      if (privateVilla && !isVip) {
+        return (
+          <div className="pt-40 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
+            <div className="container mx-auto px-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-luxury-gold/20 flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h1 className="text-4xl font-serif text-white mb-4">VIP Access Required</h1>
+              <p className="text-white/60 mb-8 max-w-md mx-auto">This property is exclusively available to our VIP members. Please log in with your VIP credentials to view this villa.</p>
+              <button
+                onClick={() => setView('home')}
+                className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-sm uppercase tracking-wider hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all"
+              >
+                Back to Home
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      // If VIP user, they can see private villas too
+      if (!villa && isVip) {
+        villa = allVillas.find(v => nameToUrlSlug(v.name) === villaUrlSlug)
+          || allVillas.find(v => v.id === villaUrlSlug || v.id === `invenio-${villaUrlSlug}`)
+          || directVilla;
+      }
 
       if (villa) {
         return (
