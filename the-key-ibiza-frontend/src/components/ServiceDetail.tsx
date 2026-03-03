@@ -267,9 +267,9 @@ const SERVICE_DATA: Record<string, any> = {
       "Elite SUV & Sedan Fleet",
       "24/7 Spontaneous Availability"
     ],
-    imageMain: "https://images.unsplash.com/photo-1563720360172-67b8f3dce741?auto=format&fit=crop&q=80&w=1200",
-    imageGrid1: "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?auto=format&fit=crop&q=80&w=800",
-    imageGrid2: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&q=80&w=800"
+    imageMain: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
+    imageGrid1: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800",
+    imageGrid2: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&q=80&w=800"
   },
   deliveries: {
     badge: "Convenience",
