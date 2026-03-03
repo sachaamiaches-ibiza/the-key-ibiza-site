@@ -78,7 +78,7 @@ const serviceDetails = [
     title: 'Driver Services',
     subtitle: 'Luxury Transportation',
     description: 'Travel in style with our professional chauffeur services. From airport transfers to island exploration, our fleet of luxury vehicles and experienced drivers ensure comfortable, punctual, and sophisticated transportation.',
-    image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?auto=format&fit=crop&q=80&w=1200',
   },
   {
     id: 'deliveries',
