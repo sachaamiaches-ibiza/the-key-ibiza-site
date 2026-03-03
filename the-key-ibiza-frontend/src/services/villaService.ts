@@ -147,8 +147,8 @@ function apiRowToVilla(row: any): Villa {
     gallery: galleryImagesArray,
     amenities: amenitiesArray,
     availability: row.availability || undefined,
-    isPrivate: row.visibility === false,
-    visibility: row.visibility === false ? 'private' : 'public',
+    isPrivate: row.vip_only === true,
+    visibility: row.vip_only === true ? 'private' : 'public',
     // Additional fields
     minStay: row.min_stay || '7 nights',
     checkIn: row.check_in || '16:00',
