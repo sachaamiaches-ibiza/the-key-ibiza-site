@@ -86,15 +86,37 @@ const PERIOD_OPTIONS = [
   { value: 'all', label: 'All time' }
 ];
 
+interface GoogleAnalyticsData {
+  period: string;
+  overview: {
+    activeUsers: number;
+    sessions: number;
+    pageViews: number;
+    bounceRate: string;
+    avgSessionDuration: string;
+    newUsers: number;
+  };
+  realtime: {
+    activeUsers: number;
+  };
+  byCountry: Array<{ country: string; sessions: number }>;
+  bySource: Array<{ source: string; sessions: number }>;
+  topPages: Array<{ page: string; views: number }>;
+  dailyTrend: Array<{ date: string; sessions: number; users: number }>;
+}
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'advanced' | 'sessions' | 'actions' | 'vip'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'google' | 'advanced' | 'sessions' | 'actions' | 'vip'>('overview');
   const [period, setPeriod] = useState('30d');
   const [vipUsers, setVipUsers] = useState<VipUser[]>([]);
   const [selectedVip, setSelectedVip] = useState<string | null>(null);
   const [vipHistory, setVipHistory] = useState<any[]>([]);
+  const [gaData, setGaData] = useState<GoogleAnalyticsData | null>(null);
+  const [gaLoading, setGaLoading] = useState(false);
+  const [gaError, setGaError] = useState<string | null>(null);
 
   // Check if user is admin
   useEffect(() => {
@@ -143,6 +165,30 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     };
     fetchVipUsers();
   }, []);
+
+  // Fetch Google Analytics data
+  useEffect(() => {
+    if (activeTab === 'google') {
+      const fetchGAData = async () => {
+        setGaLoading(true);
+        setGaError(null);
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/analytics/google?period=${period}`);
+          if (res.ok) {
+            const data = await res.json();
+            setGaData(data);
+          } else {
+            const errData = await res.json();
+            setGaError(errData.error || 'Failed to load Google Analytics');
+          }
+        } catch (err) {
+          setGaError('Connection error');
+        }
+        setGaLoading(false);
+      };
+      fetchGAData();
+    }
+  }, [activeTab, period]);
 
   // Fetch VIP history when selected
   useEffect(() => {
@@ -249,7 +295,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {(['overview', 'advanced', 'sessions', 'actions', 'vip'] as const).map((tab) => (
+          {(['overview', 'google', 'advanced', 'sessions', 'actions', 'vip'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -259,7 +305,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   : 'bg-transparent border border-white/20 text-white/60 hover:border-luxury-gold/50'
               }`}
             >
-              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab}
+              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab === 'google' ? 'Google Analytics' : tab}
             </button>
           ))}
         </div>
@@ -432,6 +478,162 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   ))}
               </div>
             </div>
+          </>
+        )}
+
+        {/* Google Analytics Tab */}
+        {activeTab === 'google' && (
+          <>
+            {gaLoading ? (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-white/60">Loading Google Analytics...</p>
+              </div>
+            ) : gaError ? (
+              <div className="text-center py-12">
+                <p className="text-red-400 mb-2">{gaError}</p>
+                <p className="text-white/40 text-sm">Make sure GA credentials are configured in Vercel</p>
+              </div>
+            ) : gaData ? (
+              <>
+                {/* Realtime Badge */}
+                <div className="mb-8 flex items-center gap-4">
+                  <div className="bg-gradient-to-br from-red-900/30 to-red-900/10 rounded-2xl px-6 py-4 border border-red-500/20 flex items-center gap-3">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <div>
+                      <p className="text-red-400/70 text-[10px] uppercase tracking-wider">Live Now</p>
+                      <p className="text-2xl text-red-400 font-serif">{gaData.realtime.activeUsers}</p>
+                    </div>
+                  </div>
+                  <p className="text-white/40 text-sm">Real-time active users on your site</p>
+                </div>
+
+                {/* Summary Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 mb-12">
+                  <div className="bg-gradient-to-br from-red-900/20 to-red-900/5 rounded-2xl p-6 border border-red-500/10">
+                    <p className="text-red-400/50 text-[10px] uppercase tracking-wider mb-2">Active Users</p>
+                    <p className="text-3xl text-red-400 font-serif">{gaData.overview.activeUsers.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-red-900/20 to-red-900/5 rounded-2xl p-6 border border-red-500/10">
+                    <p className="text-red-400/50 text-[10px] uppercase tracking-wider mb-2">Sessions</p>
+                    <p className="text-3xl text-red-400 font-serif">{gaData.overview.sessions.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-red-900/20 to-red-900/5 rounded-2xl p-6 border border-red-500/10">
+                    <p className="text-red-400/50 text-[10px] uppercase tracking-wider mb-2">Page Views</p>
+                    <p className="text-3xl text-red-400 font-serif">{gaData.overview.pageViews.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-red-900/20 to-red-900/5 rounded-2xl p-6 border border-red-500/10">
+                    <p className="text-red-400/50 text-[10px] uppercase tracking-wider mb-2">New Users</p>
+                    <p className="text-3xl text-red-400 font-serif">{gaData.overview.newUsers.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-red-900/20 to-red-900/5 rounded-2xl p-6 border border-red-500/10">
+                    <p className="text-red-400/50 text-[10px] uppercase tracking-wider mb-2">Bounce Rate</p>
+                    <p className="text-3xl text-red-400 font-serif">{gaData.overview.bounceRate}%</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-red-900/20 to-red-900/5 rounded-2xl p-6 border border-red-500/10">
+                    <p className="text-red-400/50 text-[10px] uppercase tracking-wider mb-2">Avg Duration</p>
+                    <p className="text-3xl text-red-400 font-serif">{Math.floor(parseInt(gaData.overview.avgSessionDuration) / 60)}m</p>
+                  </div>
+                </div>
+
+                {/* Charts Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                  {/* By Country */}
+                  <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-red-500/10">
+                    <h3 className="text-white text-lg font-serif mb-4 flex items-center">
+                      <span className="w-3 h-3 bg-red-500 rounded-full mr-3"></span>
+                      By Country
+                    </h3>
+                    <div className="space-y-3">
+                      {gaData.byCountry.map(({ country, sessions }) => {
+                        const percentage = gaData.overview.sessions > 0 ? Math.round((sessions / gaData.overview.sessions) * 100) : 0;
+                        return (
+                          <div key={country}>
+                            <div className="flex justify-between mb-1">
+                              <span className="text-white/60 text-sm">{country}</span>
+                              <span className="text-red-400 text-sm">{sessions} ({percentage}%)</span>
+                            </div>
+                            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full transition-all"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* By Source */}
+                  <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-red-500/10">
+                    <h3 className="text-white text-lg font-serif mb-4 flex items-center">
+                      <span className="w-3 h-3 bg-orange-500 rounded-full mr-3"></span>
+                      Traffic Sources
+                    </h3>
+                    <div className="space-y-3">
+                      {gaData.bySource.map(({ source, sessions }) => {
+                        const percentage = gaData.overview.sessions > 0 ? Math.round((sessions / gaData.overview.sessions) * 100) : 0;
+                        return (
+                          <div key={source}>
+                            <div className="flex justify-between mb-1">
+                              <span className="text-white/60 text-sm">{source}</span>
+                              <span className="text-orange-400 text-sm">{sessions} ({percentage}%)</span>
+                            </div>
+                            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full transition-all"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Top Pages */}
+                  <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-red-500/10">
+                    <h3 className="text-white text-lg font-serif mb-4 flex items-center">
+                      <span className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></span>
+                      Top Pages
+                    </h3>
+                    <div className="space-y-2">
+                      {gaData.topPages.slice(0, 8).map(({ page, views }, i) => (
+                        <div key={page} className="flex items-center justify-between py-1 border-b border-white/5">
+                          <div className="flex items-center">
+                            <span className="text-yellow-500/50 text-sm w-5">{i + 1}.</span>
+                            <span className="text-white/60 text-sm truncate max-w-[180px]">{page}</span>
+                          </div>
+                          <span className="text-yellow-400 text-sm ml-2">{views}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Daily Trend Chart */}
+                <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-red-500/10">
+                  <h3 className="text-white text-lg font-serif mb-6">Google Analytics Trend</h3>
+                  <div className="h-48 flex items-end gap-1">
+                    {gaData.dailyTrend.map((day) => {
+                      const maxSessions = Math.max(...gaData.dailyTrend.map(d => d.sessions), 1);
+                      return (
+                        <div key={day.date} className="flex-1 group relative">
+                          <div
+                            className="bg-gradient-to-t from-red-500 to-red-400 rounded-t transition-all hover:from-red-400 hover:to-red-300"
+                            style={{ height: `${(day.sessions / maxSessions) * 100}%`, minHeight: '4px' }}
+                          />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-luxury-blue/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                            {day.date}: {day.sessions} sessions
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : null}
           </>
         )}
 
