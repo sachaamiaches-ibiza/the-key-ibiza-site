@@ -1290,6 +1290,10 @@ const App: React.FC = () => {
         checkIn={wishlistHook.wishlist.checkIn}
         checkOut={wishlistHook.wishlist.checkOut}
         onRemoveVilla={wishlistHook.removeVilla}
+        onClearAll={() => {
+          wishlistHook.clearWishlist();
+          setIsWishlistDrawerOpen(false);
+        }}
         onShare={() => {
           setIsWishlistDrawerOpen(false);
           setIsWishlistShareModalOpen(true);
