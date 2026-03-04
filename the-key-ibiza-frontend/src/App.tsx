@@ -28,6 +28,7 @@ import WishlistBadge from './components/WishlistBadge';
 import WishlistDrawer from './components/WishlistDrawer';
 import WishlistShareModal from './components/WishlistShareModal';
 import WishlistPage from './components/WishlistPage';
+import WishlistMapModal from './components/WishlistMapModal';
 import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
 import { getServices } from './constants';
 import { translations } from './translations';
@@ -301,6 +302,7 @@ const App: React.FC = () => {
   const wishlistHook = useWishlist();
   const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
   const [isWishlistShareModalOpen, setIsWishlistShareModalOpen] = useState(false);
+  const [isWishlistMapModalOpen, setIsWishlistMapModalOpen] = useState(false);
 
   // Sync wishlist dates with search dates
   useEffect(() => {
@@ -1298,6 +1300,10 @@ const App: React.FC = () => {
           setIsWishlistDrawerOpen(false);
           setIsWishlistShareModalOpen(true);
         }}
+        onViewMap={() => {
+          setIsWishlistDrawerOpen(false);
+          setIsWishlistMapModalOpen(true);
+        }}
         onNavigate={setView}
         calculatePrice={calculatePriceForPeriod}
       />
@@ -1312,6 +1318,17 @@ const App: React.FC = () => {
         totalPrice={wishlistTotalPrice}
         villaCount={wishlistHook.count}
         isVip={isVip}
+      />
+
+      {/* Wishlist Map Modal - View selected villas on map */}
+      <WishlistMapModal
+        isOpen={isWishlistMapModalOpen}
+        onClose={() => setIsWishlistMapModalOpen(false)}
+        villas={VILLAS.filter(v => {
+          const villaSlug = v.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+          return wishlistHook.wishlist.villaSlugs.includes(villaSlug) || wishlistHook.wishlist.villaSlugs.includes(v.id);
+        })}
+        onNavigate={setView}
       />
     </div>
   );

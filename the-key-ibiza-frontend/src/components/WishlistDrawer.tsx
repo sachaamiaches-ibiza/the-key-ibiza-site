@@ -11,6 +11,7 @@ interface WishlistDrawerProps {
   onRemoveVilla: (villaSlug: string) => void;
   onClearAll: () => void;
   onShare: () => void;
+  onViewMap: () => void;
   onNavigate: (view: string) => void;
   calculatePrice: (villa: Villa, checkIn: string, checkOut: string) => number | null;
 }
@@ -36,6 +37,7 @@ const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
   onRemoveVilla,
   onClearAll,
   onShare,
+  onViewMap,
   onNavigate,
   calculatePrice,
 }) => {
@@ -205,16 +207,31 @@ const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
               </div>
             )}
 
-            {/* Share button */}
-            <button
-              onClick={onShare}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-luxury-gold to-amber-500 text-luxury-blue font-semibold uppercase tracking-wider text-sm hover:from-amber-500 hover:to-luxury-gold transition-all flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-              Share Selection
-            </button>
+            {/* Action buttons row */}
+            <div className="flex gap-3">
+              {/* Share button */}
+              <button
+                onClick={onShare}
+                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-luxury-gold to-amber-500 text-luxury-blue font-semibold uppercase tracking-wider text-xs hover:from-amber-500 hover:to-luxury-gold transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                Share
+              </button>
+
+              {/* View on Map button */}
+              <button
+                onClick={onViewMap}
+                className="flex-1 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold uppercase tracking-wider text-xs hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Map
+              </button>
+            </div>
 
             {/* Clear selection button */}
             <button
