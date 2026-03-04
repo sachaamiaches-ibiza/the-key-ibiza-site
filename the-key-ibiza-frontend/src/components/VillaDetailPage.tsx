@@ -1062,7 +1062,7 @@ const handlePdfPasswordSubmit = async () => {
                 onClick={() => { setGalleryIndex(i); setGalleryOpen(true); }}
                 className="aspect-[4/3] rounded-[16px] md:rounded-[24px] overflow-hidden cursor-pointer relative group"
               >
-                <WatermarkedImage src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" watermarkSize="small" fullBleed />
+                <WatermarkedImage src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" watermarkSize="small" fullBleed showWatermark={false} />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 {i === 3 && allGalleryImages.length > 4 && (
                   <div className="absolute inset-0 bg-[#0B1C26]/60 flex items-center justify-center backdrop-blur-sm">

@@ -22,6 +22,7 @@ interface WatermarkedImageProps {
   className?: string;
   watermarkSize?: 'small' | 'medium' | 'large' | 'gallery' | 'card';
   fullBleed?: boolean;
+  showWatermark?: boolean; // Toggle watermark visibility (default: true)
 }
 
 const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
@@ -30,6 +31,7 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
   className = '',
   watermarkSize = 'large',
   fullBleed = false,
+  showWatermark = true,
 }) => {
   const [isVertical, setIsVertical] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -97,22 +99,24 @@ const WatermarkedImage: React.FC<WatermarkedImageProps> = ({
         onError={() => setHasError(true)}
       />
 
-      {/* Watermark overlay */}
-      <div
-        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-10"
-        style={{ color: 'rgba(255, 255, 255, 0.6)' }}
-      >
-        <WatermarkLogo
-          className={sizes.logo}
-          style={{ filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))' }}
-        />
-        <span
-          className={`font-serif uppercase ${sizes.text}`}
-          style={{ textShadow: '0 3px 12px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.6)' }}
+      {/* Watermark overlay - only shown when showWatermark is true */}
+      {showWatermark && (
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-10"
+          style={{ color: 'rgba(255, 255, 255, 0.6)' }}
         >
-          The Key Ibiza
-        </span>
-      </div>
+          <WatermarkLogo
+            className={sizes.logo}
+            style={{ filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))' }}
+          />
+          <span
+            className={`font-serif uppercase ${sizes.text}`}
+            style={{ textShadow: '0 3px 12px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.6)' }}
+          >
+            The Key Ibiza
+          </span>
+        </div>
+      )}
     </div>
   );
 };
