@@ -7,13 +7,17 @@ interface WishlistBadgeProps {
 }
 
 const WishlistBadge: React.FC<WishlistBadgeProps> = ({ count, hasDates, onClick }) => {
-  // Only show badge when there are items AND dates are selected
-  if (count === 0 || !hasDates) return null;
+  // Show badge when there are items (dates needed only for sharing)
+  if (count === 0) return null;
 
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-6 right-6 z-[90] flex items-center gap-3 px-5 py-3 rounded-full bg-gradient-to-r from-luxury-gold to-amber-500 text-luxury-blue font-semibold shadow-xl shadow-luxury-gold/30 hover:scale-105 transition-transform animate-fadeIn"
+      className={`fixed bottom-6 right-6 z-[90] flex items-center gap-3 px-5 py-3 rounded-full font-semibold shadow-xl hover:scale-105 transition-transform animate-fadeIn ${
+        hasDates
+          ? 'bg-gradient-to-r from-luxury-gold to-amber-500 text-luxury-blue shadow-luxury-gold/30'
+          : 'bg-white/10 backdrop-blur-md border border-luxury-gold/50 text-luxury-gold shadow-black/20'
+      }`}
     >
       {/* Heart icon */}
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
