@@ -24,6 +24,10 @@ import CatamaransPage from './components/CatamaransPage';
 import VillasPage from './components/VillasPage';
 import AdminDashboard from './components/AdminDashboard';
 import ContactModal from './components/ContactModal';
+import WishlistBadge from './components/WishlistBadge';
+import WishlistDrawer from './components/WishlistDrawer';
+import WishlistShareModal from './components/WishlistShareModal';
+import WishlistPage from './components/WishlistPage';
 import { servicesWithIcons, allServicesGrid } from './components/ServiceIcons';
 import { getServices } from './constants';
 import { translations } from './translations';
@@ -32,6 +36,7 @@ import { fetchVillas, fetchVillaBySlug, getPublicVillas, getAllVillas } from './
 import { vipAuth } from './services/vipAuth';
 import { usePageTracking } from './hooks/useAudit';
 import { initGA, trackPageView } from './hooks/useGoogleAnalytics';
+import { useWishlist } from './hooks/useWishlist';
 
 export type View =
   | 'home' | 'services' | 'photographer' | 'about' | 'blog' | 'valerie-detail' | 'francesca-detail'
@@ -66,6 +71,7 @@ function viewToPath(view: View): string {
   if (view.startsWith('villa-')) return `/${view}`;
   if (view.startsWith('yacht-')) return `/${view}`;
   if (view.startsWith('blog-')) return `/${view}`;
+  if (view.startsWith('wishlist/')) return `/${view}`;
   if (view.startsWith('service-')) return `/${view.replace('service-', '')}`;
   return `/${view}`;
 }
@@ -84,6 +90,7 @@ function pathToView(path: string): View {
   if (cleanPath.startsWith('villa-')) return cleanPath;
   if (cleanPath.startsWith('yacht-')) return cleanPath;
   if (cleanPath.startsWith('blog-')) return cleanPath;
+  if (cleanPath.startsWith('wishlist/')) return cleanPath;
   if (['yacht', 'security', 'wellness', 'nightlife', 'events', 'catering', 'furniture', 'health', 'yoga', 'cleaning', 'driver', 'deliveries', 'babysitting'].includes(cleanPath)) {
     return `service-${cleanPath}` as View;
   }
@@ -289,6 +296,62 @@ const App: React.FC = () => {
 
   // Contact modal state
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  // Wishlist state
+  const wishlistHook = useWishlist();
+  const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
+  const [isWishlistShareModalOpen, setIsWishlistShareModalOpen] = useState(false);
+
+  // Sync wishlist dates with search dates
+  useEffect(() => {
+    if (searchCheckIn && searchCheckOut) {
+      wishlistHook.setDates(searchCheckIn, searchCheckOut);
+    }
+  }, [searchCheckIn, searchCheckOut]);
+
+  // Calculate price for a period (same as VillaListingPage)
+  const calculatePriceForPeriod = (villa: Villa, checkIn: string, checkOut: string): number | null => {
+    if (!checkIn || !checkOut) return null;
+
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const totalNights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (totalNights <= 0) return null;
+
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthlyPrices: { [monthIndex: number]: number } = {};
+
+    villa.seasonalPrices?.forEach(sp => {
+      const monthKey = monthNames.find(m => sp.month.includes(m));
+      if (monthKey) {
+        const monthIdx = monthNames.indexOf(monthKey);
+        const price = parseInt(sp.price.replace(/[^\d]/g, '')) || villa.numericPrice || 15000;
+        monthlyPrices[monthIdx] = price;
+      }
+    });
+
+    const defaultWeeklyPrice = villa.numericPrice || 15000;
+    let total = 0;
+
+    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+      const monthIdx = d.getMonth();
+      const weeklyRate = monthlyPrices[monthIdx] || defaultWeeklyPrice;
+      total += weeklyRate / 7;
+    }
+
+    return Math.round(total);
+  };
+
+  // Calculate wishlist total
+  const wishlistTotalPrice = wishlistHook.wishlist.villaSlugs.reduce((total, slug) => {
+    const villa = allVillas.find(v => nameToUrlSlug(v.name) === slug || v.id === slug);
+    if (villa) {
+      const price = calculatePriceForPeriod(villa, wishlistHook.wishlist.checkIn, wishlistHook.wishlist.checkOut);
+      return total + (price || 0);
+    }
+    return total;
+  }, 0);
 
   // Sync contact modal with view state
   useEffect(() => {
@@ -627,6 +690,12 @@ const App: React.FC = () => {
       return <BlogArticlePage slug={slug} onNavigate={setView} lang={lang} />;
     }
 
+    // Wishlist page (shareable selection)
+    if (view.startsWith('wishlist/')) {
+      const shareCode = view.replace('wishlist/', '');
+      return <WishlistPage shareCode={shareCode} onNavigate={setView} lang={lang} />;
+    }
+
     // Admin dashboard (protected - only for admins)
     if (view === 'admin-dashboard') {
       return <AdminDashboard onNavigate={setView} />;
@@ -649,6 +718,8 @@ const App: React.FC = () => {
             initialCheckOut={searchCheckOut}
             onDatesChange={handleSearchDatesChange}
             villas={VILLAS}
+            isInWishlist={wishlistHook.isInWishlist}
+            onWishlistToggle={wishlistHook.toggleVilla}
           />
         );
       case 'villas-longterm':
@@ -1201,6 +1272,41 @@ const App: React.FC = () => {
       <ContactModal
         isOpen={isContactModalOpen}
         onClose={handleCloseContact}
+      />
+
+      {/* Wishlist Badge - Fixed button at bottom right */}
+      <WishlistBadge
+        count={wishlistHook.count}
+        hasDates={wishlistHook.hasDates}
+        onClick={() => setIsWishlistDrawerOpen(true)}
+      />
+
+      {/* Wishlist Drawer - Side panel with selected villas */}
+      <WishlistDrawer
+        isOpen={isWishlistDrawerOpen}
+        onClose={() => setIsWishlistDrawerOpen(false)}
+        villaSlugs={wishlistHook.wishlist.villaSlugs}
+        villas={VILLAS}
+        checkIn={wishlistHook.wishlist.checkIn}
+        checkOut={wishlistHook.wishlist.checkOut}
+        onRemoveVilla={wishlistHook.removeVilla}
+        onShare={() => {
+          setIsWishlistDrawerOpen(false);
+          setIsWishlistShareModalOpen(true);
+        }}
+        onNavigate={setView}
+        calculatePrice={calculatePriceForPeriod}
+      />
+
+      {/* Wishlist Share Modal - Create and share link */}
+      <WishlistShareModal
+        isOpen={isWishlistShareModalOpen}
+        onClose={() => setIsWishlistShareModalOpen(false)}
+        villaSlugs={wishlistHook.wishlist.villaSlugs}
+        checkIn={wishlistHook.wishlist.checkIn}
+        checkOut={wishlistHook.wishlist.checkOut}
+        totalPrice={wishlistTotalPrice}
+        villaCount={wishlistHook.count}
       />
     </div>
   );

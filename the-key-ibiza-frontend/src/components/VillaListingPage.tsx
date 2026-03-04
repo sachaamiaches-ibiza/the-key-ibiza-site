@@ -15,6 +15,8 @@ interface VillaListingPageProps {
   initialCheckOut?: string;
   onDatesChange?: (checkIn: string, checkOut: string) => void;
   villas?: Villa[];
+  isInWishlist?: (villaSlug: string) => boolean;
+  onWishlistToggle?: (villaSlug: string) => void;
 }
 
 // Calculate price for a specific period based on seasonal prices
@@ -53,7 +55,18 @@ const calculatePriceForPeriod = (villa: Villa, checkIn: string, checkOut: string
   return Math.round(total);
 };
 
-const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, villas: propVillas }) => {
+// Helper to convert villa name to URL-friendly slug
+function nameToUrlSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
+
+const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, villas: propVillas, isInWishlist, onWishlistToggle }) => {
   const [villas, setVillas] = useState<Villa[]>(propVillas || []);
   const checkOutRef = useRef<HTMLInputElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
@@ -926,6 +939,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
               lang={lang}
               calculatedPrice={calculatePriceForPeriod(villa, searchFilters.checkIn, searchFilters.checkOut)}
               hasDateRange={!!(searchFilters.checkIn && searchFilters.checkOut)}
+              isInWishlist={isInWishlist ? isInWishlist(nameToUrlSlug(villa.name)) : false}
+              onWishlistToggle={onWishlistToggle}
             />
           ))}
         </div>

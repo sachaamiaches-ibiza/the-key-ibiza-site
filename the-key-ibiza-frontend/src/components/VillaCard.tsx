@@ -5,6 +5,7 @@ import { translations } from '../translations';
 import { IconBed, IconBath, IconGuests } from './ServiceIcons';
 import WatermarkedImage from './WatermarkedImage';
 import { getCardImageUrl } from '../utils/cloudinaryUrl';
+import WishlistButton from './WishlistButton';
 
 // Helper to convert villa name to URL-friendly slug
 function nameToUrlSlug(name: string): string {
@@ -23,9 +24,11 @@ interface VillaCardProps {
   lang: Language;
   calculatedPrice?: number | null;
   hasDateRange?: boolean;
+  isInWishlist?: boolean;
+  onWishlistToggle?: (villaSlug: string) => void;
 }
 
-const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculatedPrice, hasDateRange }) => {
+const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculatedPrice, hasDateRange, isInWishlist = false, onWishlistToggle }) => {
   const t = translations[lang].villa;
   const btnText = lang === 'en' ? 'Discover Property' : (lang === 'es' ? 'Descubrir Propiedad' : 'Découvrir la Propriété');
   const isInvenioVilla = villa.id?.startsWith('invenio-');
@@ -79,6 +82,18 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
               </svg>
             </button>
           </>
+        )}
+
+        {/* Wishlist button - top left */}
+        {onWishlistToggle && (
+          <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+            <WishlistButton
+              villaSlug={nameToUrlSlug(villa.name)}
+              isInWishlist={isInWishlist}
+              onToggle={onWishlistToggle}
+              size="md"
+            />
+          </div>
         )}
 
         {/* Badge - z-20 to appear above watermark */}
