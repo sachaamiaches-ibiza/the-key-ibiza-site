@@ -413,7 +413,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
         </div>
 
         {/* Search Filter Panel */}
-        <div className="mb-10 md:mb-14 relative" style={{ zIndex: 1 }}>
+        <div className="mb-10 md:mb-14 relative" style={{ zIndex: 50 }}>
           <div className="luxury-card p-4 md:p-6 rounded-[20px] md:rounded-[24px] border border-white/5 bg-luxury-blue/40">
 
             {/* === MOBILE LAYOUT (< md) === */}

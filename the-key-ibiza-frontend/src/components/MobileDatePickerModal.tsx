@@ -74,7 +74,10 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-[#0B1C26] border border-white/10 rounded-2xl p-4 mx-4 max-w-sm w-full max-h-[90vh] overflow-y-auto">
+      <div
+        className="relative bg-[#0B1C26] border border-white/10 rounded-2xl p-4 mx-4 max-w-sm w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-white font-serif text-lg">Select Dates</h3>
