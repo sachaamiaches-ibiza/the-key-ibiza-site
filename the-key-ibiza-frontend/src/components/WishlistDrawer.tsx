@@ -194,19 +194,9 @@ const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
           )}
         </div>
 
-        {/* Footer with total and share button */}
+        {/* Footer with share button */}
         {villasWithPrices.length > 0 && (
           <div className="border-t border-white/10 p-6 space-y-4">
-            {/* Total */}
-            {totalPrice > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-white/60">Estimated Total</span>
-                <span className="text-2xl font-serif text-luxury-gold">
-                  {totalPrice.toLocaleString()}
-                </span>
-              </div>
-            )}
-
             {/* Action buttons row */}
             <div className="flex gap-3">
               {/* Share button */}
