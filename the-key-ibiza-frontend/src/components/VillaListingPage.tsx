@@ -70,8 +70,6 @@ function nameToUrlSlug(name: string): string {
 const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, villas: propVillas, isInWishlist, onWishlistToggle, isVip = false }) => {
   const [villas, setVillas] = useState<Villa[]>(propVillas || []);
   const checkOutRef = useRef<HTMLInputElement>(null);
-  const checkInPickerTime = useRef<number>(0);
-  const checkOutPickerTime = useRef<number>(0);
   const filtersRef = useRef<HTMLDivElement>(null);
   const filtersRefDesktop = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -603,20 +601,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     value={searchFilters.checkIn}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setSearchFilters({...searchFilters, checkIn: e.target.value});
-                      // Auto-open checkout calendar after selecting check-in
-                      setTimeout(() => {
-                        checkOutPickerTime.current = Date.now();
-                        checkOutRef.current?.showPicker?.();
-                      }, 100);
                     }}
-                    onClick={(e) => {
-                      // Only open picker if not recently opened (prevents restart on month nav)
-                      const now = Date.now();
-                      if (now - checkInPickerTime.current > 400) {
-                        checkInPickerTime.current = now;
-                        (e.target as HTMLInputElement).showPicker?.();
-                      }
-                    }}
+                    onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
@@ -629,14 +615,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     value={searchFilters.checkOut}
                     min={searchFilters.checkIn}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
-                    onClick={(e) => {
-                      // Only open picker if not recently opened (prevents restart on month nav)
-                      const now = Date.now();
-                      if (now - checkOutPickerTime.current > 400) {
-                        checkOutPickerTime.current = now;
-                        (e.target as HTMLInputElement).showPicker?.();
-                      }
-                    }}
+                    onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
