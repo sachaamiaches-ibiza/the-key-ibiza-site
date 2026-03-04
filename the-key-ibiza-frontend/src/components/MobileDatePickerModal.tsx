@@ -18,22 +18,24 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   checkOut,
   onDatesChange,
 }) => {
-  const [range, setRange] = useState<DateRange | undefined>(() => {
-    const from = checkIn ? new Date(checkIn) : undefined;
-    const to = checkOut ? new Date(checkOut) : undefined;
-    return from ? { from, to } : undefined;
-  });
-
+  const [range, setRange] = useState<DateRange | undefined>(undefined);
   const [selecting, setSelecting] = useState<'checkin' | 'checkout'>('checkin');
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [wasOpen, setWasOpen] = useState(false);
 
+  // Only reset state when modal OPENS (not on every render)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !wasOpen) {
+      // Modal just opened - initialize state
       const from = checkIn ? new Date(checkIn) : undefined;
       const to = checkOut ? new Date(checkOut) : undefined;
       setRange(from ? { from, to } : undefined);
       setSelecting(from && !to ? 'checkout' : 'checkin');
+      // Set calendar to show check-in month or current month
+      setCurrentMonth(from || new Date());
     }
-  }, [isOpen, checkIn, checkOut]);
+    setWasOpen(isOpen);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -168,6 +170,8 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             mode="range"
             selected={range}
             onSelect={handleSelect}
+            month={currentMonth}
+            onMonthChange={setCurrentMonth}
             disabled={{ before: today }}
             numberOfMonths={1}
             showOutsideDays={false}
