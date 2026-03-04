@@ -725,6 +725,7 @@ const App: React.FC = () => {
             villas={VILLAS}
             isInWishlist={wishlistHook.isInWishlist}
             onWishlistToggle={wishlistHook.toggleVilla}
+            isVip={isVip}
           />
         );
       case 'villas-longterm':

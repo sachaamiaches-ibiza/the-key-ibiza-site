@@ -17,6 +17,7 @@ interface VillaListingPageProps {
   villas?: Villa[];
   isInWishlist?: (villaSlug: string) => boolean;
   onWishlistToggle?: (villaSlug: string) => void;
+  isVip?: boolean; // Show "Members only" badge on VIP-only villas
 }
 
 // Calculate price for a specific period based on seasonal prices
@@ -66,7 +67,7 @@ function nameToUrlSlug(name: string): string {
     .trim();
 }
 
-const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, villas: propVillas, isInWishlist, onWishlistToggle }) => {
+const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigate, lang, initialCheckIn = '', initialCheckOut = '', onDatesChange, villas: propVillas, isInWishlist, onWishlistToggle, isVip = false }) => {
   const [villas, setVillas] = useState<Villa[]>(propVillas || []);
   const checkOutRef = useRef<HTMLInputElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
@@ -941,6 +942,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
               hasDateRange={!!(searchFilters.checkIn && searchFilters.checkOut)}
               isInWishlist={isInWishlist ? isInWishlist(nameToUrlSlug(villa.name)) : false}
               onWishlistToggle={onWishlistToggle}
+              isVip={isVip}
             />
           ))}
         </div>

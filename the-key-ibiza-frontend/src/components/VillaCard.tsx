@@ -26,9 +26,10 @@ interface VillaCardProps {
   hasDateRange?: boolean;
   isInWishlist?: boolean;
   onWishlistToggle?: (villaSlug: string) => void;
+  isVip?: boolean; // Show "Members only" badge for VIP-only villas
 }
 
-const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculatedPrice, hasDateRange, isInWishlist = false, onWishlistToggle }) => {
+const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculatedPrice, hasDateRange, isInWishlist = false, onWishlistToggle, isVip = false }) => {
   const t = translations[lang].villa;
   const btnText = lang === 'en' ? 'Discover Property' : (lang === 'es' ? 'Descubrir Propiedad' : 'Découvrir la Propriété');
   const isInvenioVilla = villa.id?.startsWith('invenio-');
@@ -95,10 +96,20 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
           </div>
         )}
 
-        {/* Badge - z-20 to appear above watermark */}
+        {/* Location Badge */}
         <div className="absolute top-4 right-4 md:top-6 md:right-6 px-3 md:px-4 py-1 md:py-1.5 bg-luxury-blue/60 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center z-20">
           <span className="text-[7px] md:text-[8px] uppercase tracking-[0.2em] font-bold text-luxury-gold italic text-center">{villa.district || villa.location || 'Ibiza'}</span>
         </div>
+
+        {/* Members Only Badge - shown for VIP-only villas when user is logged in */}
+        {isVip && villa.vip_only && (
+          <div className="absolute top-12 right-4 md:top-14 md:right-6 px-2 md:px-3 py-0.5 md:py-1 bg-black/50 backdrop-blur-md border border-luxury-gold/30 rounded-full flex items-center gap-1 z-20">
+            <svg className="w-2.5 h-2.5 md:w-3 md:h-3 text-luxury-gold" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            <span className="text-[6px] md:text-[7px] uppercase tracking-[0.15em] font-medium text-luxury-gold">Members only</span>
+          </div>
+        )}
       </div>
 
       {/* Info Section */}
