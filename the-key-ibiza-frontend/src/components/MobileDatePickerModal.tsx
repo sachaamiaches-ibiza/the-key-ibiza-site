@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
-import { format } from 'date-fns';
+import { format, addMonths, subMonths } from 'date-fns';
 import 'react-day-picker/dist/style.css';
 
 interface MobileDatePickerModalProps {
@@ -26,37 +26,48 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   // Only reset state when modal OPENS (not on every render)
   useEffect(() => {
     if (isOpen && !wasOpen) {
-      // Modal just opened - initialize state
       const from = checkIn ? new Date(checkIn) : undefined;
       const to = checkOut ? new Date(checkOut) : undefined;
       setRange(from ? { from, to } : undefined);
       setSelecting(from && !to ? 'checkout' : 'checkin');
-      // Set calendar to show check-in month or current month
       setCurrentMonth(from || new Date());
     }
     setWasOpen(isOpen);
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  const today = new Date();
 
-  const handleSelect = (newRange: DateRange | undefined) => {
-    if (!newRange) {
-      setRange(undefined);
-      setSelecting('checkin');
-      return;
+  // Custom month navigation handlers
+  const handlePrevMonth = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentMonth(prev => subMonths(prev, 1));
+  }, []);
+
+  const handleNextMonth = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
+
+  const handleSelect = useCallback((newRange: DateRange | undefined) => {
+    // Only process if we actually have a date selection (not nav button clicks)
+    if (!newRange?.from) {
+      return; // Ignore if no actual date selected
     }
 
     if (selecting === 'checkin') {
       setRange({ from: newRange.from, to: undefined });
       setSelecting('checkout');
     } else {
-      if (newRange.from && newRange.to) {
+      if (newRange.to) {
         setRange(newRange);
-      } else if (newRange.from) {
+      } else {
+        // User clicked a single date while in checkout mode
         setRange({ from: range?.from, to: newRange.from });
       }
     }
-  };
+  }, [selecting, range]);
 
   const handleConfirm = () => {
     const newCheckIn = range?.from ? format(range.from, 'yyyy-MM-dd') : '';
@@ -65,20 +76,34 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
     onClose();
   };
 
-  const today = new Date();
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRange(undefined);
+    setSelecting('checkin');
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking directly on backdrop
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      onClick={handleBackdropClick}
+    >
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm pointer-events-none" />
 
       {/* Modal */}
       <div
         className="relative bg-[#0B1C26] border border-white/10 rounded-2xl p-4 mx-4 max-w-sm w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
@@ -105,8 +130,39 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
           </div>
         </div>
 
+        {/* Custom Month Navigation */}
+        <div className="flex items-center justify-between mb-3 px-1">
+          <button
+            type="button"
+            onClick={handlePrevMonth}
+            onTouchEnd={handlePrevMonth}
+            className="p-2 text-white/50 hover:text-luxury-gold active:text-luxury-gold transition-colors rounded-lg hover:bg-white/5 active:bg-white/10"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <span className="text-white font-medium">
+            {format(currentMonth, 'MMMM yyyy')}
+          </span>
+          <button
+            type="button"
+            onClick={handleNextMonth}
+            onTouchEnd={handleNextMonth}
+            className="p-2 text-white/50 hover:text-luxury-gold active:text-luxury-gold transition-colors rounded-lg hover:bg-white/5 active:bg-white/10"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
         {/* Calendar */}
-        <div className="mobile-calendar-wrapper">
+        <div
+          className="mobile-calendar-wrapper"
+          onClick={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+        >
           <style>{`
             .mobile-calendar-wrapper .rdp {
               --rdp-cell-size: 36px;
@@ -120,16 +176,11 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             .mobile-calendar-wrapper .rdp-table {
               width: 100%;
             }
-            .mobile-calendar-wrapper .rdp-caption_label {
-              color: white;
-              font-size: 14px;
+            .mobile-calendar-wrapper .rdp-caption {
+              display: none;
             }
-            .mobile-calendar-wrapper .rdp-nav_button {
-              color: rgba(255,255,255,0.5);
-            }
-            .mobile-calendar-wrapper .rdp-nav_button:hover {
-              color: #C4A461;
-              background: rgba(196, 164, 97, 0.1);
+            .mobile-calendar-wrapper .rdp-nav {
+              display: none;
             }
             .mobile-calendar-wrapper .rdp-head_cell {
               color: rgba(255,255,255,0.4);
@@ -171,20 +222,17 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             selected={range}
             onSelect={handleSelect}
             month={currentMonth}
-            onMonthChange={setCurrentMonth}
             disabled={{ before: today }}
             numberOfMonths={1}
             showOutsideDays={false}
+            hideNavigation
           />
         </div>
 
         {/* Actions */}
         <div className="flex gap-3 mt-4">
           <button
-            onClick={() => {
-              setRange(undefined);
-              setSelecting('checkin');
-            }}
+            onClick={handleClear}
             className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-medium border border-white/10 text-white/50"
           >
             Clear
