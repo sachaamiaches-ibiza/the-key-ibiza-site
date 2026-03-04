@@ -41,8 +41,9 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
 
-  // Calculate price with commission for preview
-  const priceWithCommission = Math.round(totalPrice * (1 + commissionPercent / 100));
+  // Example price for commission preview (fixed €1,000 base)
+  const exampleBase = 1000;
+  const exampleWithCommission = Math.round(exampleBase * (1 + commissionPercent / 100));
 
   // Reset state when modal opens
   useEffect(() => {
@@ -245,35 +246,21 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
                           </button>
                         ))}
                       </div>
-                      {/* Price preview */}
-                      <div className="mt-4 pt-4 border-t border-white/10">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-white/50">Base price:</span>
-                          <span className="text-white/70">{totalPrice.toLocaleString()}</span>
+                      {/* Example calculation */}
+                      {commissionPercent > 0 && (
+                        <div className="mt-4 pt-4 border-t border-white/10 text-center">
+                          <p className="text-white/50 text-xs mb-2">Commission added to each villa price</p>
+                          <p className="text-white/70 text-sm">
+                            Example: <span className="text-white">€{exampleBase.toLocaleString()}</span>
+                            <span className="text-white/40 mx-2">→</span>
+                            <span className="text-luxury-gold font-semibold">€{exampleWithCommission.toLocaleString()}</span>
+                          </p>
                         </div>
-                        {commissionPercent > 0 && (
-                          <div className="flex justify-between items-center text-sm mt-1">
-                            <span className="text-white/50">+ {commissionPercent}% commission:</span>
-                            <span className="text-luxury-gold">+{(priceWithCommission - totalPrice).toLocaleString()}</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/10">
-                          <span className="text-white font-medium">Client sees:</span>
-                          <span className="text-luxury-gold font-semibold text-lg">{priceWithCommission.toLocaleString()}</span>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   )}
                 </>
-              ) : (
-                /* Non-VIP: just show price summary, no options */
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="flex justify-between items-center">
-                    <span className="text-white/60">Total for selection:</span>
-                    <span className="text-luxury-gold font-semibold text-lg">{totalPrice.toLocaleString()}</span>
-                  </div>
-                </div>
-              )}
+              ) : null}
 
               {/* Optional name */}
               <div>

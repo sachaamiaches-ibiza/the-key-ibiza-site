@@ -219,18 +219,8 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
           ))}
         </div>
 
-        {/* Total and CTA */}
+        {/* CTA */}
         <div className="max-w-xl mx-auto text-center">
-          {/* Total price */}
-          {wishlist.showPrices && wishlist.totalPrice && (
-            <div className="mb-8 p-6 rounded-2xl bg-white/5 border border-white/10">
-              <span className="text-white/40 text-sm uppercase tracking-wider block mb-2">Estimated Total</span>
-              <span className="text-4xl md:text-5xl font-serif text-luxury-gold">
-                {wishlist.totalPrice.toLocaleString()}
-              </span>
-            </div>
-          )}
-
           {/* Contact CTA - different for white label */}
           {isWhiteLabel ? (
             <p className="text-white/50 text-sm">
