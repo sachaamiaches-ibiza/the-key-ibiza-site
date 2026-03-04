@@ -209,8 +209,8 @@ async function loadCloudinaryImagesForVilla(villa: Villa, rawRow: any): Promise<
 // ---------- FETCH ALL VILLAS FROM BACKEND ----------
 export async function fetchVillas(): Promise<Villa[]> {
   try {
-    // Include VIP token if available to see private villas
-    const token = localStorage.getItem('vip_token');
+    // Include VIP token if available to see private villas (check both storages)
+    const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -247,7 +247,7 @@ export async function fetchVillas(): Promise<Villa[]> {
 // ---------- FETCH SINGLE VILLA BY SLUG ----------
 export async function fetchVillaBySlug(slug: string): Promise<Villa | null> {
   try {
-    const token = localStorage.getItem('vip_token');
+    const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
