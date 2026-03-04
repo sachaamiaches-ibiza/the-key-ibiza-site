@@ -1,7 +1,9 @@
 // Cloudinary image optimization utility
-// Watermarks temporarily disabled - need to configure logo in Cloudinary first
+// ALL images include The Key Ibiza watermark embedded
 
 const CLOUDINARY_CLOUD_NAME = 'drxf80sho';
+const WATERMARK_LOGO = 'watermark_logo'; // Public ID in Cloudinary
+const WATERMARK_OPACITY = 40; // 0-100, subtle but visible
 
 interface CloudinaryOptions {
   width?: number;
@@ -11,13 +13,35 @@ interface CloudinaryOptions {
   crop?: 'fill' | 'fit' | 'scale' | 'limit';
 }
 
+/**
+ * Add watermark to a Cloudinary URL
+ * @param url - Original Cloudinary image URL
+ * @param logoWidth - Width of watermark logo in pixels
+ */
+function addWatermark(url: string, logoWidth: number = 150): string {
+  if (!url || !url.includes('cloudinary.com')) return url;
+
+  const uploadIndex = url.indexOf('/upload/');
+  if (uploadIndex === -1) return url;
+
+  // Watermark transformation: overlay logo, centered, with opacity
+  const watermarkTransform = `l_${WATERMARK_LOGO},w_${logoWidth},o_${WATERMARK_OPACITY},g_center`;
+
+  const beforeUpload = url.substring(0, uploadIndex + 8); // includes '/upload/'
+  const afterUpload = url.substring(uploadIndex + 8);
+
+  return `${beforeUpload}${watermarkTransform}/${afterUpload}`;
+}
+
 export function getOptimizedImageUrl(
   originalUrl: string,
   options: CloudinaryOptions = {}
 ): string {
-  // Return as-is for Cloudinary URLs (already optimized)
-  if (!originalUrl || originalUrl.includes('cloudinary.com')) {
-    return originalUrl;
+  if (!originalUrl) return originalUrl;
+
+  // If already Cloudinary URL, add watermark
+  if (originalUrl.includes('cloudinary.com')) {
+    return addWatermark(originalUrl, 150);
   }
 
   // Skip data/blob URLs
@@ -45,9 +69,11 @@ export function getOptimizedImageUrl(
   return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/fetch/${transformString}/${encodeURIComponent(originalUrl)}`;
 }
 
-// Preset for villa card thumbnails
+// Preset for villa card thumbnails - small watermark
 export function getCardImageUrl(url: string): string {
-  if (url.includes('cloudinary.com')) return url;
+  if (url.includes('cloudinary.com')) {
+    return addWatermark(url, 100);
+  }
   return getOptimizedImageUrl(url, {
     width: 600,
     quality: 'auto',
@@ -56,9 +82,11 @@ export function getCardImageUrl(url: string): string {
   });
 }
 
-// Preset for villa detail header/slideshow
+// Preset for villa detail header/slideshow - large watermark
 export function getHeaderImageUrl(url: string): string {
-  if (url.includes('cloudinary.com')) return url;
+  if (url.includes('cloudinary.com')) {
+    return addWatermark(url, 250);
+  }
   return getOptimizedImageUrl(url, {
     width: 1400,
     quality: 'auto:good',
@@ -67,9 +95,11 @@ export function getHeaderImageUrl(url: string): string {
   });
 }
 
-// Preset for gallery images
+// Preset for gallery images - medium watermark
 export function getGalleryImageUrl(url: string): string {
-  if (url.includes('cloudinary.com')) return url;
+  if (url.includes('cloudinary.com')) {
+    return addWatermark(url, 200);
+  }
   return getOptimizedImageUrl(url, {
     width: 1000,
     quality: 'auto',
@@ -78,9 +108,11 @@ export function getGalleryImageUrl(url: string): string {
   });
 }
 
-// Preset for gallery thumbnails
+// Preset for gallery thumbnails - small watermark
 export function getThumbnailUrl(url: string): string {
-  if (url.includes('cloudinary.com')) return url;
+  if (url.includes('cloudinary.com')) {
+    return addWatermark(url, 60);
+  }
   return getOptimizedImageUrl(url, {
     width: 150,
     height: 100,
@@ -88,4 +120,9 @@ export function getThumbnailUrl(url: string): string {
     format: 'auto',
     crop: 'fill'
   });
+}
+
+// Get URL WITHOUT watermark (for white-label mode)
+export function getImageUrlNoWatermark(url: string): string {
+  return url;
 }
