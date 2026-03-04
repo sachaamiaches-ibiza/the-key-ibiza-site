@@ -158,3 +158,14 @@ body.gallery-open .navbar-container {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
+/* ============================================
+   WHITE LABEL MODE - Hide all branding
+   ============================================ */
+body.white-label-mode [data-navbar],
+body.white-label-mode nav,
+body.white-label-mode header,
+body.white-label-mode footer,
+body.white-label-mode #contact {
+  display: none !important;
+}
+

@@ -8,6 +8,7 @@ export interface CreateWishlistParams {
   checkOut: string;
   showPrices?: boolean;
   commissionPercent?: number;
+  whiteLabel?: boolean;
   createdByName?: string;
   notes?: string;
 }
@@ -41,6 +42,7 @@ export interface WishlistResponse {
   checkIn: string;
   checkOut: string;
   showPrices: boolean;
+  whiteLabel?: boolean;
   createdByName?: string;
   notes?: string;
   viewsCount: number;

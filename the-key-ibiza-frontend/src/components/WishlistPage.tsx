@@ -23,6 +23,7 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
   const [wishlist, setWishlist] = useState<WishlistResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedVilla, setSelectedVilla] = useState<WishlistVilla | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -42,6 +43,21 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
   const totalNights = wishlist?.checkIn && wishlist?.checkOut
     ? Math.ceil((new Date(wishlist.checkOut).getTime() - new Date(wishlist.checkIn).getTime()) / (1000 * 60 * 60 * 24))
     : 0;
+
+  // Check if white label mode
+  const isWhiteLabel = wishlist?.whiteLabel === true;
+
+  // Hide navbar and footer in white label mode
+  useEffect(() => {
+    if (isWhiteLabel) {
+      document.body.classList.add('white-label-mode');
+    } else {
+      document.body.classList.remove('white-label-mode');
+    }
+    return () => {
+      document.body.classList.remove('white-label-mode');
+    };
+  }, [isWhiteLabel]);
 
   if (loading) {
     return (
@@ -63,27 +79,41 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
           </svg>
           <h1 className="text-3xl font-serif text-white mb-4">Selection Not Found</h1>
           <p className="text-white/50 mb-8">
-            This wishlist link may have expired or doesn't exist.
+            This link may have expired or doesn't exist.
           </p>
-          <button
-            onClick={() => onNavigate('villas-holiday')}
-            className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-sm uppercase tracking-wider font-semibold hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all"
-          >
-            Browse Villas
-          </button>
+          {!isWhiteLabel && (
+            <button
+              onClick={() => onNavigate('villas-holiday')}
+              className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-sm uppercase tracking-wider font-semibold hover:bg-luxury-blue hover:text-luxury-gold border border-luxury-gold transition-all"
+            >
+              Browse Villas
+            </button>
+          )}
         </div>
       </div>
     );
   }
 
+  // Handle villa card click - in white label mode, show modal instead of navigating
+  const handleVillaClick = (villa: WishlistVilla) => {
+    if (isWhiteLabel) {
+      setSelectedVilla(villa);
+    } else {
+      onNavigate(`villa-${nameToUrlSlug(villa.villa_name)}`);
+    }
+  };
+
   return (
-    <div className="pt-32 pb-20 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
+    <div className={`pb-20 min-h-screen ${isWhiteLabel ? 'pt-8' : 'pt-32'}`} style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12 animate-slide-up">
-          <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block italic mb-4">
-            Curated Selection
-          </span>
+          {/* Only show "Curated Selection" badge if NOT white label */}
+          {!isWhiteLabel && (
+            <span className="text-luxury-gold uppercase tracking-[0.5em] text-xs font-bold block italic mb-4">
+              Curated Selection
+            </span>
+          )}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4">
             {wishlist.createdByName ? `${wishlist.createdByName}'s` : 'Your'} Villa Selection
           </h1>
@@ -124,7 +154,7 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
             <div
               key={villa.id}
               className="group relative rounded-[24px] overflow-hidden bg-luxury-slate/30 border border-white/5 hover:border-white/20 transition-all cursor-pointer"
-              onClick={() => onNavigate(`villa-${nameToUrlSlug(villa.villa_name)}`)}
+              onClick={() => handleVillaClick(villa)}
             >
               {/* Image */}
               <div className="relative aspect-[4/3] overflow-hidden">
@@ -201,26 +231,123 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
             </div>
           )}
 
-          {/* Contact CTA */}
-          <button
-            onClick={() => onNavigate('contact')}
-            className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-gradient-to-r from-luxury-gold to-amber-500 text-luxury-blue font-semibold uppercase tracking-wider text-sm hover:from-amber-500 hover:to-luxury-gold transition-all shadow-lg shadow-luxury-gold/30"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            Contact About These Villas
-          </button>
+          {/* Contact CTA - different for white label */}
+          {isWhiteLabel ? (
+            <p className="text-white/50 text-sm">
+              Contact your agent for more information about these properties.
+            </p>
+          ) : (
+            <>
+              <button
+                onClick={() => onNavigate('contact')}
+                className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-gradient-to-r from-luxury-gold to-amber-500 text-luxury-blue font-semibold uppercase tracking-wider text-sm hover:from-amber-500 hover:to-luxury-gold transition-all shadow-lg shadow-luxury-gold/30"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Contact About These Villas
+              </button>
 
-          {/* Browse more */}
-          <button
-            onClick={() => onNavigate('villas-holiday')}
-            className="block mx-auto mt-6 text-white/50 hover:text-luxury-gold text-sm uppercase tracking-wider transition-colors"
-          >
-            Browse More Villas
-          </button>
+              {/* Browse more */}
+              <button
+                onClick={() => onNavigate('villas-holiday')}
+                className="block mx-auto mt-6 text-white/50 hover:text-luxury-gold text-sm uppercase tracking-wider transition-colors"
+              >
+                Browse More Villas
+              </button>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Villa Detail Modal - Only for white label mode */}
+      {selectedVilla && isWhiteLabel && (
+        <div className="fixed inset-0 z-[100005] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setSelectedVilla(null)}
+          />
+
+          {/* Modal */}
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#0B1C26] to-[#0a1419] rounded-3xl border border-luxury-gold/20 shadow-2xl">
+            {/* Close button */}
+            <button
+              onClick={() => setSelectedVilla(null)}
+              className="absolute top-4 right-4 text-white/40 hover:text-luxury-gold transition-colors z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Image */}
+            <div className="relative aspect-video">
+              <img
+                src={selectedVilla.header_images?.[0] || selectedVilla.thumbnail_images?.[0]}
+                alt={selectedVilla.villa_name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26] via-transparent to-transparent" />
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <h2 className="text-3xl font-serif text-white mb-2">{selectedVilla.villa_name}</h2>
+              <p className="text-luxury-gold text-sm uppercase tracking-wider mb-4">{selectedVilla.location}</p>
+
+              {selectedVilla.short_description && (
+                <p className="text-white/60 mb-6">{selectedVilla.short_description}</p>
+              )}
+
+              {/* Stats */}
+              <div className="flex items-center gap-8 text-white/60 mb-6">
+                <div className="text-center">
+                  <span className="text-2xl font-serif text-white">{selectedVilla.bedrooms}</span>
+                  <span className="text-xs uppercase tracking-wider block mt-1">Bedrooms</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-2xl font-serif text-white">{selectedVilla.bathrooms}</span>
+                  <span className="text-xs uppercase tracking-wider block mt-1">Bathrooms</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-2xl font-serif text-white">{selectedVilla.max_persons}</span>
+                  <span className="text-xs uppercase tracking-wider block mt-1">Guests</span>
+                </div>
+              </div>
+
+              {/* Amenities */}
+              {selectedVilla.amenities && selectedVilla.amenities.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Amenities</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedVilla.amenities.slice(0, 8).map((amenity, i) => (
+                      <span key={i} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/70 text-xs">
+                        {amenity}
+                      </span>
+                    ))}
+                    {selectedVilla.amenities.length > 8 && (
+                      <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-xs">
+                        +{selectedVilla.amenities.length - 8} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Price */}
+              {wishlist.showPrices && selectedVilla.calculatedPrice && (
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <span className="text-white/40 text-xs uppercase tracking-wider block mb-1">Total for period</span>
+                  <span className="text-2xl font-serif text-luxury-gold">
+                    {selectedVilla.calculatedPrice.toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

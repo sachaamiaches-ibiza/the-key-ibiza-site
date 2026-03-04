@@ -33,6 +33,7 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
 }) => {
   const [showPrices, setShowPrices] = useState(true);
   const [commissionPercent, setCommissionPercent] = useState(0);
+  const [whiteLabel, setWhiteLabel] = useState(false);
   const [creatorName, setCreatorName] = useState('');
   const [notes, setNotes] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -53,6 +54,7 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
       // VIP can toggle off and add commission
       setShowPrices(true);
       setCommissionPercent(0);
+      setWhiteLabel(false);
     }
   }, [isOpen, isVip]);
 
@@ -88,6 +90,7 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
         checkOut,
         showPrices: isVip ? showPrices : true, // Non-VIP always show prices (no hide option)
         commissionPercent: isVip && showPrices ? commissionPercent : 0, // Only VIP can add commission
+        whiteLabel: isVip ? whiteLabel : false, // Only VIP can use white label
         createdByName: creatorName || undefined,
         notes: notes || undefined,
       });
@@ -196,6 +199,28 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
                       <span
                         className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
                           showPrices ? 'left-7' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* White Label toggle */}
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div>
+                      <p className="text-white font-medium">White Label</p>
+                      <p className="text-white/40 text-xs mt-0.5">
+                        {whiteLabel ? 'No branding in shared link' : 'The Key branding visible'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setWhiteLabel(!whiteLabel)}
+                      className={`relative w-14 h-8 rounded-full transition-colors ${
+                        whiteLabel ? 'bg-luxury-gold' : 'bg-white/20'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+                          whiteLabel ? 'left-7' : 'left-1'
                         }`}
                       />
                     </button>
