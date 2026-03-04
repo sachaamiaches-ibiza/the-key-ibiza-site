@@ -601,11 +601,6 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     value={searchFilters.checkIn}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setSearchFilters({...searchFilters, checkIn: e.target.value});
-                      // Auto-open checkout calendar after selecting check-in
-                      setTimeout(() => {
-                        checkOutRef.current?.focus();
-                        checkOutRef.current?.showPicker?.();
-                      }, 150);
                     }}
                     onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
