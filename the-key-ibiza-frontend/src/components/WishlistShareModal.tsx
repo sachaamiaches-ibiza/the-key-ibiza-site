@@ -49,9 +49,9 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
       setShareUrl('');
       setCopied(false);
       setError('');
-      // VIP defaults: show prices, no commission
-      // Non-VIP: always hide prices
-      setShowPrices(isVip);
+      // Everyone shows prices by default
+      // VIP can toggle off and add commission
+      setShowPrices(true);
       setCommissionPercent(0);
     }
   }, [isOpen, isVip]);
@@ -86,8 +86,8 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
         villaSlugs,
         checkIn,
         checkOut,
-        showPrices: isVip ? showPrices : false, // Non-VIP always hide prices
-        commissionPercent: isVip && showPrices ? commissionPercent : 0,
+        showPrices: isVip ? showPrices : true, // Non-VIP always show prices (no hide option)
+        commissionPercent: isVip && showPrices ? commissionPercent : 0, // Only VIP can add commission
         createdByName: creatorName || undefined,
         notes: notes || undefined,
       });
@@ -120,14 +120,25 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
     }
   };
 
+  // Format dates nicely
+  const formatDateRange = () => {
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const startStr = start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const endStr = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    return `${startStr} - ${endStr}`;
+  };
+
   const handleWhatsApp = () => {
-    const text = `Check out my villa selection for ${new Date(checkIn).toLocaleDateString('en-GB')} - ${new Date(checkOut).toLocaleDateString('en-GB')}:\n${shareUrl}`;
+    const dateRange = formatDateRange();
+    const text = `Hey! Here's a curated selection of stunning villas in Ibiza for ${dateRange}. Take a look and let me know what you think!\n\n${shareUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const handleEmail = () => {
-    const subject = 'My Ibiza Villa Selection';
-    const body = `Hi,\n\nI've selected some villas for our trip (${new Date(checkIn).toLocaleDateString('en-GB')} - ${new Date(checkOut).toLocaleDateString('en-GB')}).\n\nView the selection here: ${shareUrl}\n\nBest regards`;
+    const dateRange = formatDateRange();
+    const subject = 'Your Ibiza Villa Selection';
+    const body = `Hey!\n\nI've put together a selection of amazing villas in Ibiza for your dates (${dateRange}).\n\nCheck them out here: ${shareUrl}\n\nLet me know which ones catch your eye!\n\nCheers`;
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
@@ -230,18 +241,11 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
                   )}
                 </>
               ) : (
-                /* Non-VIP message */
-                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                  <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                      <p className="text-amber-200 font-medium text-sm">Prices hidden</p>
-                      <p className="text-amber-200/60 text-xs mt-1">
-                        VIP agents can show prices and add commission. Contact us for VIP access.
-                      </p>
-                    </div>
+                /* Non-VIP: just show price summary, no options */
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/60">Total for selection:</span>
+                    <span className="text-luxury-gold font-semibold text-lg">{totalPrice.toLocaleString()}</span>
                   </div>
                 </div>
               )}
