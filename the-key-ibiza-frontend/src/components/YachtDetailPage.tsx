@@ -5,31 +5,8 @@ import { translations } from '../translations';
 import { LogoTheKey } from './Navbar';
 import { useIsMobile } from './useIsMobile';
 import FooterSEO from './FooterSEO';
-
-// Watermark overlay component for images and videos
-const WatermarkOverlay = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' | 'gallery' }) => {
-  const sizeClasses = {
-    small: { logo: 'w-6 h-9 md:w-8 md:h-12', text: 'text-[8px] md:text-xs tracking-[0.2em] mt-1' },
-    medium: { logo: 'w-10 h-14 md:w-16 md:h-22', text: 'text-xs md:text-sm tracking-[0.25em] mt-2' },
-    large: { logo: 'w-16 h-22 md:w-24 md:h-32', text: 'text-base md:text-xl tracking-[0.3em] mt-3' },
-    gallery: { logo: 'w-12 h-16 md:w-20 md:h-28', text: 'text-sm md:text-lg tracking-[0.25em] mt-2' },
-  };
-  const s = sizeClasses[size];
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-10">
-      <LogoTheKey
-        className={s.logo}
-        color="rgba(255,255,255,0.6)"
-      />
-      <span
-        className={`font-serif uppercase ${s.text}`}
-        style={{ color: 'rgba(255,255,255,0.6)', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
-      >
-        The Key Ibiza
-      </span>
-    </div>
-  );
-};
+import { getHeaderImageUrl, getGalleryImageUrl, getThumbnailUrl } from '../utils/cloudinaryUrl';
+// Watermarks are embedded via Cloudinary transformations
 
 // Backend URL for Cloudinary API
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
@@ -534,19 +511,18 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
               playsInline
               className="w-full h-full object-cover"
             />
-            <WatermarkOverlay size="large" />
+            {/* Video watermark - TODO: use Cloudinary video watermark */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#0B1C26]/60 via-transparent to-[#0B1C26]"></div>
           </div>
         ) : slideshowImages.length > 0 ? (
-          /* Image Slideshow with Watermark */
+          /* Image Slideshow - watermarks embedded via Cloudinary */
           slideshowImages.map((img, index) => (
             <div
               key={index}
               className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
               style={{ opacity: currentSlide === index ? 1 : 0 }}
             >
-              <img src={img} alt={`${yacht.nombre} - ${index + 1}`} className="w-full h-full object-cover" />
-              <WatermarkOverlay size="large" />
+              <img src={getHeaderImageUrl(img)} alt={`${yacht.nombre} - ${index + 1}`} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-b from-[#0B1C26]/60 via-transparent to-[#0B1C26]"></div>
             </div>
           ))
@@ -656,8 +632,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
                   onClick={() => { setGalleryIndex(i); setGalleryOpen(true); }}
                   className="aspect-[4/3] rounded-[16px] md:rounded-[24px] overflow-hidden cursor-pointer relative group"
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  {/* Watermark only on lightbox, not thumbnails */}
+                  <img src={getThumbnailUrl(img)} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   {i === 3 && allGalleryImages.length > 4 && (
                     <div className="absolute inset-0 bg-[#0B1C26]/60 flex items-center justify-center backdrop-blur-sm">
@@ -778,15 +753,12 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
               className="absolute top-16 bottom-24 left-4 right-4 md:top-20 md:bottom-28 md:left-20 md:right-20 flex items-center justify-center"
               style={{ maxHeight: 'calc(100vh - 160px)' }}
             >
-              <div className="relative" style={{ maxHeight: 'calc(100vh - 200px)', maxWidth: 'calc(100vw - 160px)' }}>
-                <img
-                  src={allGalleryImages[galleryIndex]}
-                  className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl md:rounded-2xl shadow-2xl"
-                  alt=""
-                  style={{ maxHeight: 'calc(100vh - 200px)', maxWidth: 'calc(100vw - 160px)' }}
-                />
-                <WatermarkOverlay size="gallery" />
-              </div>
+              <img
+                src={getGalleryImageUrl(allGalleryImages[galleryIndex])}
+                className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl md:rounded-2xl shadow-2xl"
+                alt=""
+                style={{ maxHeight: 'calc(100vh - 200px)', maxWidth: 'calc(100vw - 160px)' }}
+              />
             </div>
 
             <button
@@ -833,7 +805,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
                   onClick={() => !isDraggingThumbnails.current && setGalleryIndex(i)}
                   className={`flex-shrink-0 w-14 h-10 md:w-20 md:h-14 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${galleryIndex === i ? 'border-luxury-gold scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
                 >
-                  <img src={img} className="w-full h-full object-cover pointer-events-none select-none" alt="" draggable={false} />
+                  <img src={getThumbnailUrl(img)} className="w-full h-full object-cover pointer-events-none select-none" alt="" draggable={false} />
                 </div>
               ))}
             </div>

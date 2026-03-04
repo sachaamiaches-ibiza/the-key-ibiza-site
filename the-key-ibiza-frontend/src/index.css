@@ -170,54 +170,17 @@ body.white-label-mode #contact {
 }
 
 /* ============================================
-   IMAGE PROTECTION - Prevent downloads
+   IMAGE PROTECTION - Watermarks via Cloudinary
    ============================================ */
+/*
+ * All images are served with watermarks embedded via Cloudinary.
+ * Downloads will include the logo watermark.
+ * No aggressive CSS blocking needed - watermark is the protection.
+ */
 
-/* Disable selection on all images */
+/* Disable drag on images for cleaner UX */
 img {
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-  user-select: none !important;
-  -webkit-user-drag: none !important;
-  -khtml-user-drag: none !important;
-  -moz-user-drag: none !important;
-  -o-user-drag: none !important;
-  user-drag: none !important;
-  pointer-events: none !important;
-}
-
-/* Re-enable pointer events on clickable image containers */
-.image-clickable img,
-[role="button"] img,
-button img,
-a img {
-  pointer-events: auto !important;
-}
-
-/* Protected image container - adds invisible overlay */
-.protected-image {
-  position: relative;
-  -webkit-touch-callout: none !important;
-}
-
-.protected-image::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: transparent;
-  pointer-events: auto;
-  z-index: 1;
-}
-
-/* Disable text selection globally on image-heavy areas */
-.no-select {
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-  user-select: none !important;
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 

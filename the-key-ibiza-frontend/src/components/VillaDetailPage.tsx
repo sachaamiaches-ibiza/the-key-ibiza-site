@@ -6,8 +6,8 @@ import { LogoTheKey } from './Navbar';
 import VillaMap from './VillaMap';
 import { useIsMobile } from './useIsMobile';
 import MobileDatePickerModal from './MobileDatePickerModal';
-import WatermarkedImage from './WatermarkedImage';
 import jsPDF from 'jspdf';
+// Watermarks are now embedded via Cloudinary URL transformations
 import { getHeaderImageUrl, getGalleryImageUrl, getThumbnailUrl } from '../utils/cloudinaryUrl';
 
 interface VillaDetailPageProps {
@@ -951,7 +951,7 @@ const handlePdfPasswordSubmit = async () => {
             className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
             style={{ opacity: currentSlide === index ? 1 : 0 }}
           >
-            <WatermarkedImage src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" fullBleed />
+            <img src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-[#0B1C26]/60 via-transparent to-[#0B1C26]"></div>
           </div>
         ))}
@@ -1062,7 +1062,7 @@ const handlePdfPasswordSubmit = async () => {
                 onClick={() => { setGalleryIndex(i); setGalleryOpen(true); }}
                 className="aspect-[4/3] rounded-[16px] md:rounded-[24px] overflow-hidden cursor-pointer relative group"
               >
-                <WatermarkedImage src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" watermarkSize="small" fullBleed showWatermark={false} />
+                <img src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 {i === 3 && allGalleryImages.length > 4 && (
                   <div className="absolute inset-0 bg-[#0B1C26]/60 flex items-center justify-center backdrop-blur-sm">
@@ -1193,11 +1193,10 @@ const handlePdfPasswordSubmit = async () => {
 
             {/* Main image container - bounded area above thumbnails */}
             <div className="absolute top-16 bottom-24 left-4 right-4 md:top-20 md:bottom-28 md:left-20 md:right-20 flex items-center justify-center">
-              <WatermarkedImage
+              <img
                 src={allGalleryImages[galleryIndex]}
                 className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl md:rounded-2xl shadow-2xl"
                 alt=""
-                watermarkSize="gallery"
               />
             </div>
 

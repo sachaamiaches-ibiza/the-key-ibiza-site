@@ -483,32 +483,8 @@ const App: React.FC = () => {
     initGA();
   }, []);
 
-  // Image protection - disable right-click and drag on images
-  useEffect(() => {
-    const handleContextMenu = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'IMG' || target.closest('img')) {
-        e.preventDefault();
-        return false;
-      }
-    };
-
-    const handleDragStart = (e: DragEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'IMG') {
-        e.preventDefault();
-        return false;
-      }
-    };
-
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('dragstart', handleDragStart);
-
-    return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('dragstart', handleDragStart);
-    };
-  }, []);
+  // Image protection: Watermarks are now embedded via Cloudinary
+  // Downloads will include the logo - no need for aggressive blocking
 
   // Track page views with Google Analytics
   useEffect(() => {
