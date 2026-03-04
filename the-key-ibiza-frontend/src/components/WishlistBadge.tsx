@@ -13,7 +13,7 @@ const WishlistBadge: React.FC<WishlistBadgeProps> = ({ count, hasDates, onClick 
   return (
     <button
       onClick={onClick}
-      className={`fixed bottom-6 right-6 z-[90] flex items-center gap-3 px-5 py-3 rounded-full font-semibold shadow-xl hover:scale-105 transition-transform animate-fadeIn ${
+      className={`fixed bottom-24 right-6 z-[90] flex items-center gap-3 px-5 py-3 rounded-full font-semibold shadow-xl hover:scale-105 transition-transform animate-fadeIn ${
         hasDates
           ? 'bg-gradient-to-r from-luxury-gold to-amber-500 text-luxury-blue shadow-luxury-gold/30'
           : 'bg-white/10 backdrop-blur-md border border-luxury-gold/50 text-luxury-gold shadow-black/20'
