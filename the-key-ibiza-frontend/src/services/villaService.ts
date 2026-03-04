@@ -211,14 +211,18 @@ export async function fetchVillas(): Promise<Villa[]> {
   try {
     // Include VIP token if available to see private villas (check both storages)
     const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+    console.log('🔑 VIP Token found:', token ? 'YES' : 'NO');
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+      console.log('🔐 Sending Authorization header');
     }
 
     const res = await fetch(`${BACKEND_URL}/villas`, { headers });
+    console.log('📡 Villas API response status:', res.status);
 
     if (!res.ok) {
       console.error('❌ Backend error:', res.status);
@@ -229,6 +233,12 @@ export async function fetchVillas(): Promise<Villa[]> {
 
     // Parse response - handle both array and { data: [] } formats
     const rawVillas = Array.isArray(json) ? json : (json.data || []);
+    console.log('📦 Raw villas from API:', rawVillas.length);
+
+    // Check for vip_only villas
+    const vipOnlyRaw = rawVillas.filter((v: any) => v.vip_only === true);
+    console.log('🔒 VIP-only villas in response:', vipOnlyRaw.length, vipOnlyRaw.map((v: any) => v.villa_name));
+
     const villas = rawVillas.map(apiRowToVilla);
 
     // Load Cloudinary images for manual villas in parallel
