@@ -9,7 +9,17 @@ interface WishlistShareModalProps {
   checkOut: string;
   totalPrice: number;
   villaCount: number;
+  isVip: boolean;
 }
+
+const COMMISSION_OPTIONS = [
+  { value: 0, label: 'Sin comisión' },
+  { value: 10, label: '10%' },
+  { value: 15, label: '15%' },
+  { value: 20, label: '20%' },
+  { value: 25, label: '25%' },
+  { value: 30, label: '30%' },
+];
 
 const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
   isOpen,
@@ -19,8 +29,10 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
   checkOut,
   totalPrice,
   villaCount,
+  isVip,
 }) => {
   const [showPrices, setShowPrices] = useState(true);
+  const [commissionPercent, setCommissionPercent] = useState(0);
   const [creatorName, setCreatorName] = useState('');
   const [notes, setNotes] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -28,15 +40,21 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
 
+  // Calculate price with commission for preview
+  const priceWithCommission = Math.round(totalPrice * (1 + commissionPercent / 100));
+
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setShareUrl('');
       setCopied(false);
       setError('');
-      setShowPrices(true);
+      // VIP defaults: show prices, no commission
+      // Non-VIP: always hide prices
+      setShowPrices(isVip);
+      setCommissionPercent(0);
     }
-  }, [isOpen]);
+  }, [isOpen, isVip]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -68,7 +86,8 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
         villaSlugs,
         checkIn,
         checkOut,
-        showPrices,
+        showPrices: isVip ? showPrices : false, // Non-VIP always hide prices
+        commissionPercent: isVip && showPrices ? commissionPercent : 0,
         createdByName: creatorName || undefined,
         notes: notes || undefined,
       });
@@ -143,29 +162,89 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
         </div>
 
         <div className="px-6 pb-6 space-y-5">
-          {/* Show prices toggle */}
+          {/* Options - only before link is created */}
           {!shareUrl && (
             <>
-              <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
-                <div>
-                  <p className="text-white font-medium">Show prices</p>
-                  <p className="text-white/40 text-xs mt-0.5">
-                    {showPrices ? `Total: €${totalPrice.toLocaleString()}` : 'Prices will be hidden'}
-                  </p>
+              {/* VIP-only options */}
+              {isVip ? (
+                <>
+                  {/* Show prices toggle */}
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div>
+                      <p className="text-white font-medium">Show prices</p>
+                      <p className="text-white/40 text-xs mt-0.5">
+                        {showPrices ? 'Prices visible in shared link' : 'Prices will be hidden'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowPrices(!showPrices)}
+                      className={`relative w-14 h-8 rounded-full transition-colors ${
+                        showPrices ? 'bg-luxury-gold' : 'bg-white/20'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+                          showPrices ? 'left-7' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Commission selector - only if showing prices */}
+                  {showPrices && (
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                      <p className="text-white font-medium mb-3">Add commission</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {COMMISSION_OPTIONS.map(option => (
+                          <button
+                            key={option.value}
+                            onClick={() => setCommissionPercent(option.value)}
+                            className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                              commissionPercent === option.value
+                                ? 'bg-luxury-gold text-luxury-blue'
+                                : 'bg-white/10 text-white/70 hover:bg-white/20'
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Price preview */}
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-white/50">Base price:</span>
+                          <span className="text-white/70">{totalPrice.toLocaleString()}</span>
+                        </div>
+                        {commissionPercent > 0 && (
+                          <div className="flex justify-between items-center text-sm mt-1">
+                            <span className="text-white/50">+ {commissionPercent}% commission:</span>
+                            <span className="text-luxury-gold">+{(priceWithCommission - totalPrice).toLocaleString()}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/10">
+                          <span className="text-white font-medium">Client sees:</span>
+                          <span className="text-luxury-gold font-semibold text-lg">{priceWithCommission.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* Non-VIP message */
+                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <p className="text-amber-200 font-medium text-sm">Prices hidden</p>
+                      <p className="text-amber-200/60 text-xs mt-1">
+                        VIP agents can show prices and add commission. Contact us for VIP access.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setShowPrices(!showPrices)}
-                  className={`relative w-14 h-8 rounded-full transition-colors ${
-                    showPrices ? 'bg-luxury-gold' : 'bg-white/20'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
-                      showPrices ? 'left-7' : 'left-1'
-                    }`}
-                  />
-                </button>
-              </div>
+              )}
 
               {/* Optional name */}
               <div>
@@ -230,6 +309,9 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
                   </svg>
                 </div>
                 <p className="text-white font-medium">Link created!</p>
+                {isVip && showPrices && commissionPercent > 0 && (
+                  <p className="text-luxury-gold text-sm mt-1">+{commissionPercent}% commission applied</p>
+                )}
               </div>
 
               {/* Link preview */}

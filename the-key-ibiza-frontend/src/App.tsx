@@ -1307,6 +1307,7 @@ const App: React.FC = () => {
         checkOut={wishlistHook.wishlist.checkOut}
         totalPrice={wishlistTotalPrice}
         villaCount={wishlistHook.count}
+        isVip={isVip}
       />
     </div>
   );

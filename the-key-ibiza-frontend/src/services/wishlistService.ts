@@ -7,6 +7,7 @@ export interface CreateWishlistParams {
   checkIn: string;
   checkOut: string;
   showPrices?: boolean;
+  commissionPercent?: number;
   createdByName?: string;
   notes?: string;
 }
