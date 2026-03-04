@@ -83,6 +83,7 @@ export interface Villa {
   availability?: { from: string; to: string }[];
   occupiedDates?: string[];
   isPrivate?: boolean;
+  vip_only?: boolean; // VIP-only villas show "Members only" badge
   weeklyRatesRaw?: string;
   latitude?: number;
   longitude?: number;

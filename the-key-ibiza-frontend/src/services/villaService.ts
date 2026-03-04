@@ -148,6 +148,7 @@ function apiRowToVilla(row: any): Villa {
     amenities: amenitiesArray,
     availability: row.availability || undefined,
     isPrivate: row.vip_only === true,
+    vip_only: row.vip_only === true, // For "Members only" badge
     visibility: row.vip_only === true ? 'private' : 'public',
     // Additional fields
     minStay: row.min_stay || '7 nights',
