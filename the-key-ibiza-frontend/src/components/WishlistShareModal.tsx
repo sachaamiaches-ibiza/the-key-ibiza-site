@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createWishlist } from '../services/wishlistService';
+import { vipAuth } from '../services/vipAuth';
 
 interface WishlistShareModalProps {
   isOpen: boolean;
@@ -183,7 +184,7 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
               {/* VIP-only options */}
               {isVip ? (
                 <>
-                  {/* Show prices toggle */}
+                  {/* Show prices toggle - all VIP users */}
                   <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
                     <div>
                       <p className="text-white font-medium">Show prices</p>
@@ -205,30 +206,33 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
                     </button>
                   </div>
 
-                  {/* White Label toggle */}
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
-                    <div>
-                      <p className="text-white font-medium">White Label</p>
-                      <p className="text-white/40 text-xs mt-0.5">
-                        {whiteLabel ? 'No branding in shared link' : 'The Key branding visible'}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setWhiteLabel(!whiteLabel)}
-                      className={`relative w-14 h-8 rounded-full transition-colors ${
-                        whiteLabel ? 'bg-luxury-gold' : 'bg-white/20'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
-                          whiteLabel ? 'left-7' : 'left-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
+                  {/* VIP Pro only features */}
+                  {vipAuth.isVipPro() && (
+                    <>
+                      {/* White Label toggle */}
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div>
+                          <p className="text-white font-medium">White Label</p>
+                          <p className="text-white/40 text-xs mt-0.5">
+                            {whiteLabel ? 'No branding in shared link' : 'The Key branding visible'}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setWhiteLabel(!whiteLabel)}
+                          className={`relative w-14 h-8 rounded-full transition-colors ${
+                            whiteLabel ? 'bg-luxury-gold' : 'bg-white/20'
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+                              whiteLabel ? 'left-7' : 'left-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
 
-                  {/* Commission selector - only if showing prices */}
-                  {showPrices && (
+                      {/* Commission selector - only if showing prices */}
+                      {showPrices && (
                     <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                       <p className="text-white font-medium mb-3">Add commission</p>
                       <div className="grid grid-cols-3 gap-2">
@@ -258,6 +262,8 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
                         </div>
                       )}
                     </div>
+                  )}
+                    </>
                   )}
                 </>
               ) : null}

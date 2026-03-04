@@ -7,6 +7,7 @@ interface VipSession {
   email: string;
   role: 'admin' | 'user';
   name: string;
+  vipLevel: 'vip' | 'vip_pro';
 }
 
 // Get current session - check both localStorage and sessionStorage
@@ -23,6 +24,7 @@ const getSession = (): VipSession | null => {
         email: user.email,
         role: user.role || 'user',
         name: user.name || 'VIP Guest',
+        vipLevel: user.vipLevel || 'vip',
       };
     } catch {
       return null;
@@ -70,5 +72,17 @@ export const vipAuth = {
   getUserName: (): string => {
     const session = getSession();
     return session?.name || 'VIP Guest';
+  },
+
+  // Get VIP level (vip or vip_pro)
+  getVipLevel: (): 'vip' | 'vip_pro' => {
+    const session = getSession();
+    return session?.vipLevel || 'vip';
+  },
+
+  // Check if user is VIP Pro
+  isVipPro: (): boolean => {
+    const session = getSession();
+    return session?.vipLevel === 'vip_pro';
   },
 };
