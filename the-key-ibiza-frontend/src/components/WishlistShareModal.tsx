@@ -115,7 +115,7 @@ const WishlistShareModal: React.FC<WishlistShareModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[10002] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100004] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
