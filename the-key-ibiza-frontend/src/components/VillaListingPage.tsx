@@ -604,7 +604,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                       // Auto-open checkout calendar after selecting check-in
                       setTimeout(() => checkOutRef.current?.showPicker?.(), 100);
                     }}
-                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                    onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
@@ -617,7 +617,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     value={searchFilters.checkOut}
                     min={searchFilters.checkIn}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
-                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                    onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
