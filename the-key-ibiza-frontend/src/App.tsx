@@ -243,6 +243,13 @@ const App: React.FC = () => {
     return 'en';
   });
 
+  // White label detection - check if we're on the white label domain
+  const isWhiteLabelDomain = typeof window !== 'undefined' && (
+    window.location.hostname === 'elegantcollection.store' ||
+    window.location.hostname === 'www.elegantcollection.store' ||
+    window.location.hostname.includes('elegantcollection')
+  );
+
   // Custom setView that also updates the URL
   const setView = (newView: View) => {
     setViewState(newView);
@@ -970,7 +977,8 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen selection:bg-luxury-gold selection:text-white overflow-x-hidden">
-      {/* Golden Top Bar - visible on all pages */}
+      {/* Golden Top Bar - visible on all pages EXCEPT white label domain */}
+      {!isWhiteLabelDomain && (
       <div
         data-navbar="true"
         className="fixed top-0 left-0 right-0 z-[100]"
@@ -1032,8 +1040,10 @@ const App: React.FC = () => {
           </div>
         </div>
       </div>
-      <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} onOpenContact={handleOpenContact} />
+      )}
+      {!isWhiteLabelDomain && <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} onOpenContact={handleOpenContact} />}
       <main className="animate-fade-in relative z-[1]">{renderView()}</main>
+      {!isWhiteLabelDomain && (
       <section id="contact" className="py-20 md:py-28 lg:py-32 relative overflow-hidden" style={{ backgroundColor: '#0B1C26' }}>
         <div className="container mx-auto px-6 lg:px-12 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 items-center">
 
@@ -1122,6 +1132,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
+      )}
 
       {/* ===== DISCLAIMER MODAL ===== */}
       {disclaimerModalOpen && (
