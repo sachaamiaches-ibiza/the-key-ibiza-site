@@ -1044,6 +1044,7 @@ const App: React.FC = () => {
       {!isWhiteLabelDomain && <Navbar currentView={view} onNavigate={setView} lang={lang} onLanguageChange={setLang} onOpenContact={handleOpenContact} />}
       <main className="animate-fade-in relative z-[1]">{renderView()}</main>
       {!isWhiteLabelDomain && (
+      <>
       <section id="contact" className="py-20 md:py-28 lg:py-32 relative overflow-hidden" style={{ backgroundColor: '#0B1C26' }}>
         <div className="container mx-auto px-6 lg:px-12 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 items-center">
 
@@ -1132,6 +1133,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
+      </>
       )}
 
       {/* ===== DISCLAIMER MODAL ===== */}
