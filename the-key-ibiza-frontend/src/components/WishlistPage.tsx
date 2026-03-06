@@ -19,6 +19,210 @@ function nameToUrlSlug(name: string): string {
     .trim();
 }
 
+// Villa Detail Modal Component - Full featured modal for white label
+interface VillaDetailModalProps {
+  villa: WishlistVilla;
+  showPrices: boolean;
+  onClose: () => void;
+}
+
+const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, onClose }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showAllAmenities, setShowAllAmenities] = useState(false);
+
+  // Combine all images
+  const allImages = [
+    ...(villa.header_images || []),
+    ...(villa.gallery_images || []),
+    ...(villa.thumbnail_images || [])
+  ].filter((img, index, self) => self.indexOf(img) === index); // Remove duplicates
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  // Feature badges
+  const features = [
+    villa.pool && { icon: '🏊', label: 'Pool' },
+    villa.sea_view && { icon: '🌊', label: 'Sea View' },
+    villa.garden && { icon: '🌳', label: 'Garden' },
+    villa.parking && { icon: '🚗', label: 'Parking' }
+  ].filter(Boolean) as { icon: string; label: string }[];
+
+  return (
+    <div className="fixed inset-0 z-[100005] flex items-center justify-center p-2 md:p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="relative w-full max-w-4xl max-h-[95vh] overflow-y-auto bg-gradient-to-br from-[#0B1C26] to-[#0a1419] rounded-2xl md:rounded-3xl border border-luxury-gold/20 shadow-2xl">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 md:top-4 md:right-4 w-10 h-10 flex items-center justify-center bg-black/50 rounded-full text-white/60 hover:text-luxury-gold transition-colors z-20"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Image Gallery */}
+        <div className="relative aspect-[16/10] md:aspect-video bg-black">
+          <img
+            src={allImages[currentImageIndex] || villa.header_images?.[0]}
+            alt={`${villa.villa_name} - Image ${currentImageIndex + 1}`}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26] via-transparent to-transparent opacity-60" />
+
+          {/* Navigation arrows */}
+          {allImages.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Image counter */}
+          {allImages.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/60 rounded-full text-white/80 text-xs">
+              {currentImageIndex + 1} / {allImages.length}
+            </div>
+          )}
+
+          {/* Thumbnail strip */}
+          {allImages.length > 1 && (
+            <div className="absolute bottom-4 right-4 flex gap-1 max-w-[200px] overflow-hidden">
+              {allImages.slice(0, 5).map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentImageIndex(i)}
+                  className={`w-12 h-8 rounded overflow-hidden border-2 transition-all ${
+                    currentImageIndex === i ? 'border-luxury-gold' : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+              {allImages.length > 5 && (
+                <div className="w-12 h-8 rounded bg-black/60 flex items-center justify-center text-white/60 text-xs">
+                  +{allImages.length - 5}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="p-4 md:p-6 lg:p-8">
+          {/* Header */}
+          <div className="mb-6">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif text-white mb-2">{villa.villa_name}</h2>
+            <p className="text-luxury-gold text-sm uppercase tracking-wider flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {villa.location}
+            </p>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="text-center">
+              <span className="text-2xl md:text-3xl font-serif text-white">{villa.bedrooms}</span>
+              <span className="text-xs uppercase tracking-wider block mt-1 text-white/50">Bedrooms</span>
+            </div>
+            <div className="text-center border-x border-white/10">
+              <span className="text-2xl md:text-3xl font-serif text-white">{villa.bathrooms}</span>
+              <span className="text-xs uppercase tracking-wider block mt-1 text-white/50">Bathrooms</span>
+            </div>
+            <div className="text-center">
+              <span className="text-2xl md:text-3xl font-serif text-white">{villa.max_persons}</span>
+              <span className="text-xs uppercase tracking-wider block mt-1 text-white/50">Guests</span>
+            </div>
+          </div>
+
+          {/* Feature Badges */}
+          {features.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {features.map((f, i) => (
+                <span key={i} className="px-3 py-1.5 bg-luxury-gold/15 border border-luxury-gold/30 rounded-full text-luxury-gold text-sm flex items-center gap-1.5">
+                  <span>{f.icon}</span>
+                  {f.label}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Description */}
+          {(villa.description || villa.short_description) && (
+            <div className="mb-6">
+              <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">About this property</h3>
+              <p className="text-white/70 leading-relaxed whitespace-pre-line">
+                {villa.description || villa.short_description}
+              </p>
+            </div>
+          )}
+
+          {/* Amenities */}
+          {villa.amenities && villa.amenities.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Amenities</h3>
+              <div className="flex flex-wrap gap-2">
+                {(showAllAmenities ? villa.amenities : villa.amenities.slice(0, 12)).map((amenity, i) => (
+                  <span key={i} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white/70 text-sm">
+                    {amenity}
+                  </span>
+                ))}
+              </div>
+              {villa.amenities.length > 12 && !showAllAmenities && (
+                <button
+                  onClick={() => setShowAllAmenities(true)}
+                  className="mt-3 text-luxury-gold text-sm hover:underline"
+                >
+                  Show all {villa.amenities.length} amenities
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Price */}
+          {showPrices && villa.calculatedPrice && (
+            <div className="p-4 rounded-xl bg-gradient-to-r from-luxury-gold/10 to-transparent border border-luxury-gold/20">
+              <span className="text-white/40 text-xs uppercase tracking-wider block mb-1">Total for selected period</span>
+              <span className="text-3xl font-serif text-luxury-gold">
+                €{villa.calculatedPrice.toLocaleString()}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang }) => {
   const [wishlist, setWishlist] = useState<WishlistResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -257,91 +461,11 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
 
       {/* Villa Detail Modal - Only for white label mode */}
       {selectedVilla && isWhiteLabel && (
-        <div className="fixed inset-0 z-[100005] flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setSelectedVilla(null)}
-          />
-
-          {/* Modal */}
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#0B1C26] to-[#0a1419] rounded-3xl border border-luxury-gold/20 shadow-2xl">
-            {/* Close button */}
-            <button
-              onClick={() => setSelectedVilla(null)}
-              className="absolute top-4 right-4 text-white/40 hover:text-luxury-gold transition-colors z-10"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            {/* Image */}
-            <div className="relative aspect-video">
-              <img
-                src={selectedVilla.header_images?.[0] || selectedVilla.thumbnail_images?.[0]}
-                alt={selectedVilla.villa_name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26] via-transparent to-transparent" />
-            </div>
-
-            {/* Content */}
-            <div className="p-6">
-              <h2 className="text-3xl font-serif text-white mb-2">{selectedVilla.villa_name}</h2>
-              <p className="text-luxury-gold text-sm uppercase tracking-wider mb-4">{selectedVilla.location}</p>
-
-              {selectedVilla.short_description && (
-                <p className="text-white/60 mb-6">{selectedVilla.short_description}</p>
-              )}
-
-              {/* Stats */}
-              <div className="flex items-center gap-8 text-white/60 mb-6">
-                <div className="text-center">
-                  <span className="text-2xl font-serif text-white">{selectedVilla.bedrooms}</span>
-                  <span className="text-xs uppercase tracking-wider block mt-1">Bedrooms</span>
-                </div>
-                <div className="text-center">
-                  <span className="text-2xl font-serif text-white">{selectedVilla.bathrooms}</span>
-                  <span className="text-xs uppercase tracking-wider block mt-1">Bathrooms</span>
-                </div>
-                <div className="text-center">
-                  <span className="text-2xl font-serif text-white">{selectedVilla.max_persons}</span>
-                  <span className="text-xs uppercase tracking-wider block mt-1">Guests</span>
-                </div>
-              </div>
-
-              {/* Amenities */}
-              {selectedVilla.amenities && selectedVilla.amenities.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Amenities</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedVilla.amenities.slice(0, 8).map((amenity, i) => (
-                      <span key={i} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/70 text-xs">
-                        {amenity}
-                      </span>
-                    ))}
-                    {selectedVilla.amenities.length > 8 && (
-                      <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-xs">
-                        +{selectedVilla.amenities.length - 8} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Price */}
-              {wishlist.showPrices && selectedVilla.calculatedPrice && (
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-white/40 text-xs uppercase tracking-wider block mb-1">Total for period</span>
-                  <span className="text-2xl font-serif text-luxury-gold">
-                    {selectedVilla.calculatedPrice.toLocaleString()}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <VillaDetailModal
+          villa={selectedVilla}
+          showPrices={wishlist?.showPrices || false}
+          onClose={() => setSelectedVilla(null)}
+        />
       )}
     </div>
   );

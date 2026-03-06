@@ -26,15 +26,21 @@ export interface WishlistVilla {
   villa_name: string;
   location: string;
   short_description?: string;
+  description?: string;
   bedrooms: number;
   bathrooms: number;
   max_persons: number;
   header_images?: string[];
   thumbnail_images?: string[];
+  gallery_images?: string[];
   amenities?: string[];
   calculatedPrice?: number;
   price_min_week?: number;
   price_max_week?: number;
+  pool?: boolean;
+  sea_view?: boolean;
+  garden?: boolean;
+  parking?: boolean;
 }
 
 export interface WishlistResponse {
