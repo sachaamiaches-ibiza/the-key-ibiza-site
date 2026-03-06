@@ -63,6 +63,11 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
 
       {/* Modal */}
       <div className="relative w-full max-w-4xl max-h-[95vh] overflow-y-auto bg-gradient-to-br from-[#0B1C26] to-[#0a1419] rounded-2xl md:rounded-3xl border border-luxury-gold/20 shadow-2xl">
+        {/* Drag handle bar at top */}
+        <div className="sticky top-0 z-30 flex items-center justify-center py-3 bg-gradient-to-b from-[#0B1C26] to-transparent">
+          <div className="w-12 h-1 rounded-full bg-white/20" />
+        </div>
+
         {/* Close button */}
         <button
           onClick={onClose}
@@ -210,11 +215,30 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
 
           {/* Price */}
           {showPrices && villa.calculatedPrice && (
-            <div className="p-4 rounded-xl bg-gradient-to-r from-luxury-gold/10 to-transparent border border-luxury-gold/20">
+            <div className="p-4 rounded-xl bg-gradient-to-r from-luxury-gold/10 to-transparent border border-luxury-gold/20 mb-6">
               <span className="text-white/40 text-xs uppercase tracking-wider block mb-1">Total for selected period</span>
               <span className="text-3xl font-serif text-luxury-gold">
                 €{villa.calculatedPrice.toLocaleString()}
               </span>
+            </div>
+          )}
+
+          {/* Map */}
+          {villa.location_lat && villa.location_lng && (
+            <div className="mt-6">
+              <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Location</h3>
+              <div className="rounded-xl overflow-hidden border border-white/10">
+                <iframe
+                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${villa.location_lat},${villa.location_lng}&zoom=14&maptype=satellite`}
+                  width="100%"
+                  height="250"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full"
+                />
+              </div>
             </div>
           )}
         </div>

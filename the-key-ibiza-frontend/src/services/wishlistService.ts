@@ -41,6 +41,8 @@ export interface WishlistVilla {
   sea_view?: boolean;
   garden?: boolean;
   parking?: boolean;
+  location_lat?: number;
+  location_lng?: number;
 }
 
 export interface WishlistResponse {
