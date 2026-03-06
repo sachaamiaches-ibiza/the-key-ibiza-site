@@ -223,22 +223,21 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
             </div>
           )}
 
-          {/* Map - Shows all of Ibiza with villa marker */}
+          {/* Map - Same style as main website (Leaflet with OpenStreetMap) */}
           {villa.location_lat && villa.location_lng && (
             <div className="mt-6 mb-2">
-              <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Location in Ibiza</h3>
+              <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Location</h3>
               <div className="rounded-xl overflow-hidden border border-white/10">
                 <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${villa.location_lat},${villa.location_lng}&zoom=10&maptype=satellite&center=38.9067,1.4206`}
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=1.1,38.8,1.7,39.15&layer=mapnik&marker=${villa.location_lat},${villa.location_lng}`}
                   width="100%"
-                  height="280"
+                  height="300"
                   style={{ border: 0 }}
-                  allowFullScreen
                   loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
                   className="w-full"
                 />
               </div>
+              <p className="text-white/25 text-[10px] mt-3 text-center tracking-wide">Approximate location. Exact address provided upon booking confirmation.</p>
             </div>
           )}
 
