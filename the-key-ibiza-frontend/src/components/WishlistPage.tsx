@@ -54,7 +54,7 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
   ].filter(Boolean) as { icon: string; label: string }[];
 
   return (
-    <div className="fixed inset-0 z-[100005] flex items-center justify-center p-2 md:p-4">
+    <div className="fixed inset-0 z-[100005] flex items-center justify-center py-6 px-4 md:py-8 md:px-6">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/90 backdrop-blur-sm"
@@ -62,10 +62,10 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-4xl max-h-[95vh] overflow-y-auto bg-gradient-to-br from-[#0B1C26] to-[#0a1419] rounded-2xl md:rounded-3xl border border-luxury-gold/20 shadow-2xl">
+      <div className="relative w-full max-w-4xl max-h-full overflow-y-auto bg-gradient-to-br from-[#0B1C26] to-[#0a1419] rounded-2xl md:rounded-3xl border border-luxury-gold/20 shadow-2xl">
         {/* Drag handle bar at top */}
-        <div className="sticky top-0 z-30 flex items-center justify-center py-3 bg-gradient-to-b from-[#0B1C26] to-transparent">
-          <div className="w-12 h-1 rounded-full bg-white/20" />
+        <div className="sticky top-0 z-30 flex items-center justify-center py-3 bg-[#0B1C26] border-b border-white/5">
+          <div className="w-12 h-1 rounded-full bg-white/30" />
         </div>
 
         {/* Close button */}
@@ -140,7 +140,7 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
         </div>
 
         {/* Content */}
-        <div className="p-4 md:p-6 lg:p-8 pb-20 md:pb-10">
+        <div className="p-4 md:p-6 lg:p-8 pb-8">
           {/* Header */}
           <div className="mb-6">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif text-white mb-2">{villa.villa_name}</h2>
@@ -223,15 +223,15 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
             </div>
           )}
 
-          {/* Map */}
+          {/* Map - Shows all of Ibiza with villa marker */}
           {villa.location_lat && villa.location_lng && (
-            <div className="mt-6">
-              <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Location</h3>
+            <div className="mt-6 mb-2">
+              <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Location in Ibiza</h3>
               <div className="rounded-xl overflow-hidden border border-white/10">
                 <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${villa.location_lat},${villa.location_lng}&zoom=14&maptype=satellite`}
+                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${villa.location_lat},${villa.location_lng}&zoom=10&maptype=satellite&center=38.9067,1.4206`}
                   width="100%"
-                  height="250"
+                  height="280"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
@@ -241,6 +241,14 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
               </div>
             </div>
           )}
+
+          {/* Bottom safe area */}
+          <div className="h-2" />
+        </div>
+
+        {/* Bottom border bar */}
+        <div className="sticky bottom-0 z-30 flex items-center justify-center py-2 bg-[#0B1C26] border-t border-white/5">
+          <div className="w-8 h-1 rounded-full bg-white/20" />
         </div>
       </div>
     </div>
