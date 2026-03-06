@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWishlist, WishlistResponse, WishlistVilla } from '../services/wishlistService';
 import { Language } from '../types';
+import VillaMap from './VillaMap';
 
 interface WishlistPageProps {
   shareCode: string;
@@ -223,19 +224,12 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
             </div>
           )}
 
-          {/* Map - Same style as main website (Leaflet with OpenStreetMap) */}
+          {/* Map - Same component as main website (zoom disabled) */}
           {villa.location_lat && villa.location_lng && (
             <div className="mt-6 mb-2">
               <h3 className="text-white/40 text-xs uppercase tracking-wider mb-3">Location</h3>
               <div className="rounded-xl overflow-hidden border border-white/10">
-                <iframe
-                  src={`https://www.openstreetmap.org/export/embed.html?bbox=1.1,38.8,1.7,39.15&layer=mapnik&marker=${villa.location_lat},${villa.location_lng}`}
-                  width="100%"
-                  height="300"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  className="w-full"
-                />
+                <VillaMap latitude={villa.location_lat} longitude={villa.location_lng} />
               </div>
               <p className="text-white/25 text-[10px] mt-3 text-center tracking-wide">Approximate location. Exact address provided upon booking confirmation.</p>
             </div>
