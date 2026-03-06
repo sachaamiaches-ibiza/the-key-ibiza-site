@@ -250,6 +250,18 @@ const App: React.FC = () => {
     window.location.hostname.includes('elegantcollection')
   );
 
+  // White label: Change title and favicon
+  useEffect(() => {
+    if (isWhiteLabelDomain) {
+      document.title = 'Luxury Villa Collection';
+      // Change favicon to a neutral one (diamond emoji as data URI)
+      const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+      if (link) {
+        link.href = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💎</text></svg>';
+      }
+    }
+  }, [isWhiteLabelDomain]);
+
   // Custom setView that also updates the URL
   const setView = (newView: View) => {
     setViewState(newView);
