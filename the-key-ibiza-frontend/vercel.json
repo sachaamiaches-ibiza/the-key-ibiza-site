@@ -1,17 +1,6 @@
 {
   "redirects": [
     {
-      "source": "/wishlist/:code",
-      "destination": "https://the-key-ibiza-backend.vercel.app/share/wishlist/:code",
-      "statusCode": 307,
-      "missing": [
-        {
-          "type": "query",
-          "key": "loaded"
-        }
-      ]
-    },
-    {
       "source": "/villa-:slug(.*)",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug",
       "statusCode": 307,
@@ -46,6 +35,16 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/wishlist/:code",
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/wishlist/:code",
+      "missing": [
+        {
+          "type": "query",
+          "key": "loaded"
+        }
+      ]
+    },
     {
       "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
       "destination": "/index.html"
