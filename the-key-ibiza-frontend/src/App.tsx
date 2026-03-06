@@ -1297,7 +1297,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <AIConcierge lang={lang} />
+      {!isWhiteLabelDomain && <AIConcierge lang={lang} />}
 
       {/* Contact Modal - Shareable via URL */}
       <ContactModal
