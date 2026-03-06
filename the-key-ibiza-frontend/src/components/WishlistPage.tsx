@@ -135,7 +135,7 @@ const VillaDetailModal: React.FC<VillaDetailModalProps> = ({ villa, showPrices, 
         </div>
 
         {/* Content */}
-        <div className="p-4 md:p-6 lg:p-8">
+        <div className="p-4 md:p-6 lg:p-8 pb-20 md:pb-10">
           {/* Header */}
           <div className="mb-6">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif text-white mb-2">{villa.villa_name}</h2>
