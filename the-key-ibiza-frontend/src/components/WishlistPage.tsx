@@ -44,8 +44,13 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ shareCode, onNavigate, lang
     ? Math.ceil((new Date(wishlist.checkOut).getTime() - new Date(wishlist.checkIn).getTime()) / (1000 * 60 * 60 * 24))
     : 0;
 
-  // Check if white label mode
-  const isWhiteLabel = wishlist?.whiteLabel === true;
+  // Check if white label mode - by domain OR by wishlist flag
+  const isWhiteLabelDomain = typeof window !== 'undefined' && (
+    window.location.hostname === 'elegantcollection.store' ||
+    window.location.hostname === 'www.elegantcollection.store' ||
+    window.location.hostname.includes('elegantcollection')
+  );
+  const isWhiteLabel = isWhiteLabelDomain || wishlist?.whiteLabel === true;
 
   // Hide navbar and footer in white label mode
   useEffect(() => {
