@@ -616,54 +616,45 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         });
       }
 
-      // ===== PAGE 3: Gallery - 4 photos in grid + 5th centered =====
-      pdf.addPage();
-      yPos = margin;
+      // ===== GALLERY PAGES: All photos, 6 per page (2 columns x 3 rows) =====
+      const allImages = [...headerImages, ...(villa.gallery || [])];
+      const imagesPerPage = 6;
+      const cols = 2;
+      const rows = 3;
+      const gap = 8;
+      const imgWidth = (contentWidth - gap) / cols;
+      const imgHeight = 75;
 
-      pdf.setFontSize(18);
-      pdf.setTextColor(11, 28, 38);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Gallery', margin, yPos);
-      yPos += 15;
+      for (let pageStart = 0; pageStart < allImages.length; pageStart += imagesPerPage) {
+        pdf.addPage();
+        yPos = margin;
 
-      const imagesToShow = headerImages.slice(0, 5);
-      const imgHeight = 55;
-      const imgWidth = contentWidth / 2 - 5;
-      const gap = 10;
-
-      // First 4 images in 2x2 grid
-      for (let i = 0; i < Math.min(4, imagesToShow.length); i++) {
-        try {
-          const imgData = await loadImage(imagesToShow[i]);
-          const col = i % 2;
-          const row = Math.floor(i / 2);
-          const xPos = margin + (col * (imgWidth + gap));
-          const imgYPos = yPos + (row * (imgHeight + gap));
-
-          pdf.addImage(imgData, 'JPEG', xPos, imgYPos, imgWidth, imgHeight);
-
-          // Watermark on each image
-          drawImageWatermark(xPos, imgYPos, imgWidth, imgHeight);
-        } catch (e) {
-          console.error(`Failed to load image ${i}:`, e);
+        // Title only on first gallery page
+        if (pageStart === 0) {
+          pdf.setFontSize(18);
+          pdf.setTextColor(11, 28, 38);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('Gallery', margin, yPos);
+          yPos += 12;
         }
-      }
 
-      // 5th image centered below
-      if (imagesToShow.length >= 5) {
-        try {
-          const imgData = await loadImage(imagesToShow[4]);
-          const fifthImgWidth = contentWidth * 0.6;
-          const fifthImgHeight = imgHeight;
-          const fifthXPos = margin + (contentWidth - fifthImgWidth) / 2;
-          const fifthYPos = yPos + (2 * (imgHeight + gap)) + 5;
+        const pageImages = allImages.slice(pageStart, pageStart + imagesPerPage);
 
-          pdf.addImage(imgData, 'JPEG', fifthXPos, fifthYPos, fifthImgWidth, fifthImgHeight);
+        for (let i = 0; i < pageImages.length; i++) {
+          try {
+            const imgData = await loadImage(pageImages[i]);
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const xPos = margin + (col * (imgWidth + gap));
+            const imgYPos = yPos + (row * (imgHeight + gap));
 
-          // Watermark on 5th image
-          drawImageWatermark(fifthXPos, fifthYPos, fifthImgWidth, fifthImgHeight);
-        } catch (e) {
-          console.error('Failed to load 5th image:', e);
+            pdf.addImage(imgData, 'JPEG', xPos, imgYPos, imgWidth, imgHeight);
+
+            // Watermark on each image
+            drawImageWatermark(xPos, imgYPos, imgWidth, imgHeight);
+          } catch (e) {
+            console.error(`Failed to load gallery image ${pageStart + i}:`, e);
+          }
         }
       }
 
