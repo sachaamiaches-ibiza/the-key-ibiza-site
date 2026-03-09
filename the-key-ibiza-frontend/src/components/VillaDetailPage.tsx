@@ -617,7 +617,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       }
 
       // ===== GALLERY PAGES: All photos, 6 per page (2 columns x 3 rows) =====
-      const allImages = [...headerImages, ...(villa.gallery || [])];
+      const allImages = villa.gallery || [];
       const imagesPerPage = 6;
       const cols = 2;
       const rows = 3;
