@@ -124,6 +124,55 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   const thumbnailStartX = useRef(0);
   const thumbnailScrollLeft = useRef(0);
 
+  // Update document meta tags for sharing (Safari share sheet reads DOM)
+  useEffect(() => {
+    const originalTitle = document.title;
+    const villaTitle = `${villa.name} | The Key Ibiza`;
+    const villaDescription = villa.shortDescription || `Luxury villa in ${villa.location}. Book your exclusive stay with The Key Ibiza.`;
+    const villaImage = villa.headerImages?.[0] || villa.imageUrl || '';
+    const villaUrl = `https://thekey-ibiza.com/villa-${villa.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`;
+
+    // Update title
+    document.title = villaTitle;
+
+    // Helper to update or create meta tag
+    const updateMeta = (property: string, content: string, isName = false) => {
+      const selector = isName ? `meta[name="${property}"]` : `meta[property="${property}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+      if (meta) {
+        meta.content = content;
+      } else {
+        meta = document.createElement('meta');
+        if (isName) {
+          meta.name = property;
+        } else {
+          meta.setAttribute('property', property);
+        }
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    };
+
+    // Update Open Graph tags
+    updateMeta('og:title', villaTitle);
+    updateMeta('og:description', villaDescription);
+    updateMeta('og:image', villaImage);
+    updateMeta('og:url', villaUrl);
+
+    // Update Twitter tags
+    updateMeta('twitter:title', villaTitle);
+    updateMeta('twitter:description', villaDescription);
+    updateMeta('twitter:image', villaImage);
+
+    // Update description
+    updateMeta('description', villaDescription, true);
+
+    // Cleanup: restore original meta tags when unmounting
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [villa]);
+
   // Sync dates to parent when they change
   useEffect(() => {
     if (onDatesChange) {
