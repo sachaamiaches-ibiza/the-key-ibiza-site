@@ -109,10 +109,15 @@ function parseWeeklyRatesField(value: any): SeasonalPrice[] {
 function apiRowToVilla(row: any): Villa {
   const minPrice = parsePrice(row.price_min_week);
   const maxPrice = parsePrice(row.price_max_week) || minPrice;
-  // Sort images by name (ascending) to ensure consistent order
-  const headerImagesArray = parseArrayField(row.header_images).sort((a: string, b: string) => a.localeCompare(b));
-  const galleryImagesArray = parseArrayField(row.gallery_images).sort((a: string, b: string) => a.localeCompare(b));
-  const thumbnailImagesArray = parseArrayField(row.thumbnail_images).sort((a: string, b: string) => a.localeCompare(b));
+  // Sort images by filename with numeric option (01 before 10)
+  const sortByFilename = (a: string, b: string) => {
+    const nameA = a.split('/').pop() || a;
+    const nameB = b.split('/').pop() || b;
+    return nameA.localeCompare(nameB, undefined, { numeric: true });
+  };
+  const headerImagesArray = parseArrayField(row.header_images).sort(sortByFilename);
+  const galleryImagesArray = parseArrayField(row.gallery_images).sort(sortByFilename);
+  const thumbnailImagesArray = parseArrayField(row.thumbnail_images).sort(sortByFilename);
   const amenitiesArray = parseArrayField(row.amenities);
 
   // Parse description - split by double newlines for paragraphs
@@ -195,15 +200,12 @@ async function loadCloudinaryImagesForVilla(villa: Villa, rawRow: any): Promise<
       hasNoGallery ? fetchCloudinaryFolder(`Villas/${villaFolderName}/Gallery`) : Promise.resolve(villa.gallery)
     ]);
 
-    // Sort images by name (ascending) to ensure consistent order
-    const sortedHeaders = headerImages.sort((a: string, b: string) => a.localeCompare(b));
-    const sortedGallery = galleryImages.sort((a: string, b: string) => a.localeCompare(b));
-
+    // Backend already sorts by filename with numeric option, no need to re-sort here
     return {
       ...villa,
-      headerImages: sortedHeaders.length > 0 ? sortedHeaders : villa.headerImages,
-      imageUrl: sortedHeaders.length > 0 ? sortedHeaders[0] : villa.imageUrl,
-      gallery: sortedGallery.length > 0 ? sortedGallery : villa.gallery
+      headerImages: headerImages.length > 0 ? headerImages : villa.headerImages,
+      imageUrl: headerImages.length > 0 ? headerImages[0] : villa.imageUrl,
+      gallery: galleryImages.length > 0 ? galleryImages : villa.gallery
     };
   } catch (e) {
     console.error(`❌ Error loading Cloudinary images for ${villa.name}:`, e);
