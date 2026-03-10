@@ -109,9 +109,10 @@ function parseWeeklyRatesField(value: any): SeasonalPrice[] {
 function apiRowToVilla(row: any): Villa {
   const minPrice = parsePrice(row.price_min_week);
   const maxPrice = parsePrice(row.price_max_week) || minPrice;
-  const headerImagesArray = parseArrayField(row.header_images);
-  const galleryImagesArray = parseArrayField(row.gallery_images);
-  const thumbnailImagesArray = parseArrayField(row.thumbnail_images);
+  // Sort images by name (ascending) to ensure consistent order
+  const headerImagesArray = parseArrayField(row.header_images).sort((a: string, b: string) => a.localeCompare(b));
+  const galleryImagesArray = parseArrayField(row.gallery_images).sort((a: string, b: string) => a.localeCompare(b));
+  const thumbnailImagesArray = parseArrayField(row.thumbnail_images).sort((a: string, b: string) => a.localeCompare(b));
   const amenitiesArray = parseArrayField(row.amenities);
 
   // Parse description - split by double newlines for paragraphs
@@ -194,11 +195,15 @@ async function loadCloudinaryImagesForVilla(villa: Villa, rawRow: any): Promise<
       hasNoGallery ? fetchCloudinaryFolder(`Villas/${villaFolderName}/Gallery`) : Promise.resolve(villa.gallery)
     ]);
 
+    // Sort images by name (ascending) to ensure consistent order
+    const sortedHeaders = headerImages.sort((a: string, b: string) => a.localeCompare(b));
+    const sortedGallery = galleryImages.sort((a: string, b: string) => a.localeCompare(b));
+
     return {
       ...villa,
-      headerImages: headerImages.length > 0 ? headerImages : villa.headerImages,
-      imageUrl: headerImages.length > 0 ? headerImages[0] : villa.imageUrl,
-      gallery: galleryImages.length > 0 ? galleryImages : villa.gallery
+      headerImages: sortedHeaders.length > 0 ? sortedHeaders : villa.headerImages,
+      imageUrl: sortedHeaders.length > 0 ? sortedHeaders[0] : villa.imageUrl,
+      gallery: sortedGallery.length > 0 ? sortedGallery : villa.gallery
     };
   } catch (e) {
     console.error(`❌ Error loading Cloudinary images for ${villa.name}:`, e);

@@ -1,0 +1,56 @@
+<svg width="950" height="200" viewBox="0 0 950 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&amp;display=swap');
+      .logo-text { font-family: 'Playfair Display', Georgia, serif; }
+      .service-text { font-family: 'Playfair Display', Georgia, serif; }
+    </style>
+  </defs>
+
+  <!-- Background WHITE -->
+  <rect width="950" height="200" fill="#FFFFFF"/>
+
+  <!-- LOGO GROUP (key + THE KEY Ibiza) -->
+  <!-- Key Icon -->
+  <g transform="translate(30, 20) scale(0.52)">
+    <circle cx="50" cy="35" r="32" stroke="#C9B27C" stroke-width="3.5" fill="none"/>
+    <circle cx="50" cy="35" r="18" stroke="#C9B27C" stroke-width="2.5" stroke-dasharray="80 20" fill="none"/>
+    <path d="M50 35V130" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 65H70" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 82H82" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 99H75" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 116H88" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 130H65" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- THE KEY text (next to key) -->
+  <text x="110" y="55" class="logo-text" fill="#C9B27C" font-size="22" font-weight="400" letter-spacing="5">THE KEY</text>
+
+  <!-- Ibiza text (italic, below THE KEY) -->
+  <text x="125" y="78" class="logo-text" fill="rgba(201,178,124,0.7)" font-size="15" font-style="italic" letter-spacing="3">Ibiza</text>
+
+  <!-- Tagline (GRAY, centered under the full logo) -->
+  <text x="135" y="135" class="service-text" fill="rgba(0,0,0,0.5)" font-size="16" text-anchor="middle">Architects of bespoke stays</text>
+  <text x="135" y="157" class="service-text" fill="rgba(0,0,0,0.5)" font-size="16" text-anchor="middle">and tailored experiences.</text>
+
+  <!-- Column 1 (BLACK) -->
+  <text x="340" y="55" class="service-text" fill="#1a1a1a" font-size="21">Villa rental</text>
+  <text x="340" y="84" class="service-text" fill="#1a1a1a" font-size="21">Boat charter</text>
+  <text x="340" y="113" class="service-text" fill="#1a1a1a" font-size="21">Night Life</text>
+  <text x="340" y="142" class="service-text" fill="#1a1a1a" font-size="21">Furniture</text>
+  <text x="340" y="171" class="service-text" fill="#1a1a1a" font-size="21">Deliveries</text>
+
+  <!-- Column 2 (BLACK) -->
+  <text x="500" y="55" class="service-text" fill="#1a1a1a" font-size="21">Catering &amp; Bottle Service</text>
+  <text x="500" y="84" class="service-text" fill="#1a1a1a" font-size="21">Personalized Events</text>
+  <text x="500" y="113" class="service-text" fill="#1a1a1a" font-size="21">Health &amp; Beauty Program</text>
+  <text x="500" y="142" class="service-text" fill="#1a1a1a" font-size="21">Yoga &amp; Personal Growth</text>
+  <text x="500" y="171" class="service-text" fill="#1a1a1a" font-size="21">Professional Photographer</text>
+
+  <!-- Column 3 (BLACK) -->
+  <text x="770" y="55" class="service-text" fill="#1a1a1a" font-size="21">Security Services</text>
+  <text x="770" y="84" class="service-text" fill="#1a1a1a" font-size="21">Cleaning Services</text>
+  <text x="770" y="113" class="service-text" fill="#1a1a1a" font-size="21">Driver Services</text>
+  <text x="770" y="142" class="service-text" fill="#1a1a1a" font-size="21">Babysitting</text>
+  <text x="770" y="171" class="service-text" fill="#1a1a1a" font-size="21">Private jet</text>
+</svg>
