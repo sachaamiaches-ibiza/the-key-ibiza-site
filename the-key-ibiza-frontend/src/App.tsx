@@ -283,6 +283,16 @@ const App: React.FC = () => {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // Clean up ?loaded=true from URL (used by OG redirect system)
+  // This ensures shared links go through the backend for correct meta tags
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('loaded')) {
+      url.searchParams.delete('loaded');
+      window.history.replaceState(window.history.state, '', url.pathname);
+    }
+  }, []);
   const [serviceIndex, setServiceIndex] = useState(0);
   const [serviceVisible, setServiceVisible] = useState(true);
   const [mobileVillaIndex, setMobileVillaIndex] = useState(0);
