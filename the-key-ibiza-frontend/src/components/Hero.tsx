@@ -6,9 +6,10 @@ import { Language } from '../types';
 interface HeroProps {
   onNavigate: (view: any) => void;
   lang: Language;
+  onOpenContact?: () => void;
 }
 
-const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
+const Hero: React.FC<HeroProps> = ({ onNavigate, lang, onOpenContact }) => {
   const [circleTopVisible, setCircleTopVisible] = useState(false);
   const [logoVisible, setLogoVisible] = useState(false);
   const [claimVisible, setClaimVisible] = useState(false);
@@ -184,7 +185,7 @@ const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
               Explore Our World
             </button>
             <button
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => onOpenContact?.()}
               className="px-8 py-3.5 rounded-full"
               style={{
                 backgroundColor: '#0B1C26',

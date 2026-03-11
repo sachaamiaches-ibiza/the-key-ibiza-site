@@ -782,7 +782,7 @@ const App: React.FC = () => {
         }
         return (
           <>
-            <Hero onNavigate={setView} lang={lang} />
+            <Hero onNavigate={setView} lang={lang} onOpenContact={handleOpenContact} />
             
             <section id="explore-world" className="w-full overflow-hidden scroll-mt-24" style={{ height: '240px', backgroundColor: '#0B1C26' }}>
               <div className="relative w-full h-full flex items-center justify-center">
