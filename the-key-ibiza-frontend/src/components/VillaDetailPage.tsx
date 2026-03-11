@@ -191,7 +191,13 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
 
   // Apply Cloudinary optimization to gallery images
   const allGalleryImages = (villa.gallery || []).map(img => getGalleryImageUrl(img));
-  const occupiedDates = villa.occupiedDates || [];
+
+  // State for blocked dates from iCal
+  const [icalBlockedDates, setIcalBlockedDates] = useState<string[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(true);
+
+  // Combine villa's occupiedDates with iCal blocked dates
+  const occupiedDates = [...(villa.occupiedDates || []), ...icalBlockedDates];
 
   const reviews = [
     { name: 'James H.', rating: 5, text: 'Absolutely stunning villa with breathtaking views. The Key team delivered exceptional service throughout our stay.', date: 'August 2024', isGoogleVerified: true },
@@ -200,6 +206,44 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   ];
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Fetch blocked dates from iCal
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      if (!villa.icalUrl && !villa.id) {
+        setAvailabilityLoading(false);
+        return;
+      }
+
+      try {
+        // Create slug from villa name
+        const villaSlug = villa.name
+          .toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim();
+
+        const response = await fetch(
+          `https://the-key-ibiza-backend.vercel.app/villas/${villaSlug}/availability`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.blockedDates && data.blockedDates.length > 0) {
+            setIcalBlockedDates(data.blockedDates);
+            console.log(`📅 Loaded ${data.blockedDates.length} blocked dates for ${villa.name} from ${data.source}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching availability:', error);
+      }
+      setAvailabilityLoading(false);
+    };
+
+    fetchAvailability();
+  }, [villa.name, villa.icalUrl, villa.id]);
 
   useEffect(() => {
     const imageCount = slideshowImages.length;
@@ -1357,13 +1401,15 @@ const handlePdfPasswordSubmit = async () => {
                           }}
                           className={`aspect-square flex items-center justify-center text-[10px] md:text-xs rounded-md md:rounded-lg transition-all font-medium ${
                             day
-                              ? isDisabled
-                                ? 'bg-[#0B1C26] text-white/25 cursor-not-allowed border border-white/5'
-                                : isCheckIn || isCheckOut
-                                  ? 'bg-luxury-gold text-[#0B1C26] ring-2 ring-white/30 scale-105 cursor-pointer'
-                                  : isInRange
-                                    ? 'bg-luxury-gold/80 text-[#0B1C26] cursor-pointer'
-                                    : 'bg-white/10 text-white/70 hover:bg-luxury-gold/30 hover:scale-105 cursor-pointer'
+                              ? isOccupied
+                                ? 'bg-red-900/50 text-red-300/60 cursor-not-allowed border border-red-500/20'
+                                : isPast
+                                  ? 'bg-[#0B1C26] text-white/20 cursor-not-allowed border border-white/5'
+                                  : isCheckIn || isCheckOut
+                                    ? 'bg-luxury-gold text-[#0B1C26] ring-2 ring-white/30 scale-105 cursor-pointer'
+                                    : isInRange
+                                      ? 'bg-luxury-gold/80 text-[#0B1C26] cursor-pointer'
+                                      : 'bg-white/10 text-white/70 hover:bg-luxury-gold/30 hover:scale-105 cursor-pointer'
                               : ''
                           }`}
                           aria-disabled={isDisabled}
@@ -1389,9 +1435,10 @@ const handlePdfPasswordSubmit = async () => {
           </div>
 
           <div className="flex items-center justify-center gap-6 md:gap-8 mt-4 md:mt-6 text-[10px] md:text-xs text-white/60">
-            <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-[#0B1C26] border border-white/10"></div><span>Occupied</span></div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-red-900/50 border border-red-500/30"></div><span>Booked</span></div>
             <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-white/10"></div><span>Available</span></div>
             <div className="flex items-center gap-2"><div className="w-3 h-3 md:w-4 md:h-4 rounded bg-luxury-gold"></div><span>Selected</span></div>
+            {availabilityLoading && <div className="flex items-center gap-2"><span className="text-luxury-gold">Loading calendar...</span></div>}
           </div>
 
           {/* Message to scroll up when dates are selected */}
