@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
 import { Language } from '../types';
 
 interface BlogArticlePageProps {
@@ -149,6 +150,7 @@ const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNavigate, lan
           <div className="prose prose-invert prose-lg max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkBreaks]}
+              rehypePlugins={[rehypeRaw]}
               components={{
                 p: ({ children }) => (
                   <p className="text-white/70 text-lg leading-relaxed mb-6">{children}</p>
