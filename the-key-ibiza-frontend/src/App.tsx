@@ -14,6 +14,7 @@ import ValerieDetail from './components/ValerieDetail';
 import FrancescaDetail from './components/FrancescaDetail';
 import BlogPage from './components/BlogPage';
 import BlogArticlePage from './components/BlogArticlePage';
+import BlogPreview from './components/BlogPreview';
 import FooterSEO from './components/FooterSEO';
 import VipLogin from './components/VipLogin';
 import ComingSoon from './components/ComingSoon';
@@ -976,8 +977,17 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            <FooterSEO 
-              onNavigate={setView} 
+            {/* Blog Preview Section */}
+            <BlogPreview onNavigate={(view, slug) => {
+              if (slug) {
+                setView(`blog-article:${slug}`);
+              } else {
+                setView(view);
+              }
+            }} lang={lang} />
+
+            <FooterSEO
+              onNavigate={setView}
               lang={lang}
               title={lang === 'es' ? "Posicionamiento y Excelencia: El Referente del Lujo en Ibiza" : "Ibiza Luxury Authority: Positioning & Excellence"}
               description={lang === 'es' ? 

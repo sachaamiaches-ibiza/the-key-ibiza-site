@@ -36,6 +36,59 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate, lang }) => {
     ? articles.filter(a => a.category === selectedCategory)
     : articles;
 
+  // SEO: Update meta tags for blog page
+  useEffect(() => {
+    const originalTitle = document.title;
+    const blogTitle = 'The Key Ibiza Blog | Luxury Lifestyle & Ibiza Insights';
+    const blogDescription = 'Discover curated articles about Ibiza luxury living, exclusive villas, yacht charters, island gastronomy, nightlife, and the best experiences the island has to offer.';
+    const blogUrl = 'https://thekey-ibiza.com/blog';
+    const blogImage = 'https://res.cloudinary.com/drxf80sho/image/upload/v1772298662/95188334-C74E-4CA0-9BC5-315529D6811E_1_201_a_u27ewv.jpg';
+
+    document.title = blogTitle;
+
+    const updateMeta = (property: string, content: string, isName = false) => {
+      const selector = isName ? `meta[name="${property}"]` : `meta[property="${property}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+      if (meta) {
+        meta.content = content;
+      } else {
+        meta = document.createElement('meta');
+        if (isName) {
+          meta.name = property;
+        } else {
+          meta.setAttribute('property', property);
+        }
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    };
+
+    updateMeta('og:title', blogTitle);
+    updateMeta('og:description', blogDescription);
+    updateMeta('og:url', blogUrl);
+    updateMeta('og:image', blogImage);
+    updateMeta('og:type', 'website');
+    updateMeta('twitter:title', blogTitle);
+    updateMeta('twitter:description', blogDescription);
+    updateMeta('twitter:image', blogImage);
+    updateMeta('description', blogDescription, true);
+
+    // Add canonical link for SEO
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (canonical) {
+      canonical.href = blogUrl;
+    } else {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      canonical.href = blogUrl;
+      document.head.appendChild(canonical);
+    }
+
+    return () => {
+      document.title = originalTitle;
+    };
+  }, []);
+
   useEffect(() => {
     const fetchArticles = async () => {
       try {
