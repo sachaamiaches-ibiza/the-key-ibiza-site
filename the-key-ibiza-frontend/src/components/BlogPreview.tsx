@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Language } from '../types';
 
 interface BlogPreviewProps {
@@ -24,6 +24,9 @@ const BACKEND_URL = window.location.hostname === 'localhost'
 const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
   const [articles, setArticles] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -31,7 +34,7 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
         const res = await fetch(`${BACKEND_URL}/blog`);
         if (res.ok) {
           const data = await res.json();
-          setArticles(data.slice(0, 3)); // Only show 3 latest
+          setArticles(data.slice(0, 3));
         }
       } catch (error) {
         console.error('Error fetching blog posts:', error);
@@ -41,11 +44,90 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
     fetchArticles();
   }, []);
 
+  // Autoplay for mobile
+  useEffect(() => {
+    if (articles.length === 0) return;
+
+    const startAutoplay = () => {
+      autoplayRef.current = setInterval(() => {
+        setMobileIndex((prev) => (prev + 1) % articles.length);
+      }, 4000); // Change slide every 4 seconds
+    };
+
+    startAutoplay();
+
+    return () => {
+      if (autoplayRef.current) {
+        clearInterval(autoplayRef.current);
+      }
+    };
+  }, [articles.length]);
+
+  // Reset autoplay on manual interaction
+  const resetAutoplay = () => {
+    if (autoplayRef.current) {
+      clearInterval(autoplayRef.current);
+    }
+    autoplayRef.current = setInterval(() => {
+      setMobileIndex((prev) => (prev + 1) % articles.length);
+    }, 4000);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEnd = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEnd;
+    const threshold = 50;
+
+    if (diff > threshold && mobileIndex < articles.length - 1) {
+      setMobileIndex(mobileIndex + 1);
+      resetAutoplay();
+    } else if (diff < -threshold && mobileIndex > 0) {
+      setMobileIndex(mobileIndex - 1);
+      resetAutoplay();
+    }
+  };
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
+
+  const ArticleCard = ({ article }: { article: BlogPost }) => (
+    <article
+      onClick={() => onNavigate('blog-article', article.slug)}
+      className="group cursor-pointer"
+    >
+      <div className="aspect-[4/3] rounded-2xl overflow-hidden mb-6 border border-white/5">
+        <img
+          src={article.image_url || 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800'}
+          alt={article.title}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      </div>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <span className="text-luxury-gold uppercase tracking-widest text-[10px] font-bold">
+            {article.category}
+          </span>
+          <span className="w-1 h-1 bg-white/20 rounded-full"></span>
+          <span className="text-white/30 text-xs">
+            {formatDate(article.published_at)}
+          </span>
+        </div>
+        <h3 className="text-xl md:text-2xl font-serif text-white group-hover:text-luxury-gold transition-colors leading-tight">
+          {article.title}
+        </h3>
+        <p className="text-white/50 text-sm leading-relaxed line-clamp-2">
+          {article.excerpt}
+        </p>
+      </div>
+    </article>
+  );
 
   if (loading) {
     return (
@@ -79,45 +161,50 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
           </p>
         </div>
 
-        {/* Articles Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 mb-12">
+        {/* Desktop: Grid layout */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 mb-12">
           {articles.map((article) => (
-            <article
-              key={article.id}
-              onClick={() => onNavigate('blog-article', article.slug)}
-              className="group cursor-pointer"
-            >
-              {/* Image */}
-              <div className="aspect-[4/3] rounded-2xl overflow-hidden mb-6 border border-white/5">
-                <img
-                  src={article.image_url || 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800'}
-                  alt={article.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-
-              {/* Content */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-luxury-gold uppercase tracking-widest text-[10px] font-bold">
-                    {article.category}
-                  </span>
-                  <span className="w-1 h-1 bg-white/20 rounded-full"></span>
-                  <span className="text-white/30 text-xs">
-                    {formatDate(article.published_at)}
-                  </span>
-                </div>
-
-                <h3 className="text-xl md:text-2xl font-serif text-white group-hover:text-luxury-gold transition-colors leading-tight">
-                  {article.title}
-                </h3>
-
-                <p className="text-white/50 text-sm leading-relaxed line-clamp-2">
-                  {article.excerpt}
-                </p>
-              </div>
-            </article>
+            <ArticleCard key={article.id} article={article} />
           ))}
+        </div>
+
+        {/* Mobile: Swipeable carousel with autoplay */}
+        <div className="md:hidden mb-12">
+          <div
+            className="overflow-hidden"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(-${mobileIndex * 100}%)` }}
+            >
+              {articles.map((article) => (
+                <div key={article.id} className="w-full flex-shrink-0 px-2">
+                  <ArticleCard article={article} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Progress bar indicator */}
+          <div className="flex justify-center gap-2 mt-8">
+            {articles.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setMobileIndex(i);
+                  resetAutoplay();
+                }}
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  i === mobileIndex
+                    ? 'bg-luxury-gold w-8'
+                    : 'bg-white/20 w-2 hover:bg-white/40'
+                }`}
+                aria-label={`Go to article ${i + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* View All Button */}
