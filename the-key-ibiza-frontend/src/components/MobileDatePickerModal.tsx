@@ -122,15 +122,15 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      className="fixed inset-0 z-[9999]"
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm pointer-events-none" />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
       {/* Modal */}
       <div
-        className="relative bg-[#0B1C26] border border-white/10 rounded-2xl p-4 md:p-6 mx-auto max-w-sm md:max-w-md w-[calc(100%-2rem)] max-h-[90vh] overflow-y-auto"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0B1C26] border border-white/10 rounded-2xl p-4 md:p-6 max-w-sm md:max-w-md w-[calc(100%-2rem)] max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
