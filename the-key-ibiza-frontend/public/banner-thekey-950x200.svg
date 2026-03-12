@@ -10,9 +10,9 @@
   <!-- Background -->
   <rect width="950" height="200" fill="#0B1C26"/>
 
-  <!-- LOGO GROUP (key + THE KEY Ibiza) -->
+  <!-- LOGO GROUP (key + THE KEY Ibiza) - LEFT -->
   <!-- Key Icon -->
-  <g transform="translate(30, 20) scale(0.52)">
+  <g transform="translate(20, 20) scale(0.52)">
     <circle cx="50" cy="35" r="32" stroke="#C9B27C" stroke-width="3.5" fill="none"/>
     <circle cx="50" cy="35" r="18" stroke="#C9B27C" stroke-width="2.5" stroke-dasharray="80 20" fill="none"/>
     <path d="M50 35V130" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
@@ -23,34 +23,40 @@
     <path d="M50 130H65" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
   </g>
 
-  <!-- THE KEY text (next to key) -->
-  <text x="110" y="55" class="logo-text" fill="#C9B27C" font-size="22" font-weight="400" letter-spacing="5">THE KEY</text>
+  <!-- THE KEY text -->
+  <text x="100" y="55" class="logo-text" fill="#C9B27C" font-size="20" font-weight="400" letter-spacing="4">THE KEY</text>
+  <text x="112" y="75" class="logo-text" fill="rgba(201,178,124,0.7)" font-size="13" font-style="italic" letter-spacing="2">Ibiza</text>
 
-  <!-- Ibiza text (italic, below THE KEY) -->
-  <text x="125" y="78" class="logo-text" fill="rgba(201,178,124,0.7)" font-size="15" font-style="italic" letter-spacing="3">Ibiza</text>
+  <!-- Tagline -->
+  <text x="125" y="125" class="service-text" fill="rgba(255,255,255,0.7)" font-size="13" text-anchor="middle">Architects of bespoke stays</text>
+  <text x="125" y="145" class="service-text" fill="rgba(255,255,255,0.7)" font-size="13" text-anchor="middle">and tailored experiences.</text>
 
-  <!-- Tagline (WHITE, centered under the full logo) -->
-  <text x="135" y="135" class="service-text" fill="rgba(255,255,255,0.7)" font-size="16" text-anchor="middle">Architects of bespoke stays</text>
-  <text x="135" y="157" class="service-text" fill="rgba(255,255,255,0.7)" font-size="16" text-anchor="middle">and tailored experiences.</text>
+  <!-- LEFT COLUMN (services) -->
+  <text x="245" y="42" class="service-text" fill="#C9B27C" font-size="17">Villa rental</text>
+  <text x="245" y="66" class="service-text" fill="#C9B27C" font-size="17">Boat charter</text>
+  <text x="245" y="90" class="service-text" fill="#C9B27C" font-size="17">Private jet</text>
+  <text x="245" y="114" class="service-text" fill="#C9B27C" font-size="17">VIP Table Reservation</text>
+  <text x="245" y="138" class="service-text" fill="#C9B27C" font-size="17">Catering &amp; Bottle Service</text>
+  <text x="245" y="162" class="service-text" fill="#C9B27C" font-size="17">Personalized Events</text>
+  <text x="245" y="186" class="service-text" fill="#C9B27C" font-size="17">Night Life</text>
 
-  <!-- Column 1 -->
-  <text x="340" y="55" class="service-text" fill="#C9B27C" font-size="21">Villa rental</text>
-  <text x="340" y="84" class="service-text" fill="#C9B27C" font-size="21">Boat charter</text>
-  <text x="340" y="113" class="service-text" fill="#C9B27C" font-size="21">Night Life</text>
-  <text x="340" y="142" class="service-text" fill="#C9B27C" font-size="21">Furniture</text>
-  <text x="340" y="171" class="service-text" fill="#C9B27C" font-size="21">Deliveries</text>
+  <!-- CENTER SPACE FOR BUTTON (420-530 approx) -->
 
-  <!-- Column 2 -->
-  <text x="500" y="55" class="service-text" fill="#C9B27C" font-size="21">Catering &amp; Bottle Service</text>
-  <text x="500" y="84" class="service-text" fill="#C9B27C" font-size="21">Personalized Events</text>
-  <text x="500" y="113" class="service-text" fill="#C9B27C" font-size="21">Health &amp; Beauty Program</text>
-  <text x="500" y="142" class="service-text" fill="#C9B27C" font-size="21">Yoga &amp; Personal Growth</text>
-  <text x="500" y="171" class="service-text" fill="#C9B27C" font-size="21">Professional Photographer</text>
+  <!-- RIGHT COLUMN (services) -->
+  <text x="560" y="42" class="service-text" fill="#C9B27C" font-size="17">Health &amp; Beauty Program</text>
+  <text x="560" y="66" class="service-text" fill="#C9B27C" font-size="17">Yoga &amp; Personal Growth</text>
+  <text x="560" y="90" class="service-text" fill="#C9B27C" font-size="17">Professional Photographer</text>
+  <text x="560" y="114" class="service-text" fill="#C9B27C" font-size="17">Security Services</text>
+  <text x="560" y="138" class="service-text" fill="#C9B27C" font-size="17">Cleaning Services</text>
+  <text x="560" y="162" class="service-text" fill="#C9B27C" font-size="17">Driver Services</text>
+  <text x="560" y="186" class="service-text" fill="#C9B27C" font-size="17">Babysitting</text>
 
-  <!-- Column 3 -->
-  <text x="770" y="55" class="service-text" fill="#C9B27C" font-size="21">Security Services</text>
-  <text x="770" y="84" class="service-text" fill="#C9B27C" font-size="21">Cleaning Services</text>
-  <text x="770" y="113" class="service-text" fill="#C9B27C" font-size="21">Driver Services</text>
-  <text x="770" y="142" class="service-text" fill="#C9B27C" font-size="21">Babysitting</text>
-  <text x="770" y="171" class="service-text" fill="#C9B27C" font-size="21">Private jet</text>
+  <!-- FAR RIGHT COLUMN -->
+  <text x="780" y="42" class="service-text" fill="#C9B27C" font-size="17">Deliveries</text>
+  <text x="780" y="66" class="service-text" fill="#C9B27C" font-size="17">Furniture</text>
+  <text x="780" y="90" class="service-text" fill="#C9B27C" font-size="17">Car rental</text>
+  <text x="780" y="114" class="service-text" fill="#C9B27C" font-size="17">Airport Transfer</text>
+  <text x="780" y="138" class="service-text" fill="#C9B27C" font-size="17">Personal Shopping</text>
+  <text x="780" y="162" class="service-text" fill="#C9B27C" font-size="17">Luxury Experiences</text>
+  <text x="780" y="186" class="service-text" fill="#C9B27C" font-size="17">24/7 Concierge</text>
 </svg>
