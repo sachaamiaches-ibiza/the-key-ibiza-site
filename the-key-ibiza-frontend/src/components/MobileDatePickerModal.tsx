@@ -27,16 +27,25 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   const touchStartX = useRef<number | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Only reset state when modal OPENS (not on every render)
+  // Load existing dates when modal opens
   useEffect(() => {
     if (isOpen && !wasOpen) {
-      // Reset to allow new selection
-      setRange(undefined);
-      setSelecting('checkin');
-      setCurrentMonth(new Date());
+      // Load existing dates if available
+      const fromDate = checkIn ? new Date(checkIn) : undefined;
+      const toDate = checkOut ? new Date(checkOut) : undefined;
+
+      if (fromDate) {
+        setRange({ from: fromDate, to: toDate });
+        setSelecting(toDate ? 'checkin' : 'checkout');
+        setCurrentMonth(fromDate);
+      } else {
+        setRange(undefined);
+        setSelecting('checkin');
+        setCurrentMonth(new Date());
+      }
     }
     setWasOpen(isOpen);
-  }, [isOpen, wasOpen]);
+  }, [isOpen, wasOpen, checkIn, checkOut]);
 
   const today = new Date();
 
