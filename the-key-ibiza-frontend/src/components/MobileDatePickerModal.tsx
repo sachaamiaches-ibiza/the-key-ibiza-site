@@ -170,7 +170,11 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             .mobile-calendar-wrapper .rdp-month { width: 100%; }
             .mobile-calendar-wrapper .rdp-table { width: 100%; }
             .mobile-calendar-wrapper .rdp-caption,
-            .mobile-calendar-wrapper .rdp-nav { display: none !important; }
+            .mobile-calendar-wrapper .rdp-caption_label,
+            .mobile-calendar-wrapper .rdp-nav,
+            .mobile-calendar-wrapper .rdp-caption_dropdowns,
+            .mobile-calendar-wrapper .rdp-months_dropdown,
+            .mobile-calendar-wrapper .rdp-years_dropdown { display: none !important; }
             .mobile-calendar-wrapper .rdp-head_cell,
             .mobile-calendar-wrapper .rdp-weekday {
               color: #C4A461 !important;
