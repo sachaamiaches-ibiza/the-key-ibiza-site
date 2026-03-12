@@ -226,10 +226,12 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             .mobile-calendar-wrapper .rdp-caption_dropdowns {
               display: none !important;
             }
-            .mobile-calendar-wrapper .rdp-head_cell {
-              color: rgba(255,255,255,0.5) !important;
+            .mobile-calendar-wrapper .rdp-head_cell,
+            .mobile-calendar-wrapper .rdp-weekday {
+              color: #C4A461 !important;
               font-size: 11px;
-              font-weight: 500;
+              font-weight: 600;
+              text-transform: uppercase;
             }
             .mobile-calendar-wrapper .rdp-cell {
               color: white !important;
