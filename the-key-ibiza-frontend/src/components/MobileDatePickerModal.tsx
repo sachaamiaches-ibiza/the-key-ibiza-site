@@ -300,7 +300,6 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             selected={range}
             onSelect={handleSelect}
             month={currentMonth}
-            onMonthChange={setCurrentMonth}
             disabled={{ before: today }}
             numberOfMonths={1}
             showOutsideDays={false}
