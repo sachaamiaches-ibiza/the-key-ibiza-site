@@ -18,193 +18,124 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   checkOut,
   onDatesChange,
 }) => {
-  // Use refs for state that must NEVER reset while modal is open
-  const rangeRef = useRef<DateRange | undefined>(undefined);
-  const selectingRef = useRef<'checkin' | 'checkout'>('checkin');
-  const monthRef = useRef<Date>(new Date());
-  const initializedRef = useRef(false);
+  const [range, setRange] = useState<DateRange | undefined>(undefined);
+  const [selecting, setSelecting] = useState<'checkin' | 'checkout'>('checkin');
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
-  // Force re-render counter
-  const [, forceUpdate] = useState(0);
-  const triggerRender = useCallback(() => forceUpdate(n => n + 1), []);
-
-  // Swipe detection
+  // Track previous isOpen value and store props in refs
+  const wasOpenRef = useRef(false);
+  const checkInRef = useRef(checkIn);
+  const checkOutRef = useRef(checkOut);
   const touchStartX = useRef<number | null>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Initialize ONCE when modal opens
-  if (isOpen && !initializedRef.current) {
-    const fromDate = checkIn ? new Date(checkIn) : undefined;
-    const toDate = checkOut ? new Date(checkOut) : undefined;
+  // Keep refs in sync with props
+  checkInRef.current = checkIn;
+  checkOutRef.current = checkOut;
 
-    if (fromDate) {
-      rangeRef.current = { from: fromDate, to: toDate };
-      selectingRef.current = toDate ? 'checkin' : 'checkout';
-      monthRef.current = fromDate;
-    } else {
-      rangeRef.current = undefined;
-      selectingRef.current = 'checkin';
-      monthRef.current = new Date();
-    }
-    initializedRef.current = true;
-  }
-
-  // Reset initialization flag when modal closes
+  // Initialize ONLY when isOpen transitions from false to true
   useEffect(() => {
-    if (!isOpen) {
-      initializedRef.current = false;
+    if (isOpen && !wasOpenRef.current) {
+      // Just opened - initialize from current prop values
+      const fromDate = checkInRef.current ? new Date(checkInRef.current) : undefined;
+      const toDate = checkOutRef.current ? new Date(checkOutRef.current) : undefined;
+
+      if (fromDate) {
+        setRange({ from: fromDate, to: toDate });
+        setSelecting(toDate ? 'checkin' : 'checkout');
+        setCurrentMonth(fromDate);
+      } else {
+        setRange(undefined);
+        setSelecting('checkin');
+        setCurrentMonth(new Date());
+      }
     }
+    wasOpenRef.current = isOpen;
   }, [isOpen]);
 
   const today = new Date();
 
-  // Getters for ref values
-  const range = rangeRef.current;
-  const selecting = selectingRef.current;
-  const currentMonth = monthRef.current;
-
-  // Custom month navigation handlers
   const handlePrevMonth = useCallback(() => {
-    monthRef.current = subMonths(monthRef.current, 1);
-    triggerRender();
-  }, [triggerRender]);
+    setCurrentMonth(prev => subMonths(prev, 1));
+  }, []);
 
   const handleNextMonth = useCallback(() => {
-    monthRef.current = addMonths(monthRef.current, 1);
-    triggerRender();
-  }, [triggerRender]);
+    setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
 
-  // Swipe handlers for horizontal month navigation
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
-
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchStartX.current - touchEndX;
-
-    // Minimum swipe distance of 50px
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        // Swipe left - next month
-        handleNextMonth();
-      } else {
-        // Swipe right - previous month
-        handlePrevMonth();
-      }
+      diff > 0 ? handleNextMonth() : handlePrevMonth();
     }
-
     touchStartX.current = null;
   }, [handleNextMonth, handlePrevMonth]);
 
   const handleSelect = useCallback((newRange: DateRange | undefined) => {
-    if (!newRange?.from) {
-      return;
-    }
+    if (!newRange?.from) return;
 
-    if (selectingRef.current === 'checkin') {
-      // Starting fresh selection
-      rangeRef.current = { from: newRange.from, to: undefined };
-      selectingRef.current = 'checkout';
-      triggerRender();
+    if (selecting === 'checkin') {
+      setRange({ from: newRange.from, to: undefined });
+      setSelecting('checkout');
     } else {
-      // Selecting checkout
-      if (newRange.from && newRange.to) {
-        rangeRef.current = newRange;
-        // Auto-close after selecting both dates
-        const newCheckIn = format(newRange.from, 'yyyy-MM-dd');
-        const newCheckOut = format(newRange.to, 'yyyy-MM-dd');
-        onDatesChange(newCheckIn, newCheckOut);
+      if (newRange.to) {
+        setRange(newRange);
+        onDatesChange(format(newRange.from, 'yyyy-MM-dd'), format(newRange.to, 'yyyy-MM-dd'));
         onClose();
-      } else if (newRange.from) {
-        // User clicked a date - use it as checkout if after checkin
-        const currentRange = rangeRef.current;
-        if (currentRange?.from && newRange.from > currentRange.from) {
-          const finalRange = { from: currentRange.from, to: newRange.from };
-          rangeRef.current = finalRange;
-          // Auto-close after selecting both dates
-          const newCheckIn = format(currentRange.from, 'yyyy-MM-dd');
-          const newCheckOut = format(newRange.from, 'yyyy-MM-dd');
-          onDatesChange(newCheckIn, newCheckOut);
-          onClose();
-        } else {
-          // Start over with this date as checkin
-          rangeRef.current = { from: newRange.from, to: undefined };
-          selectingRef.current = 'checkout';
-          triggerRender();
-        }
+      } else if (range?.from && newRange.from > range.from) {
+        const finalRange = { from: range.from, to: newRange.from };
+        setRange(finalRange);
+        onDatesChange(format(range.from, 'yyyy-MM-dd'), format(newRange.from, 'yyyy-MM-dd'));
+        onClose();
+      } else {
+        setRange({ from: newRange.from, to: undefined });
+        setSelecting('checkout');
       }
     }
-  }, [onDatesChange, onClose, triggerRender]);
-
-  const handleConfirm = () => {
-    const newCheckIn = range?.from ? format(range.from, 'yyyy-MM-dd') : '';
-    const newCheckOut = range?.to ? format(range.to, 'yyyy-MM-dd') : '';
-    onDatesChange(newCheckIn, newCheckOut);
-    onClose();
-  };
+  }, [selecting, range, onDatesChange, onClose]);
 
   const handleClear = () => {
-    rangeRef.current = undefined;
-    selectingRef.current = 'checkin';
-    triggerRender();
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    setRange(undefined);
+    setSelecting('checkin');
   };
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[9999]"
-      onClick={handleBackdropClick}
-    >
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-[9999]" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
-      {/* Modal */}
       <div
         className="absolute inset-0 m-auto bg-[#0B1C26] border border-white/10 rounded-2xl p-4 md:p-6 max-w-sm md:max-w-md w-[calc(100%-2rem)] h-fit max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-white font-serif text-lg">Select Dates</h3>
-          <button
-            onClick={onClose}
-            className="text-white/50 hover:text-white p-1"
-          >
+          <button onClick={onClose} className="text-white/50 hover:text-white p-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Selection indicator */}
         <div className="flex gap-2 mb-4">
           <button
-            onClick={() => { selectingRef.current = 'checkin'; rangeRef.current = undefined; triggerRender(); }}
+            onClick={() => { setSelecting('checkin'); setRange(undefined); }}
             className={`flex-1 p-2 rounded-lg border text-center text-xs transition-all ${
-              selecting === 'checkin'
-                ? 'border-luxury-gold bg-luxury-gold/10 text-luxury-gold'
-                : 'border-white/10 text-white/50'
+              selecting === 'checkin' ? 'border-luxury-gold bg-luxury-gold/10 text-luxury-gold' : 'border-white/10 text-white/50'
             }`}
           >
             <div className="text-[8px] uppercase tracking-wider mb-1">Check-in</div>
             <div>{range?.from ? format(range.from, 'dd MMM yyyy') : '—'}</div>
           </button>
           <button
-            onClick={() => { if (rangeRef.current?.from) { selectingRef.current = 'checkout'; triggerRender(); } }}
+            onClick={() => range?.from && setSelecting('checkout')}
             className={`flex-1 p-2 rounded-lg border text-center text-xs transition-all ${
-              selecting === 'checkout'
-                ? 'border-luxury-gold bg-luxury-gold/10 text-luxury-gold'
-                : 'border-white/10 text-white/50'
+              selecting === 'checkout' ? 'border-luxury-gold bg-luxury-gold/10 text-luxury-gold' : 'border-white/10 text-white/50'
             }`}
           >
             <div className="text-[8px] uppercase tracking-wider mb-1">Check-out</div>
@@ -212,61 +143,34 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
           </button>
         </div>
 
-        {/* Custom Month Navigation */}
         <div className="flex items-center justify-between mb-3 px-1">
-          <button
-            type="button"
-            onClick={handlePrevMonth}
-            className="p-2 text-white/50 hover:text-luxury-gold active:text-luxury-gold transition-colors rounded-lg hover:bg-white/5 active:bg-white/10"
-          >
+          <button type="button" onClick={handlePrevMonth} className="p-2 text-white/50 hover:text-luxury-gold transition-colors rounded-lg hover:bg-white/5">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <span className="text-white font-medium">
-            {format(currentMonth, 'MMMM yyyy')}
-          </span>
-          <button
-            type="button"
-            onClick={handleNextMonth}
-            className="p-2 text-white/50 hover:text-luxury-gold active:text-luxury-gold transition-colors rounded-lg hover:bg-white/5 active:bg-white/10"
-          >
+          <span className="text-white font-medium">{format(currentMonth, 'MMMM yyyy')}</span>
+          <button type="button" onClick={handleNextMonth} className="p-2 text-white/50 hover:text-luxury-gold transition-colors rounded-lg hover:bg-white/5">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
 
-        {/* Swipe hint */}
         <p className="text-white/30 text-[10px] text-center mb-1">Swipe left/right to change month</p>
 
-        {/* Calendar with swipe */}
-        <div
-          ref={calendarRef}
-          className="mobile-calendar-wrapper touch-pan-y"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
+        <div className="mobile-calendar-wrapper touch-pan-y" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           <style>{`
             .mobile-calendar-wrapper .rdp {
               --rdp-cell-size: 36px;
               --rdp-accent-color: #C4A461;
-              --rdp-background-color: rgba(196, 164, 97, 0.2);
               margin: 0;
               margin-top: -8px;
             }
-            .mobile-calendar-wrapper .rdp-month {
-              width: 100%;
-            }
-            .mobile-calendar-wrapper .rdp-table {
-              width: 100%;
-            }
+            .mobile-calendar-wrapper .rdp-month { width: 100%; }
+            .mobile-calendar-wrapper .rdp-table { width: 100%; }
             .mobile-calendar-wrapper .rdp-caption,
-            .mobile-calendar-wrapper .rdp-nav,
-            .mobile-calendar-wrapper .rdp-caption_label,
-            .mobile-calendar-wrapper .rdp-caption_dropdowns {
-              display: none !important;
-            }
+            .mobile-calendar-wrapper .rdp-nav { display: none !important; }
             .mobile-calendar-wrapper .rdp-head_cell,
             .mobile-calendar-wrapper .rdp-weekday {
               color: #C4A461 !important;
@@ -274,16 +178,9 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
               font-weight: 600;
               text-transform: uppercase;
             }
-            .mobile-calendar-wrapper .rdp-cell {
-              color: white !important;
-            }
             .mobile-calendar-wrapper .rdp-day {
               color: white !important;
               font-size: 13px;
-              font-weight: 400;
-            }
-            .mobile-calendar-wrapper .rdp-button:not(.rdp-day_disabled) {
-              color: white !important;
             }
             .mobile-calendar-wrapper .rdp-day:hover:not(.rdp-day_disabled) {
               background: rgba(196, 164, 97, 0.3) !important;
@@ -291,15 +188,12 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             .mobile-calendar-wrapper .rdp-day_selected,
             .mobile-calendar-wrapper .rdp-day_range_start,
             .mobile-calendar-wrapper .rdp-day_range_end,
-            .mobile-calendar-wrapper .rdp-selected,
-            .mobile-calendar-wrapper [aria-selected="true"],
-            .mobile-calendar-wrapper .rdp-day[aria-selected="true"] {
+            .mobile-calendar-wrapper [aria-selected="true"] {
               background: #C4A461 !important;
               color: #0B1C26 !important;
               font-weight: 600;
             }
-            .mobile-calendar-wrapper .rdp-day_range_middle,
-            .mobile-calendar-wrapper .rdp-range_middle {
+            .mobile-calendar-wrapper .rdp-day_range_middle {
               background: rgba(196, 164, 97, 0.5) !important;
               color: #0B1C26 !important;
             }
@@ -322,20 +216,12 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
           />
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3 mt-4">
-          <button
-            onClick={handleClear}
-            className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-medium border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all"
-          >
+          <button onClick={handleClear} className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-medium border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all">
             Clear
           </button>
-          <button
-            onClick={handleConfirm}
-            disabled={!range?.from}
-            className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-semibold bg-luxury-gold text-luxury-blue disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Confirm
+          <button onClick={onClose} className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-semibold bg-luxury-gold text-luxury-blue">
+            Close
           </button>
         </div>
       </div>
