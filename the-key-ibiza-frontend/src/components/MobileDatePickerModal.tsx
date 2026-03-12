@@ -21,34 +21,33 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   const [range, setRange] = useState<DateRange | undefined>(undefined);
   const [selecting, setSelecting] = useState<'checkin' | 'checkout'>('checkin');
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const initializedRef = useRef(false);
+
+  // Track previous isOpen to detect open/close transition
+  const prevIsOpenRef = useRef(false);
 
   // Swipe detection
   const touchStartX = useRef<number | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Load existing dates when modal opens (only once per open)
+  // Load existing dates ONLY when modal opens (closed -> open transition)
   useEffect(() => {
-    if (isOpen) {
-      if (!initializedRef.current) {
-        // Modal just opened - initialize state once
-        const fromDate = checkIn ? new Date(checkIn) : undefined;
-        const toDate = checkOut ? new Date(checkOut) : undefined;
+    const justOpened = isOpen && !prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
 
-        if (fromDate) {
-          setRange({ from: fromDate, to: toDate });
-          setSelecting(toDate ? 'checkin' : 'checkout');
-          setCurrentMonth(fromDate);
-        } else {
-          setRange(undefined);
-          setSelecting('checkin');
-          setCurrentMonth(new Date());
-        }
-        initializedRef.current = true;
-      }
+    if (!justOpened) return;
+
+    // Modal just opened - load dates from props
+    const fromDate = checkIn ? new Date(checkIn) : undefined;
+    const toDate = checkOut ? new Date(checkOut) : undefined;
+
+    if (fromDate) {
+      setRange({ from: fromDate, to: toDate });
+      setSelecting(toDate ? 'checkin' : 'checkout');
+      setCurrentMonth(fromDate);
     } else {
-      // Modal closed - reset flag for next open
-      initializedRef.current = false;
+      setRange(undefined);
+      setSelecting('checkin');
+      setCurrentMonth(new Date());
     }
   }, [isOpen, checkIn, checkOut]);
 
@@ -101,10 +100,21 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
       // Selecting checkout
       if (newRange.from && newRange.to) {
         setRange(newRange);
+        // Auto-close after selecting both dates
+        const newCheckIn = format(newRange.from, 'yyyy-MM-dd');
+        const newCheckOut = format(newRange.to, 'yyyy-MM-dd');
+        onDatesChange(newCheckIn, newCheckOut);
+        onClose();
       } else if (newRange.from) {
         // User clicked a date - use it as checkout if after checkin
         if (range?.from && newRange.from > range.from) {
-          setRange({ from: range.from, to: newRange.from });
+          const finalRange = { from: range.from, to: newRange.from };
+          setRange(finalRange);
+          // Auto-close after selecting both dates
+          const newCheckIn = format(range.from, 'yyyy-MM-dd');
+          const newCheckOut = format(newRange.from, 'yyyy-MM-dd');
+          onDatesChange(newCheckIn, newCheckOut);
+          onClose();
         } else {
           // Start over with this date as checkin
           setRange({ from: newRange.from, to: undefined });
@@ -112,7 +122,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
         }
       }
     }
-  }, [selecting, range]);
+  }, [selecting, range, onDatesChange, onClose]);
 
   const handleConfirm = () => {
     const newCheckIn = range?.from ? format(range.from, 'yyyy-MM-dd') : '';
