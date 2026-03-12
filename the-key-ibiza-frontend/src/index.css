@@ -1,3 +1,20 @@
+@import "tailwindcss";
+
+/* ============================================
+   TAILWIND v4 CUSTOM THEME - Luxury Colors
+   ============================================ */
+@theme {
+  --color-luxury-gold: #C4A461;
+  --color-luxury-blue: #0B1C26;
+  --color-luxury-slate: #141B24;
+}
+
+/* Tu estilo personalizado adicional */
+body {
+  background-color: #0A0E14;
+  background: radial-gradient(circle at top right, #141B24 0%, #0A0E14 100%);
+  background-attachment: fixed;
+}
 
 /* ============================================
    GLOBAL TEXT COLOR FIXES - Luxury Gold Theme
@@ -83,5 +100,87 @@ textarea:-webkit-autofill {
 ::-moz-selection {
   background-color: rgba(196, 164, 97, 0.3);
   color: #ffffff;
+}
+
+/* ============================================
+   SCROLLBAR HIDE - for thumbnail strips
+   ============================================ */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================
+   GALLERY OPEN - Hide navbar
+   ============================================ */
+body.gallery-open > div > nav,
+body.gallery-open > div > header,
+body.gallery-open > nav,
+body.gallery-open > header,
+body.gallery-open [data-navbar],
+body.gallery-open .navbar-container {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ============================================
+   WISHLIST ANIMATIONS
+   ============================================ */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* ============================================
+   WHITE LABEL MODE - Hide all branding
+   ============================================ */
+body.white-label-mode [data-navbar],
+body.white-label-mode nav,
+body.white-label-mode header,
+body.white-label-mode footer,
+body.white-label-mode #contact {
+  display: none !important;
+}
+
+/* ============================================
+   IMAGE PROTECTION - Watermarks via Cloudinary
+   ============================================ */
+/*
+ * All images are served with watermarks embedded via Cloudinary.
+ * Downloads will include the logo watermark.
+ * No aggressive CSS blocking needed - watermark is the protection.
+ */
+
+/* Disable drag on images for cleaner UX */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
