@@ -198,7 +198,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
         </div>
 
         {/* Swipe hint */}
-        <p className="text-white/30 text-[10px] text-center mb-2">Swipe left/right to change month</p>
+        <p className="text-white/30 text-[10px] text-center mb-1">Swipe left/right to change month</p>
 
         {/* Calendar with swipe */}
         <div
@@ -213,6 +213,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
               --rdp-accent-color: #C4A461;
               --rdp-background-color: rgba(196, 164, 97, 0.2);
               margin: 0;
+              margin-top: -8px;
             }
             .mobile-calendar-wrapper .rdp-month {
               width: 100%;
