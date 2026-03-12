@@ -250,14 +250,18 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             }
             .mobile-calendar-wrapper .rdp-day_selected,
             .mobile-calendar-wrapper .rdp-day_range_start,
-            .mobile-calendar-wrapper .rdp-day_range_end {
+            .mobile-calendar-wrapper .rdp-day_range_end,
+            .mobile-calendar-wrapper .rdp-selected,
+            .mobile-calendar-wrapper [aria-selected="true"],
+            .mobile-calendar-wrapper .rdp-day[aria-selected="true"] {
               background: #C4A461 !important;
               color: #0B1C26 !important;
               font-weight: 600;
             }
-            .mobile-calendar-wrapper .rdp-day_range_middle {
-              background: rgba(196, 164, 97, 0.4) !important;
-              color: white !important;
+            .mobile-calendar-wrapper .rdp-day_range_middle,
+            .mobile-calendar-wrapper .rdp-range_middle {
+              background: rgba(196, 164, 97, 0.5) !important;
+              color: #0B1C26 !important;
             }
             .mobile-calendar-wrapper .rdp-day_disabled {
               color: rgba(255,255,255,0.2) !important;
