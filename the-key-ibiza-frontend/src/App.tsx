@@ -24,6 +24,7 @@ import YachtDetailPage from './components/YachtDetailPage';
 import CatamaransPage from './components/CatamaransPage';
 import VillasPage from './components/VillasPage';
 import AdminDashboard from './components/AdminDashboard';
+import InstagramCreator from './components/InstagramCreator';
 import ContactModal from './components/ContactModal';
 import WishlistBadge from './components/WishlistBadge';
 import WishlistDrawer from './components/WishlistDrawer';
@@ -734,6 +735,11 @@ const App: React.FC = () => {
     // Admin dashboard (protected - only for admins)
     if (view === 'admin-dashboard') {
       return <AdminDashboard onNavigate={setView} />;
+    }
+
+    // Instagram Creator (protected - only for admins)
+    if (view === 'instagram-creator') {
+      return <InstagramCreator onNavigate={setView} />;
     }
 
     switch (view) {

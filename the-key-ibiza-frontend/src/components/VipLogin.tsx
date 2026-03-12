@@ -117,12 +117,20 @@ const VipLogin: React.FC<VipLoginProps> = ({ onAuthChange, onNavigate }) => {
             Please enjoy the journey and feel free to contact us if you have any questions.
           </p>
           {isAdmin && onNavigate && (
-            <button
-              onClick={() => onNavigate('admin-dashboard')}
-              className="w-full bg-luxury-gold/20 border border-luxury-gold/50 text-luxury-gold py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-luxury-gold hover:text-luxury-blue transition-all mb-3"
-            >
-              Admin Dashboard
-            </button>
+            <div className="space-y-2 mb-3">
+              <button
+                onClick={() => onNavigate('admin-dashboard')}
+                className="w-full bg-luxury-gold/20 border border-luxury-gold/50 text-luxury-gold py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-luxury-gold hover:text-luxury-blue transition-all"
+              >
+                Admin Dashboard
+              </button>
+              <button
+                onClick={() => onNavigate('instagram-creator')}
+                className="w-full bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/50 text-pink-400 py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium hover:from-pink-500 hover:to-purple-500 hover:text-white transition-all"
+              >
+                Instagram Creator
+              </button>
+            </div>
           )}
           <button
             onClick={handleLogout}
