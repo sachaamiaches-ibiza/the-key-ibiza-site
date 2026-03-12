@@ -130,7 +130,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
 
       {/* Modal */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0B1C26] border border-white/10 rounded-2xl p-4 md:p-6 max-w-sm md:max-w-md w-[calc(100%-2rem)] max-h-[90vh] overflow-y-auto"
+        className="absolute inset-0 m-auto bg-[#0B1C26] border border-white/10 rounded-2xl p-4 md:p-6 max-w-sm md:max-w-md w-[calc(100%-2rem)] h-fit max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
