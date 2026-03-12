@@ -223,7 +223,6 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             .mobile-calendar-wrapper .rdp-caption,
             .mobile-calendar-wrapper .rdp-nav,
             .mobile-calendar-wrapper .rdp-caption_label,
-            .mobile-calendar-wrapper .rdp-months,
             .mobile-calendar-wrapper .rdp-caption_dropdowns {
               display: none !important;
             }
