@@ -862,51 +862,23 @@ const handlePdfPasswordSubmit = async () => {
       <div className="flex flex-col gap-3 min-[360px]:grid min-[360px]:grid-cols-2 mb-4">
         <div>
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-in</label>
-          {isMobile ? (
-            <button
-              type="button"
-              onClick={() => setMobileDatePickerOpen(true)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left"
-            >
-              {checkIn || 'Select date'}
-            </button>
-          ) : (
-            <input
-              type="date"
-              value={checkIn}
-              min={getTodayString()}
-              onChange={(e) => {
-                setCheckIn(e.target.value);
-                setTimeout(() => checkOutInputRef.current?.showPicker?.(), 100);
-              }}
-              onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-              style={{ colorScheme: 'dark' }}
-            />
-          )}
+          <button
+            type="button"
+            onClick={() => setMobileDatePickerOpen(true)}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left hover:border-luxury-gold/30"
+          >
+            {checkIn || 'Select date'}
+          </button>
         </div>
         <div>
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-out</label>
-          {isMobile ? (
-            <button
-              type="button"
-              onClick={() => setMobileDatePickerOpen(true)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left"
-            >
-              {checkOut || 'Select date'}
-            </button>
-          ) : (
-            <input
-              ref={checkOutInputRef}
-              type="date"
-              value={checkOut}
-              min={checkIn || getTodayString()}
-              onChange={(e) => setCheckOut(e.target.value)}
-              onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer"
-              style={{ colorScheme: 'dark' }}
-            />
-          )}
+          <button
+            type="button"
+            onClick={() => setMobileDatePickerOpen(true)}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left hover:border-luxury-gold/30"
+          >
+            {checkOut || 'Select date'}
+          </button>
         </div>
       </div>
 
@@ -943,19 +915,17 @@ const handlePdfPasswordSubmit = async () => {
         </div>
       ) : null}
 
-      {/* Mobile Date Picker Modal */}
-      {isMobile && (
-        <MobileDatePickerModal
-          isOpen={mobileDatePickerOpen}
-          onClose={() => setMobileDatePickerOpen(false)}
-          checkIn={checkIn}
-          checkOut={checkOut}
-          onDatesChange={(newCheckIn, newCheckOut) => {
-            setCheckIn(newCheckIn);
-            setCheckOut(newCheckOut);
-          }}
-        />
-      )}
+      {/* Date Picker Modal */}
+      <MobileDatePickerModal
+        isOpen={mobileDatePickerOpen}
+        onClose={() => setMobileDatePickerOpen(false)}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        onDatesChange={(newCheckIn, newCheckOut) => {
+          setCheckIn(newCheckIn);
+          setCheckOut(newCheckOut);
+        }}
+      />
 
       {/* VIP PDF Download Button */}
       {isVip && (
