@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
 import { format, addMonths, subMonths } from 'date-fns';
 import 'react-day-picker/dist/style.css';
@@ -18,40 +18,22 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   checkOut,
   onDatesChange,
 }) => {
-  const [range, setRange] = useState<DateRange | undefined>(undefined);
-  const [selecting, setSelecting] = useState<'checkin' | 'checkout'>('checkin');
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  // Initialize state directly from props (component is remounted each time modal opens)
+  const [range, setRange] = useState<DateRange | undefined>(() => {
+    const fromDate = checkIn ? new Date(checkIn) : undefined;
+    const toDate = checkOut ? new Date(checkOut) : undefined;
+    return fromDate ? { from: fromDate, to: toDate } : undefined;
+  });
 
-  // Track previous isOpen value and store props in refs
-  const wasOpenRef = useRef(false);
-  const checkInRef = useRef(checkIn);
-  const checkOutRef = useRef(checkOut);
+  const [selecting, setSelecting] = useState<'checkin' | 'checkout'>(() => {
+    return (checkIn && checkOut) ? 'checkin' : (checkIn ? 'checkout' : 'checkin');
+  });
+
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => {
+    return checkIn ? new Date(checkIn) : new Date();
+  });
+
   const touchStartX = useRef<number | null>(null);
-
-  // Keep refs in sync with props
-  checkInRef.current = checkIn;
-  checkOutRef.current = checkOut;
-
-  // Initialize ONLY when isOpen transitions from false to true
-  useEffect(() => {
-    if (isOpen && !wasOpenRef.current) {
-      // Just opened - initialize from current prop values
-      const fromDate = checkInRef.current ? new Date(checkInRef.current) : undefined;
-      const toDate = checkOutRef.current ? new Date(checkOutRef.current) : undefined;
-
-      if (fromDate) {
-        setRange({ from: fromDate, to: toDate });
-        setSelecting(toDate ? 'checkin' : 'checkout');
-        setCurrentMonth(fromDate);
-      } else {
-        setRange(undefined);
-        setSelecting('checkin');
-        setCurrentMonth(new Date());
-      }
-    }
-    wasOpenRef.current = isOpen;
-  }, [isOpen]);
-
   const today = new Date();
 
   const handlePrevMonth = useCallback(() => {

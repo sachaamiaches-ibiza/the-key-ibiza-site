@@ -91,6 +91,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   // Mobile date picker
   const isMobile = useIsMobile();
   const [mobileDatePickerOpen, setMobileDatePickerOpen] = useState(false);
+  const [datePickerKey, setDatePickerKey] = useState(0);
 
   // VIP PDF download state
   const [pdfDropdownOpen, setPdfDropdownOpen] = useState(false);
@@ -864,7 +865,7 @@ const handlePdfPasswordSubmit = async () => {
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-in</label>
           <button
             type="button"
-            onClick={() => setMobileDatePickerOpen(true)}
+            onClick={() => { setDatePickerKey(k => k + 1); setMobileDatePickerOpen(true); }}
             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left hover:border-luxury-gold/30"
           >
             {checkIn || 'Select date'}
@@ -874,7 +875,7 @@ const handlePdfPasswordSubmit = async () => {
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-out</label>
           <button
             type="button"
-            onClick={() => setMobileDatePickerOpen(true)}
+            onClick={() => { setDatePickerKey(k => k + 1); setMobileDatePickerOpen(true); }}
             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left hover:border-luxury-gold/30"
           >
             {checkOut || 'Select date'}
@@ -930,6 +931,7 @@ const handlePdfPasswordSubmit = async () => {
 
       {/* Date Picker Modal */}
       <MobileDatePickerModal
+        key={datePickerKey}
         isOpen={mobileDatePickerOpen}
         onClose={() => setMobileDatePickerOpen(false)}
         checkIn={checkIn}
