@@ -91,6 +91,72 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
   const [showMap, setShowMap] = useState(false);
   const VILLAS_PER_PAGE = 21; // ~5 pages for 105 villas
 
+  // Availability data for each villa (villaSlug -> blockedDates[])
+  const [villaAvailability, setVillaAvailability] = useState<Record<string, string[]>>({});
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+
+  // Fetch availability for all villas
+  useEffect(() => {
+    const fetchAllAvailability = async () => {
+      if (villas.length === 0) return;
+
+      setAvailabilityLoading(true);
+      const availability: Record<string, string[]> = {};
+
+      // Fetch availability for villas that have iCal URLs
+      const villasWithIcal = villas.filter(v => v.icalUrl);
+
+      await Promise.all(
+        villasWithIcal.map(async (villa) => {
+          try {
+            const villaSlug = nameToUrlSlug(villa.name);
+            const response = await fetch(
+              `https://the-key-ibiza-backend.vercel.app/villas/${villaSlug}/availability`
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data.blockedDates && data.blockedDates.length > 0) {
+                availability[villaSlug] = data.blockedDates;
+              }
+            }
+          } catch (error) {
+            console.error(`Error fetching availability for ${villa.name}:`, error);
+          }
+        })
+      );
+
+      setVillaAvailability(availability);
+      setAvailabilityLoading(false);
+      console.log('📅 Loaded availability for', Object.keys(availability).length, 'villas');
+    };
+
+    fetchAllAvailability();
+  }, [villas]);
+
+  // Helper to check if a villa is available for the selected date range
+  const isVillaAvailable = (villa: Villa, checkIn: string, checkOut: string): boolean => {
+    if (!checkIn || !checkOut) return true; // No dates selected, show all
+
+    const villaSlug = nameToUrlSlug(villa.name);
+    const blockedDates = villaAvailability[villaSlug] || [];
+
+    if (blockedDates.length === 0) return true; // No blocked dates, available
+
+    // Check if any date in the range is blocked
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+
+    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      if (blockedDates.includes(dateStr)) {
+        return false; // Found a blocked date in range
+      }
+    }
+
+    return true; // All dates available
+  };
+
   // Close filters dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -275,8 +341,8 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
           (v.amenities || v.features)?.some((f: string) => f.toLowerCase() === amenity.toLowerCase())
         );
 
-      // Availability check will be implemented with calendar integration
-      const matchAvailability = true; // TODO: Connect to calendar availability
+      // Availability check - only show villas 100% available for selected dates
+      const matchAvailability = isVillaAvailable(v, searchFilters.checkIn, searchFilters.checkOut);
 
       return matchBeds && matchLoc && matchPrice && matchSearch && matchAmenities && matchAvailability;
     });
