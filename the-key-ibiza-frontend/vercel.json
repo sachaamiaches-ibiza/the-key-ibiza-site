@@ -4,10 +4,11 @@
       "source": "/villa-:slug(.*)",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug",
       "statusCode": 307,
-      "missing": [
+      "has": [
         {
-          "type": "query",
-          "key": "loaded"
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
         }
       ]
     },
@@ -15,10 +16,11 @@
       "source": "/yacht-:slug(.*)",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug",
       "statusCode": 307,
-      "missing": [
+      "has": [
         {
-          "type": "query",
-          "key": "loaded"
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
         }
       ]
     },
@@ -26,10 +28,11 @@
       "source": "/blog-:slug(.*)",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug",
       "statusCode": 307,
-      "missing": [
+      "has": [
         {
-          "type": "query",
-          "key": "loaded"
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
         }
       ]
     }
@@ -37,17 +40,13 @@
   "rewrites": [
     {
       "source": "/wishlist/:code",
-      "destination": "https://the-key-ibiza-backend.vercel.app/share/wishlist/:code",
-      "missing": [
-        {
-          "type": "query",
-          "key": "loaded"
-        }
-      ]
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/wishlist/:code"
     },
     {
-      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/).*)",
+      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/|favicon|apple-touch).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "trailingSlash": false,
+  "cleanUrls": true
 }
