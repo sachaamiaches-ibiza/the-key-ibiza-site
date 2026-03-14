@@ -3,70 +3,191 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Message, Language } from '../types';
 import { LogoTheKey } from './Navbar';
 import { translations } from '../translations';
-import { getAIConciergeResponse, getAISuggestion } from '../services/gemini';
 
 interface AIConciergeProps {
   lang: Language;
 }
 
 type RequestType = 'villa' | 'boat' | 'service' | 'property' | null;
-type Mode = 'options' | 'guided' | 'ai-chat' | 'contact' | 'complete';
+type Mode = 'options' | 'guided' | 'contact' | 'complete';
 
 interface CollectedData {
   requestType: RequestType;
   dates?: string;
   guests?: string;
   budget?: string;
-  specific?: string;
-  boatDate?: string;
-  boatGuests?: string;
-  boatBudget?: string;
-  serviceDate?: string;
-  serviceGuests?: string;
+  boatType?: string;
   serviceType?: string;
-  serviceDescription?: string;
   propertyType?: string;
-  propertyArea?: string;
-  propertyBudget?: string;
-  propertyUse?: string;
-  propertySpecific?: string;
+  area?: string;
   fullName?: string;
   phone?: string;
   email?: string;
 }
 
-const VILLA_STEPS = [
-  { key: 'dates', question: 'Which dates are you considering for your stay in Ibiza?' },
-  { key: 'guests', question: 'How many guests, or how many bedrooms would you prefer?' },
-  { key: 'budget', question: 'Do you have a budget range in mind?' },
-  { key: 'specific', question: 'Any special wishes for your stay? (sea view, pool, location...)' },
+interface QuickOption {
+  label: string;
+  value: string;
+}
+
+interface Step {
+  key: string;
+  question: string;
+  options: QuickOption[];
+  allowCustom?: boolean;
+}
+
+const VILLA_STEPS: Step[] = [
+  {
+    key: 'dates',
+    question: 'When are you planning your stay?',
+    options: [
+      { label: '📅 This month', value: 'This month' },
+      { label: '🌴 Next month', value: 'Next month' },
+      { label: '☀️ Summer 2026', value: 'Summer 2026' },
+      { label: '🗓️ Flexible', value: 'Flexible dates' },
+    ]
+  },
+  {
+    key: 'guests',
+    question: 'How many guests?',
+    options: [
+      { label: '👫 2-4', value: '2-4 guests' },
+      { label: '👨‍👩‍👧‍👦 5-8', value: '5-8 guests' },
+      { label: '👥 9-12', value: '9-12 guests' },
+      { label: '🎉 12+', value: '12+ guests' },
+    ]
+  },
+  {
+    key: 'budget',
+    question: 'Weekly budget range?',
+    options: [
+      { label: '💰 < €10k', value: 'Under €10,000/week' },
+      { label: '💎 €10-25k', value: '€10,000-25,000/week' },
+      { label: '👑 €25-50k', value: '€25,000-50,000/week' },
+      { label: '🏆 €50k+', value: 'Over €50,000/week' },
+    ]
+  },
 ];
 
-const BOAT_STEPS = [
-  { key: 'boatDate', question: 'Which date are you thinking for your charter?' },
-  { key: 'boatGuests', question: 'How many guests will be joining you?' },
-  { key: 'boatBudget', question: 'Do you have a budget range in mind?' },
+const BOAT_STEPS: Step[] = [
+  {
+    key: 'boatType',
+    question: 'What type of charter?',
+    options: [
+      { label: '🛥️ Day trip', value: 'Day trip (8h)' },
+      { label: '🌅 Sunset cruise', value: 'Sunset cruise (4h)' },
+      { label: '⛵ Multi-day', value: 'Multi-day charter' },
+      { label: '🎊 Party boat', value: 'Party/Event charter' },
+    ]
+  },
+  {
+    key: 'guests',
+    question: 'How many guests?',
+    options: [
+      { label: '👫 2-6', value: '2-6 guests' },
+      { label: '👥 7-12', value: '7-12 guests' },
+      { label: '🎉 12-20', value: '12-20 guests' },
+      { label: '🛳️ 20+', value: '20+ guests' },
+    ]
+  },
+  {
+    key: 'budget',
+    question: 'Budget range?',
+    options: [
+      { label: '💰 < €2k', value: 'Under €2,000' },
+      { label: '💎 €2-5k', value: '€2,000-5,000' },
+      { label: '👑 €5-15k', value: '€5,000-15,000' },
+      { label: '🏆 €15k+', value: 'Over €15,000' },
+    ]
+  },
 ];
 
-const SERVICE_STEPS = [
-  { key: 'serviceDate', question: 'Which date do you have in mind?' },
-  { key: 'serviceGuests', question: 'Approximately how many guests?' },
-  { key: 'serviceType', question: 'What type of service or event?' },
-  { key: 'serviceDescription', question: 'Could you share more details about what you envision?' },
+const SERVICE_STEPS: Step[] = [
+  {
+    key: 'serviceType',
+    question: 'What service do you need?',
+    options: [
+      { label: '👨‍🍳 Private Chef', value: 'Private Chef' },
+      { label: '🎉 Event Planning', value: 'Event Planning' },
+      { label: '💆 Wellness & Spa', value: 'Wellness & Spa' },
+      { label: '🚗 Driver & Security', value: 'Driver & Security' },
+    ]
+  },
+  {
+    key: 'guests',
+    question: 'How many people?',
+    options: [
+      { label: '👫 2-4', value: '2-4 people' },
+      { label: '👥 5-10', value: '5-10 people' },
+      { label: '🎊 10-30', value: '10-30 people' },
+      { label: '🎪 30+', value: '30+ people' },
+    ]
+  },
+  {
+    key: 'dates',
+    question: 'When?',
+    options: [
+      { label: '📅 This week', value: 'This week' },
+      { label: '🗓️ Next week', value: 'Next week' },
+      { label: '🌴 This month', value: 'This month' },
+      { label: '⏳ Planning ahead', value: 'Planning ahead' },
+    ]
+  },
 ];
 
-const PROPERTY_STEPS = [
-  { key: 'propertyType', question: 'Villa, apartment, or land?' },
-  { key: 'propertyArea', question: 'Which area of Ibiza interests you?' },
-  { key: 'propertyBudget', question: 'What is your budget range?' },
-  { key: 'propertyUse', question: 'For personal use or investment?' },
-  { key: 'propertySpecific', question: 'Anything specific you are looking for?' },
+const PROPERTY_STEPS: Step[] = [
+  {
+    key: 'propertyType',
+    question: 'What are you looking for?',
+    options: [
+      { label: '🏡 Villa', value: 'Villa' },
+      { label: '🏢 Apartment', value: 'Apartment' },
+      { label: '🏝️ Land', value: 'Land' },
+      { label: '🏨 Commercial', value: 'Commercial property' },
+    ]
+  },
+  {
+    key: 'area',
+    question: 'Preferred area?',
+    options: [
+      { label: '🌅 Ibiza Town', value: 'Ibiza Town' },
+      { label: '🏖️ San José', value: 'San José' },
+      { label: '🌊 Santa Eulalia', value: 'Santa Eulalia' },
+      { label: '🗺️ Open to all', value: 'Open to all areas' },
+    ]
+  },
+  {
+    key: 'budget',
+    question: 'Investment range?',
+    options: [
+      { label: '💰 < €1M', value: 'Under €1M' },
+      { label: '💎 €1-3M', value: '€1-3M' },
+      { label: '👑 €3-10M', value: '€3-10M' },
+      { label: '🏆 €10M+', value: 'Over €10M' },
+    ]
+  },
 ];
 
-const CONTACT_STEPS = [
-  { key: 'fullName', question: 'May I have your full name?' },
-  { key: 'phone', question: 'And the best phone number to reach you?' },
-  { key: 'email', question: 'Finally, your email address?' },
+const CONTACT_STEPS: Step[] = [
+  {
+    key: 'fullName',
+    question: 'Your name?',
+    options: [],
+    allowCustom: true
+  },
+  {
+    key: 'phone',
+    question: 'Phone number?',
+    options: [],
+    allowCustom: true
+  },
+  {
+    key: 'email',
+    question: 'Email address?',
+    options: [],
+    allowCustom: true
+  },
 ];
 
 const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
@@ -74,34 +195,33 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Welcome to The Key Ibiza. How may I assist you today?' }
+    { role: 'assistant', content: 'Welcome to The Key Ibiza ✨\nHow can I help you today?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Flow state
   const [mode, setMode] = useState<Mode>('options');
   const [requestType, setRequestType] = useState<RequestType>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [collectedData, setCollectedData] = useState<CollectedData>({ requestType: null });
-  const [aiSuggestionShown, setAiSuggestionShown] = useState(false);
+  const [currentOptions, setCurrentOptions] = useState<QuickOption[]>([]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, currentOptions]);
 
   const resetFlow = () => {
     setMode('options');
     setRequestType(null);
     setCurrentStep(0);
     setCollectedData({ requestType: null });
-    setAiSuggestionShown(false);
-    setMessages([{ role: 'assistant', content: 'Welcome to The Key Ibiza. How may I assist you today?' }]);
+    setCurrentOptions([]);
+    setMessages([{ role: 'assistant', content: 'Welcome to The Key Ibiza ✨\nHow can I help you today?' }]);
   };
 
-  const getSteps = () => {
+  const getSteps = (): Step[] => {
     switch (requestType) {
       case 'villa': return VILLA_STEPS;
       case 'boat': return BOAT_STEPS;
@@ -112,16 +232,32 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
   };
 
   const sendEmail = async (data: CollectedData) => {
-    const typeLabel = data.requestType === 'villa' ? 'Villa rental'
-      : data.requestType === 'boat' ? 'Boat charter'
-      : data.requestType === 'service' ? 'Service / Event'
-      : 'Property purchase';
+    const typeLabels: Record<string, string> = {
+      villa: 'Villa Rental',
+      boat: 'Yacht Charter',
+      service: 'Concierge Service',
+      property: 'Property Purchase'
+    };
+    const typeLabel = typeLabels[data.requestType || ''] || 'Inquiry';
 
-    let messageContent = `Request Type: ${typeLabel}\n\n`;
+    let messageContent = `🔑 NEW ${typeLabel.toUpperCase()} REQUEST\n\n`;
+
+    const fieldLabels: Record<string, string> = {
+      dates: '📅 Dates',
+      guests: '👥 Guests',
+      budget: '💰 Budget',
+      boatType: '🛥️ Charter Type',
+      serviceType: '✨ Service',
+      propertyType: '🏡 Property Type',
+      area: '📍 Area',
+      fullName: '👤 Name',
+      phone: '📞 Phone',
+      email: '✉️ Email'
+    };
 
     Object.entries(data).forEach(([key, value]) => {
       if (value && key !== 'requestType') {
-        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        const label = fieldLabels[key] || key;
         messageContent += `${label}: ${value}\n`;
       }
     });
@@ -130,7 +266,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     formData.append('name', data.fullName || '');
     formData.append('email', data.email || '');
     formData.append('phone', data.phone || '');
-    formData.append('_subject', `AI Concierge Request – ${typeLabel}`);
+    formData.append('_subject', `🔑 ${typeLabel} Request - ${data.fullName}`);
     formData.append('message', messageContent);
     formData.append('_captcha', 'false');
     formData.append('_template', 'table');
@@ -141,7 +277,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
         body: formData,
       });
     } catch {
-      const subject = encodeURIComponent(`AI Concierge Request – ${typeLabel}`);
+      const subject = encodeURIComponent(`${typeLabel} Request`);
       const body = encodeURIComponent(messageContent);
       window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
     }
@@ -155,12 +291,14 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     setMode('guided');
     setCurrentStep(0);
 
-    const userLabel = option === 'villa' ? 'Villa rental'
-      : option === 'boat' ? 'Boat charter'
-      : option === 'service' ? 'Service / Event'
-      : 'Property purchase';
+    const labels: Record<string, string> = {
+      villa: '🏡 Villa rental',
+      boat: '⛵ Yacht charter',
+      service: '✨ Services',
+      property: '🔑 Property'
+    };
 
-    setMessages(prev => [...prev, { role: 'user', content: userLabel }]);
+    setMessages(prev => [...prev, { role: 'user', content: labels[option] }]);
 
     const steps = option === 'villa' ? VILLA_STEPS
       : option === 'boat' ? BOAT_STEPS
@@ -169,166 +307,125 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
 
     setTimeout(() => {
       setMessages(prev => [...prev, { role: 'assistant', content: steps[0].question }]);
-    }, 400);
+      setCurrentOptions(steps[0].options);
+    }, 300);
   };
 
-  const handleAskAI = () => {
-    setMode('ai-chat');
-    setMessages(prev => [...prev, {
-      role: 'assistant',
-      content: 'Feel free to ask me anything about Ibiza, our villas, yachts, or services. I\'m here to help!'
-    }]);
-  };
+  const handleQuickReply = (value: string) => {
+    const steps = mode === 'contact' ? CONTACT_STEPS : getSteps();
+    const currentKey = steps[currentStep].key as keyof CollectedData;
+    const newData = { ...collectedData, [currentKey]: value };
+    setCollectedData(newData);
+    setCurrentOptions([]);
 
-  const fetchAISuggestion = async () => {
-    if (!requestType || aiSuggestionShown) return;
+    setMessages(prev => [...prev, { role: 'user', content: value }]);
 
-    setIsLoading(true);
-    setAiSuggestionShown(true);
-
-    try {
-      const suggestion = await getAISuggestion(requestType, collectedData as Record<string, string>, lang);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `✨ Based on your preferences:\n\n${suggestion}\n\nWould you like to proceed with your contact details, or ask me anything else?`
-      }]);
-    } catch {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: 'I have noted your preferences. Would you like to leave your contact details so our team can prepare personalized recommendations?'
-      }]);
-    }
-
-    setIsLoading(false);
-  };
-
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-
-    const userInput = input.trim();
-    setMessages(prev => [...prev, { role: 'user', content: userInput }]);
-    setInput('');
-    setIsLoading(true);
-
-    if (mode === 'ai-chat') {
-      // Free AI chat
-      try {
-        const response = await getAIConciergeResponse(userInput, messages, lang, {
-          requestType: requestType || undefined,
-          collectedData: collectedData as Record<string, string>
-        });
-        setMessages(prev => [...prev, { role: 'assistant', content: response }]);
-      } catch {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: 'I apologize, I encountered an issue. Please try again.'
-        }]);
-      }
-      setIsLoading(false);
-      return;
-    }
-
-    if (mode === 'contact') {
-      const contactSteps = CONTACT_STEPS;
-      const currentKey = contactSteps[currentStep].key as keyof CollectedData;
-      const newData = { ...collectedData, [currentKey]: userInput };
-      setCollectedData(newData);
-
-      setTimeout(() => {
-        if (currentStep < contactSteps.length - 1) {
+    setTimeout(() => {
+      if (mode === 'contact') {
+        if (currentStep < CONTACT_STEPS.length - 1) {
           setCurrentStep(currentStep + 1);
-          setMessages(prev => [...prev, { role: 'assistant', content: contactSteps[currentStep + 1].question }]);
+          setMessages(prev => [...prev, { role: 'assistant', content: CONTACT_STEPS[currentStep + 1].question }]);
         } else {
           setMode('complete');
           sendEmail(newData);
           setMessages(prev => [...prev, {
             role: 'assistant',
-            content: '🔑 Thank you! Our team will contact you shortly with personalized recommendations. We look forward to making your Ibiza experience unforgettable.'
+            content: '🔑 Perfect! Our team will contact you within 2 hours with personalized recommendations.\n\nThank you for choosing The Key Ibiza!'
           }]);
         }
-        setIsLoading(false);
-      }, 400);
-      return;
-    }
-
-    if (mode === 'guided') {
-      const steps = getSteps();
-      const currentKey = steps[currentStep].key as keyof CollectedData;
-      const newData = { ...collectedData, [currentKey]: userInput };
-      setCollectedData(newData);
-
-      setTimeout(async () => {
+      } else {
         if (currentStep < steps.length - 1) {
           setCurrentStep(currentStep + 1);
           setMessages(prev => [...prev, { role: 'assistant', content: steps[currentStep + 1].question }]);
-          setIsLoading(false);
+          setCurrentOptions(steps[currentStep + 1].options);
         } else {
-          // All questions answered - move to contact
+          // Move to contact
           setMode('contact');
           setCurrentStep(0);
           setMessages(prev => [...prev, {
             role: 'assistant',
-            content: 'Perfect! Let me take your contact details so our team can prepare personalized recommendations.'
+            content: '✨ Excellent choices! Just a few details to reach you:'
           }]);
           setTimeout(() => {
             setMessages(prev => [...prev, { role: 'assistant', content: CONTACT_STEPS[0].question }]);
-            setIsLoading(false);
-          }, 1000);
+          }, 500);
         }
-      }, 400);
-    }
+      }
+    }, 300);
   };
 
-  const showOptions = mode === 'options';
+  const handleSend = () => {
+    if (!input.trim()) return;
+    handleQuickReply(input.trim());
+    setInput('');
+  };
+
+  const showMainOptions = mode === 'options';
+  const showQuickReplies = mode === 'guided' && currentOptions.length > 0;
+  const needsTextInput = mode === 'contact';
   const isComplete = mode === 'complete';
-  const canType = !showOptions && !isComplete;
 
   return (
     <div className="fixed bottom-8 right-8 lg:bottom-12 lg:right-12 z-[100]">
       {isOpen ? (
-        <div className="bg-luxury-blue/98 border border-white/10 w-[340px] md:w-96 lg:w-[420px] rounded-[40px] overflow-hidden shadow-2xl backdrop-blur-3xl animate-slide-up ring-1 ring-white/5">
+        <div className="bg-luxury-blue/98 border border-white/10 w-[340px] md:w-96 lg:w-[400px] rounded-[32px] overflow-hidden shadow-2xl backdrop-blur-3xl animate-slide-up ring-1 ring-white/5">
           {/* Header */}
-          <div className="bg-luxury-gold/5 p-6 border-b border-white/5 flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <LogoTheKey className="w-8 h-12 text-luxury-gold" />
+          <div className="bg-luxury-gold/5 p-5 border-b border-white/5 flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <LogoTheKey className="w-7 h-10 text-luxury-gold" />
               <div>
-                <h3 className="font-serif text-lg text-luxury-gold tracking-wide leading-none">{t.title}</h3>
-                <p className="text-[9px] uppercase tracking-[0.25em] text-white/40 mt-1 font-medium">{t.subtitle}</p>
+                <h3 className="font-serif text-base text-luxury-gold tracking-wide leading-none">{t.title}</h3>
+                <p className="text-[8px] uppercase tracking-[0.2em] text-white/40 mt-1">{t.subtitle}</p>
               </div>
             </div>
-            <button onClick={() => { setIsOpen(false); resetFlow(); }} className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white/30 hover:text-white hover:bg-white/10 transition-all">
+            <button onClick={() => { setIsOpen(false); resetFlow(); }} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/30 hover:text-white hover:bg-white/10 transition-all">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
           </div>
 
           {/* Messages */}
-          <div ref={scrollRef} className="h-80 lg:h-[400px] overflow-y-auto p-6 space-y-4 text-sm font-light no-scrollbar">
+          <div ref={scrollRef} className="h-72 lg:h-80 overflow-y-auto p-4 space-y-3 text-sm font-light no-scrollbar">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-[20px] ${m.role === 'user'
+                <div className={`max-w-[85%] px-4 py-3 rounded-2xl whitespace-pre-wrap ${m.role === 'user'
                   ? 'bg-luxury-gold text-luxury-blue font-medium'
-                  : 'bg-white/5 text-white/80 border border-white/10 leading-relaxed whitespace-pre-wrap'}`}>
+                  : 'bg-white/5 text-white/90 border border-white/10'}`}>
                   {m.content}
                 </div>
               </div>
             ))}
 
-            {/* Options */}
-            {showOptions && (
-              <div className="space-y-2.5 pt-2">
+            {/* Main Options */}
+            {showMainOptions && (
+              <div className="grid grid-cols-2 gap-2 pt-2">
                 {[
-                  { id: 'villa' as const, label: '🏡 Villa rental', desc: 'Luxury villas with pool' },
-                  { id: 'boat' as const, label: '⛵ Yacht charter', desc: 'Yachts & catamarans' },
-                  { id: 'service' as const, label: '✨ Services', desc: 'Chef, events, wellness...' },
-                  { id: 'property' as const, label: '🔑 Buy property', desc: 'Investment & lifestyle' },
+                  { id: 'villa' as const, emoji: '🏡', label: 'Villa' },
+                  { id: 'boat' as const, emoji: '⛵', label: 'Yacht' },
+                  { id: 'service' as const, emoji: '✨', label: 'Services' },
+                  { id: 'property' as const, emoji: '🔑', label: 'Buy' },
                 ].map(opt => (
                   <button
                     key={opt.id}
                     onClick={() => handleOptionSelect(opt.id)}
-                    className="w-full p-3.5 rounded-2xl bg-white/5 border border-white/10 text-left hover:bg-luxury-gold/10 hover:border-luxury-gold/30 transition-all group"
+                    className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-luxury-gold/10 hover:border-luxury-gold/30 transition-all text-center"
                   >
-                    <span className="text-white/90 group-hover:text-luxury-gold transition-colors">{opt.label}</span>
-                    <span className="text-white/40 text-xs ml-2">{opt.desc}</span>
+                    <span className="text-2xl block mb-1">{opt.emoji}</span>
+                    <span className="text-white/80 text-xs">{opt.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Quick Reply Buttons */}
+            {showQuickReplies && (
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {currentOptions.map((opt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleQuickReply(opt.value)}
+                    className="p-3 rounded-xl bg-luxury-gold/10 border border-luxury-gold/30 text-luxury-gold text-xs hover:bg-luxury-gold/20 transition-all text-left"
+                  >
+                    {opt.label}
                   </button>
                 ))}
               </div>
@@ -336,7 +433,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white/5 p-4 rounded-2xl flex items-center space-x-2">
+                <div className="bg-white/5 px-4 py-3 rounded-2xl flex items-center space-x-2">
                   <div className="w-2 h-2 bg-luxury-gold rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-luxury-gold rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                   <div className="w-2 h-2 bg-luxury-gold rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
@@ -345,35 +442,48 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
             )}
           </div>
 
-          {/* Input */}
-          <div className="p-4 bg-white/5 border-t border-white/5 flex space-x-3">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={isComplete ? 'Conversation ended' : (showOptions ? 'Select an option above...' : t.placeholder)}
-              disabled={!canType}
-              className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2.5 text-white placeholder-white/25 disabled:opacity-50"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!canType || !input.trim()}
-              className="bg-luxury-gold text-luxury-blue w-11 h-11 rounded-xl flex items-center justify-center border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold transition-all disabled:opacity-40"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-              </svg>
-            </button>
-          </div>
+          {/* Input - only for contact info */}
+          {needsTextInput && !isComplete && (
+            <div className="p-3 bg-white/5 border-t border-white/5 flex space-x-2">
+              <input
+                type={currentStep === 2 ? 'email' : currentStep === 1 ? 'tel' : 'text'}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                placeholder={currentStep === 0 ? 'John Smith' : currentStep === 1 ? '+34 600 000 000' : 'email@example.com'}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-luxury-gold/50"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                className="bg-luxury-gold text-luxury-blue w-12 h-12 rounded-xl flex items-center justify-center hover:bg-luxury-gold/80 transition-all disabled:opacity-40"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* Restart button when complete */}
+          {isComplete && (
+            <div className="p-3 bg-white/5 border-t border-white/5">
+              <button
+                onClick={resetFlow}
+                className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm hover:bg-white/10 transition-all"
+              >
+                Start new conversation
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center transition-all duration-500 group border border-luxury-gold/30 hover:border-luxury-gold/60 hover:scale-105"
+          className="w-16 h-16 lg:w-18 lg:h-18 rounded-2xl flex items-center justify-center transition-all duration-500 group border border-luxury-gold/30 hover:border-luxury-gold/60 hover:scale-105 shadow-xl"
           style={{ backgroundColor: 'rgba(8, 20, 28, 0.95)' }}
         >
-          <LogoTheKey className="w-8 h-12 lg:w-10 lg:h-14 text-luxury-gold transition-all duration-500 group-hover:scale-110" />
+          <LogoTheKey className="w-8 h-11 text-luxury-gold transition-all duration-500 group-hover:scale-110" />
         </button>
       )}
     </div>
