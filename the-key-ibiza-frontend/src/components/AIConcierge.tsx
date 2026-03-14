@@ -32,40 +32,79 @@ interface QuickOption {
 
 interface Step {
   key: string;
-  question: string;
-  options: QuickOption[];
+  question: Record<Language, string>;
+  options: { label: string; value: Record<Language, string> }[];
   allowCustom?: boolean;
 }
+
+// Translations for the concierge
+const conciergeStrings = {
+  welcome: {
+    en: 'Welcome to The Key Ibiza ✨\nHow can I help you today?',
+    fr: 'Bienvenue chez The Key Ibiza ✨\nComment puis-je vous aider?',
+    es: 'Bienvenido a The Key Ibiza ✨\n¿Cómo puedo ayudarte?',
+    de: 'Willkommen bei The Key Ibiza ✨\nWie kann ich Ihnen helfen?',
+  },
+  mainOptions: {
+    villa: { en: 'Villa', fr: 'Villa', es: 'Villa', de: 'Villa' },
+    boat: { en: 'Yacht', fr: 'Yacht', es: 'Yate', de: 'Yacht' },
+    service: { en: 'Services', fr: 'Services', es: 'Servicios', de: 'Services' },
+    property: { en: 'Buy', fr: 'Acheter', es: 'Comprar', de: 'Kaufen' },
+  },
+  excellent: {
+    en: '✨ Excellent choices! Just a few details to reach you:',
+    fr: '✨ Excellents choix! Quelques détails pour vous contacter:',
+    es: '✨ ¡Excelentes opciones! Unos detalles para contactarte:',
+    de: '✨ Ausgezeichnete Wahl! Noch ein paar Details:',
+  },
+  complete: {
+    en: '🔑 Perfect! Our team will contact you within 2 hours with personalized recommendations.\n\nThank you for choosing The Key Ibiza!',
+    fr: '🔑 Parfait! Notre équipe vous contactera sous 2 heures avec des recommandations personnalisées.\n\nMerci d\'avoir choisi The Key Ibiza!',
+    es: '🔑 ¡Perfecto! Nuestro equipo te contactará en 2 horas con recomendaciones personalizadas.\n\n¡Gracias por elegir The Key Ibiza!',
+    de: '🔑 Perfekt! Unser Team wird Sie innerhalb von 2 Stunden mit personalisierten Empfehlungen kontaktieren.\n\nVielen Dank, dass Sie The Key Ibiza gewählt haben!',
+  },
+  newConversation: {
+    en: 'Start new conversation',
+    fr: 'Nouvelle conversation',
+    es: 'Nueva conversación',
+    de: 'Neues Gespräch',
+  },
+  contactQuestions: {
+    name: { en: 'Your name?', fr: 'Votre nom?', es: '¿Tu nombre?', de: 'Ihr Name?' },
+    phone: { en: 'Phone number?', fr: 'Numéro de téléphone?', es: '¿Número de teléfono?', de: 'Telefonnummer?' },
+    email: { en: 'Email address?', fr: 'Adresse email?', es: '¿Correo electrónico?', de: 'E-Mail-Adresse?' },
+  },
+};
 
 const VILLA_STEPS: Step[] = [
   {
     key: 'dates',
-    question: 'When are you planning your stay?',
+    question: { en: 'When are you planning your stay?', fr: 'Quand prévoyez-vous votre séjour?', es: '¿Cuándo planeas tu estancia?', de: 'Wann planen Sie Ihren Aufenthalt?' },
     options: [
-      { label: '📅 This month', value: 'This month' },
-      { label: '🌴 Next month', value: 'Next month' },
-      { label: '☀️ Summer 2026', value: 'Summer 2026' },
-      { label: '🗓️ Flexible', value: 'Flexible dates' },
+      { label: '📅', value: { en: 'This month', fr: 'Ce mois-ci', es: 'Este mes', de: 'Diesen Monat' } },
+      { label: '🌴', value: { en: 'Next month', fr: 'Mois prochain', es: 'Próximo mes', de: 'Nächsten Monat' } },
+      { label: '☀️', value: { en: 'Summer 2026', fr: 'Été 2026', es: 'Verano 2026', de: 'Sommer 2026' } },
+      { label: '🗓️', value: { en: 'Flexible', fr: 'Flexible', es: 'Flexible', de: 'Flexibel' } },
     ]
   },
   {
     key: 'guests',
-    question: 'How many guests?',
+    question: { en: 'How many guests?', fr: 'Combien de personnes?', es: '¿Cuántos huéspedes?', de: 'Wie viele Gäste?' },
     options: [
-      { label: '👫 2-4', value: '2-4 guests' },
-      { label: '👨‍👩‍👧‍👦 5-8', value: '5-8 guests' },
-      { label: '👥 9-12', value: '9-12 guests' },
-      { label: '🎉 12+', value: '12+ guests' },
+      { label: '👫 2-4', value: { en: '2-4 guests', fr: '2-4 personnes', es: '2-4 huéspedes', de: '2-4 Gäste' } },
+      { label: '👨‍👩‍👧‍👦 5-8', value: { en: '5-8 guests', fr: '5-8 personnes', es: '5-8 huéspedes', de: '5-8 Gäste' } },
+      { label: '👥 9-12', value: { en: '9-12 guests', fr: '9-12 personnes', es: '9-12 huéspedes', de: '9-12 Gäste' } },
+      { label: '🎉 12+', value: { en: '12+ guests', fr: '12+ personnes', es: '12+ huéspedes', de: '12+ Gäste' } },
     ]
   },
   {
     key: 'budget',
-    question: 'Weekly budget range?',
+    question: { en: 'Weekly budget range?', fr: 'Budget hebdomadaire?', es: '¿Presupuesto semanal?', de: 'Wochenbudget?' },
     options: [
-      { label: '💰 < €10k', value: 'Under €10,000/week' },
-      { label: '💎 €10-25k', value: '€10,000-25,000/week' },
-      { label: '👑 €25-50k', value: '€25,000-50,000/week' },
-      { label: '🏆 €50k+', value: 'Over €50,000/week' },
+      { label: '💰 < €10k', value: { en: 'Under €10,000/week', fr: 'Moins de 10 000€/semaine', es: 'Menos de 10.000€/semana', de: 'Unter 10.000€/Woche' } },
+      { label: '💎 €10-25k', value: { en: '€10,000-25,000/week', fr: '10 000-25 000€/semaine', es: '10.000-25.000€/semana', de: '10.000-25.000€/Woche' } },
+      { label: '👑 €25-50k', value: { en: '€25,000-50,000/week', fr: '25 000-50 000€/semaine', es: '25.000-50.000€/semana', de: '25.000-50.000€/Woche' } },
+      { label: '🏆 €50k+', value: { en: 'Over €50,000/week', fr: 'Plus de 50 000€/semaine', es: 'Más de 50.000€/semana', de: 'Über 50.000€/Woche' } },
     ]
   },
 ];
@@ -73,32 +112,32 @@ const VILLA_STEPS: Step[] = [
 const BOAT_STEPS: Step[] = [
   {
     key: 'boatType',
-    question: 'What type of charter?',
+    question: { en: 'What type of charter?', fr: 'Quel type de location?', es: '¿Qué tipo de charter?', de: 'Welche Art von Charter?' },
     options: [
-      { label: '🛥️ Day trip', value: 'Day trip (8h)' },
-      { label: '🌅 Sunset cruise', value: 'Sunset cruise (4h)' },
-      { label: '⛵ Multi-day', value: 'Multi-day charter' },
-      { label: '🎊 Party boat', value: 'Party/Event charter' },
+      { label: '🛥️', value: { en: 'Day trip (8h)', fr: 'Journée (8h)', es: 'Día completo (8h)', de: 'Tagestour (8h)' } },
+      { label: '🌅', value: { en: 'Sunset cruise (4h)', fr: 'Croisière coucher de soleil (4h)', es: 'Crucero atardecer (4h)', de: 'Sonnenuntergang (4h)' } },
+      { label: '⛵', value: { en: 'Multi-day charter', fr: 'Plusieurs jours', es: 'Varios días', de: 'Mehrtägig' } },
+      { label: '🎊', value: { en: 'Party/Event', fr: 'Fête/Événement', es: 'Fiesta/Evento', de: 'Party/Event' } },
     ]
   },
   {
     key: 'guests',
-    question: 'How many guests?',
+    question: { en: 'How many guests?', fr: 'Combien de personnes?', es: '¿Cuántos invitados?', de: 'Wie viele Gäste?' },
     options: [
-      { label: '👫 2-6', value: '2-6 guests' },
-      { label: '👥 7-12', value: '7-12 guests' },
-      { label: '🎉 12-20', value: '12-20 guests' },
-      { label: '🛳️ 20+', value: '20+ guests' },
+      { label: '👫 2-6', value: { en: '2-6 guests', fr: '2-6 personnes', es: '2-6 invitados', de: '2-6 Gäste' } },
+      { label: '👥 7-12', value: { en: '7-12 guests', fr: '7-12 personnes', es: '7-12 invitados', de: '7-12 Gäste' } },
+      { label: '🎉 12-20', value: { en: '12-20 guests', fr: '12-20 personnes', es: '12-20 invitados', de: '12-20 Gäste' } },
+      { label: '🛳️ 20+', value: { en: '20+ guests', fr: '20+ personnes', es: '20+ invitados', de: '20+ Gäste' } },
     ]
   },
   {
     key: 'budget',
-    question: 'Budget range?',
+    question: { en: 'Budget range?', fr: 'Budget?', es: '¿Presupuesto?', de: 'Budget?' },
     options: [
-      { label: '💰 < €2k', value: 'Under €2,000' },
-      { label: '💎 €2-5k', value: '€2,000-5,000' },
-      { label: '👑 €5-15k', value: '€5,000-15,000' },
-      { label: '🏆 €15k+', value: 'Over €15,000' },
+      { label: '💰 < €2k', value: { en: 'Under €2,000', fr: 'Moins de 2 000€', es: 'Menos de 2.000€', de: 'Unter 2.000€' } },
+      { label: '💎 €2-5k', value: { en: '€2,000-5,000', fr: '2 000-5 000€', es: '2.000-5.000€', de: '2.000-5.000€' } },
+      { label: '👑 €5-15k', value: { en: '€5,000-15,000', fr: '5 000-15 000€', es: '5.000-15.000€', de: '5.000-15.000€' } },
+      { label: '🏆 €15k+', value: { en: 'Over €15,000', fr: 'Plus de 15 000€', es: 'Más de 15.000€', de: 'Über 15.000€' } },
     ]
   },
 ];
@@ -106,32 +145,32 @@ const BOAT_STEPS: Step[] = [
 const SERVICE_STEPS: Step[] = [
   {
     key: 'serviceType',
-    question: 'What service do you need?',
+    question: { en: 'What service do you need?', fr: 'Quel service recherchez-vous?', es: '¿Qué servicio necesitas?', de: 'Welchen Service benötigen Sie?' },
     options: [
-      { label: '👨‍🍳 Private Chef', value: 'Private Chef' },
-      { label: '🎉 Event Planning', value: 'Event Planning' },
-      { label: '💆 Wellness & Spa', value: 'Wellness & Spa' },
-      { label: '🚗 Driver & Security', value: 'Driver & Security' },
+      { label: '👨‍🍳', value: { en: 'Private Chef', fr: 'Chef Privé', es: 'Chef Privado', de: 'Privatkoch' } },
+      { label: '🎉', value: { en: 'Event Planning', fr: 'Organisation d\'événements', es: 'Organización de eventos', de: 'Eventplanung' } },
+      { label: '💆', value: { en: 'Wellness & Spa', fr: 'Bien-être & Spa', es: 'Bienestar & Spa', de: 'Wellness & Spa' } },
+      { label: '🚗', value: { en: 'Driver & Security', fr: 'Chauffeur & Sécurité', es: 'Conductor & Seguridad', de: 'Fahrer & Sicherheit' } },
     ]
   },
   {
     key: 'guests',
-    question: 'How many people?',
+    question: { en: 'How many people?', fr: 'Combien de personnes?', es: '¿Cuántas personas?', de: 'Wie viele Personen?' },
     options: [
-      { label: '👫 2-4', value: '2-4 people' },
-      { label: '👥 5-10', value: '5-10 people' },
-      { label: '🎊 10-30', value: '10-30 people' },
-      { label: '🎪 30+', value: '30+ people' },
+      { label: '👫 2-4', value: { en: '2-4 people', fr: '2-4 personnes', es: '2-4 personas', de: '2-4 Personen' } },
+      { label: '👥 5-10', value: { en: '5-10 people', fr: '5-10 personnes', es: '5-10 personas', de: '5-10 Personen' } },
+      { label: '🎊 10-30', value: { en: '10-30 people', fr: '10-30 personnes', es: '10-30 personas', de: '10-30 Personen' } },
+      { label: '🎪 30+', value: { en: '30+ people', fr: '30+ personnes', es: '30+ personas', de: '30+ Personen' } },
     ]
   },
   {
     key: 'dates',
-    question: 'When?',
+    question: { en: 'When?', fr: 'Quand?', es: '¿Cuándo?', de: 'Wann?' },
     options: [
-      { label: '📅 This week', value: 'This week' },
-      { label: '🗓️ Next week', value: 'Next week' },
-      { label: '🌴 This month', value: 'This month' },
-      { label: '⏳ Planning ahead', value: 'Planning ahead' },
+      { label: '📅', value: { en: 'This week', fr: 'Cette semaine', es: 'Esta semana', de: 'Diese Woche' } },
+      { label: '🗓️', value: { en: 'Next week', fr: 'Semaine prochaine', es: 'Próxima semana', de: 'Nächste Woche' } },
+      { label: '🌴', value: { en: 'This month', fr: 'Ce mois-ci', es: 'Este mes', de: 'Diesen Monat' } },
+      { label: '⏳', value: { en: 'Planning ahead', fr: 'À planifier', es: 'Planificando', de: 'Vorausplanung' } },
     ]
   },
 ];
@@ -139,54 +178,33 @@ const SERVICE_STEPS: Step[] = [
 const PROPERTY_STEPS: Step[] = [
   {
     key: 'propertyType',
-    question: 'What are you looking for?',
+    question: { en: 'What are you looking for?', fr: 'Que recherchez-vous?', es: '¿Qué buscas?', de: 'Was suchen Sie?' },
     options: [
-      { label: '🏡 Villa', value: 'Villa' },
-      { label: '🏢 Apartment', value: 'Apartment' },
-      { label: '🏝️ Land', value: 'Land' },
-      { label: '🏨 Commercial', value: 'Commercial property' },
+      { label: '🏡', value: { en: 'Villa', fr: 'Villa', es: 'Villa', de: 'Villa' } },
+      { label: '🏢', value: { en: 'Apartment', fr: 'Appartement', es: 'Apartamento', de: 'Wohnung' } },
+      { label: '🏝️', value: { en: 'Land', fr: 'Terrain', es: 'Terreno', de: 'Grundstück' } },
+      { label: '🏨', value: { en: 'Commercial', fr: 'Commercial', es: 'Comercial', de: 'Gewerbe' } },
     ]
   },
   {
     key: 'area',
-    question: 'Preferred area?',
+    question: { en: 'Preferred area?', fr: 'Zone préférée?', es: '¿Zona preferida?', de: 'Bevorzugte Gegend?' },
     options: [
-      { label: '🌅 Ibiza Town', value: 'Ibiza Town' },
-      { label: '🏖️ San José', value: 'San José' },
-      { label: '🌊 Santa Eulalia', value: 'Santa Eulalia' },
-      { label: '🗺️ Open to all', value: 'Open to all areas' },
+      { label: '🌅 Ibiza Town', value: { en: 'Ibiza Town', fr: 'Ibiza Town', es: 'Ibiza Town', de: 'Ibiza-Stadt' } },
+      { label: '🏖️ San José', value: { en: 'San José', fr: 'San José', es: 'San José', de: 'San José' } },
+      { label: '🌊 Santa Eulalia', value: { en: 'Santa Eulalia', fr: 'Santa Eulalia', es: 'Santa Eulalia', de: 'Santa Eulalia' } },
+      { label: '🗺️', value: { en: 'Open to all', fr: 'Ouvert à tout', es: 'Abierto a todo', de: 'Überall' } },
     ]
   },
   {
     key: 'budget',
-    question: 'Investment range?',
+    question: { en: 'Investment range?', fr: 'Budget d\'investissement?', es: '¿Rango de inversión?', de: 'Investitionsrahmen?' },
     options: [
-      { label: '💰 < €1M', value: 'Under €1M' },
-      { label: '💎 €1-3M', value: '€1-3M' },
-      { label: '👑 €3-10M', value: '€3-10M' },
-      { label: '🏆 €10M+', value: 'Over €10M' },
+      { label: '💰 < €1M', value: { en: 'Under €1M', fr: 'Moins de 1M€', es: 'Menos de 1M€', de: 'Unter 1M€' } },
+      { label: '💎 €1-3M', value: { en: '€1-3M', fr: '1-3M€', es: '1-3M€', de: '1-3M€' } },
+      { label: '👑 €3-10M', value: { en: '€3-10M', fr: '3-10M€', es: '3-10M€', de: '3-10M€' } },
+      { label: '🏆 €10M+', value: { en: 'Over €10M', fr: 'Plus de 10M€', es: 'Más de 10M€', de: 'Über 10M€' } },
     ]
-  },
-];
-
-const CONTACT_STEPS: Step[] = [
-  {
-    key: 'fullName',
-    question: 'Your name?',
-    options: [],
-    allowCustom: true
-  },
-  {
-    key: 'phone',
-    question: 'Phone number?',
-    options: [],
-    allowCustom: true
-  },
-  {
-    key: 'email',
-    question: 'Email address?',
-    options: [],
-    allowCustom: true
   },
 ];
 
@@ -195,7 +213,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Welcome to The Key Ibiza ✨\nHow can I help you today?' }
+    { role: 'assistant', content: conciergeStrings.welcome[lang] }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -204,7 +222,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
   const [requestType, setRequestType] = useState<RequestType>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [collectedData, setCollectedData] = useState<CollectedData>({ requestType: null });
-  const [currentOptions, setCurrentOptions] = useState<QuickOption[]>([]);
+  const [currentOptions, setCurrentOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -218,7 +236,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     setCurrentStep(0);
     setCollectedData({ requestType: null });
     setCurrentOptions([]);
-    setMessages([{ role: 'assistant', content: 'Welcome to The Key Ibiza ✨\nHow can I help you today?' }]);
+    setMessages([{ role: 'assistant', content: conciergeStrings.welcome[lang] }]);
   };
 
   const getSteps = (): Step[] => {
@@ -231,6 +249,13 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     }
   };
 
+  const getTranslatedOptions = (step: Step): { label: string; value: string }[] => {
+    return step.options.map(opt => ({
+      label: `${opt.label} ${opt.value[lang]}`,
+      value: opt.value[lang]
+    }));
+  };
+
   const sendEmail = async (data: CollectedData) => {
     const typeLabels: Record<string, string> = {
       villa: 'Villa Rental',
@@ -241,6 +266,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     const typeLabel = typeLabels[data.requestType || ''] || 'Inquiry';
 
     let messageContent = `🔑 NEW ${typeLabel.toUpperCase()} REQUEST\n\n`;
+    messageContent += `Language: ${lang.toUpperCase()}\n\n`;
 
     const fieldLabels: Record<string, string> = {
       dates: '📅 Dates',
@@ -291,14 +317,14 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     setMode('guided');
     setCurrentStep(0);
 
-    const labels: Record<string, string> = {
-      villa: '🏡 Villa rental',
-      boat: '⛵ Yacht charter',
-      service: '✨ Services',
-      property: '🔑 Property'
+    const labels: Record<string, Record<Language, string>> = {
+      villa: { en: '🏡 Villa rental', fr: '🏡 Location villa', es: '🏡 Alquiler villa', de: '🏡 Villa mieten' },
+      boat: { en: '⛵ Yacht charter', fr: '⛵ Location yacht', es: '⛵ Alquiler yate', de: '⛵ Yacht charter' },
+      service: { en: '✨ Services', fr: '✨ Services', es: '✨ Servicios', de: '✨ Services' },
+      property: { en: '🔑 Property', fr: '🔑 Immobilier', es: '🔑 Inmueble', de: '🔑 Immobilie' },
     };
 
-    setMessages(prev => [...prev, { role: 'user', content: labels[option] }]);
+    setMessages(prev => [...prev, { role: 'user', content: labels[option][lang] }]);
 
     const steps = option === 'villa' ? VILLA_STEPS
       : option === 'boat' ? BOAT_STEPS
@@ -306,14 +332,42 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
       : PROPERTY_STEPS;
 
     setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'assistant', content: steps[0].question }]);
-      setCurrentOptions(steps[0].options);
+      setMessages(prev => [...prev, { role: 'assistant', content: steps[0].question[lang] }]);
+      setCurrentOptions(getTranslatedOptions(steps[0]));
     }, 300);
   };
 
   const handleQuickReply = (value: string) => {
-    const steps = mode === 'contact' ? CONTACT_STEPS : getSteps();
-    const currentKey = steps[currentStep].key as keyof CollectedData;
+    const steps = getSteps();
+    const currentKey = steps[currentStep]?.key as keyof CollectedData;
+
+    if (mode === 'contact') {
+      const contactKeys = ['fullName', 'phone', 'email'];
+      const key = contactKeys[currentStep] as keyof CollectedData;
+      const newData = { ...collectedData, [key]: value };
+      setCollectedData(newData);
+      setCurrentOptions([]);
+
+      setMessages(prev => [...prev, { role: 'user', content: value }]);
+
+      setTimeout(() => {
+        if (currentStep < 2) {
+          setCurrentStep(currentStep + 1);
+          const questions = [
+            conciergeStrings.contactQuestions.name,
+            conciergeStrings.contactQuestions.phone,
+            conciergeStrings.contactQuestions.email
+          ];
+          setMessages(prev => [...prev, { role: 'assistant', content: questions[currentStep + 1][lang] }]);
+        } else {
+          setMode('complete');
+          sendEmail(newData);
+          setMessages(prev => [...prev, { role: 'assistant', content: conciergeStrings.complete[lang] }]);
+        }
+      }, 300);
+      return;
+    }
+
     const newData = { ...collectedData, [currentKey]: value };
     setCollectedData(newData);
     setCurrentOptions([]);
@@ -321,35 +375,17 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
     setMessages(prev => [...prev, { role: 'user', content: value }]);
 
     setTimeout(() => {
-      if (mode === 'contact') {
-        if (currentStep < CONTACT_STEPS.length - 1) {
-          setCurrentStep(currentStep + 1);
-          setMessages(prev => [...prev, { role: 'assistant', content: CONTACT_STEPS[currentStep + 1].question }]);
-        } else {
-          setMode('complete');
-          sendEmail(newData);
-          setMessages(prev => [...prev, {
-            role: 'assistant',
-            content: '🔑 Perfect! Our team will contact you within 2 hours with personalized recommendations.\n\nThank you for choosing The Key Ibiza!'
-          }]);
-        }
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(currentStep + 1);
+        setMessages(prev => [...prev, { role: 'assistant', content: steps[currentStep + 1].question[lang] }]);
+        setCurrentOptions(getTranslatedOptions(steps[currentStep + 1]));
       } else {
-        if (currentStep < steps.length - 1) {
-          setCurrentStep(currentStep + 1);
-          setMessages(prev => [...prev, { role: 'assistant', content: steps[currentStep + 1].question }]);
-          setCurrentOptions(steps[currentStep + 1].options);
-        } else {
-          // Move to contact
-          setMode('contact');
-          setCurrentStep(0);
-          setMessages(prev => [...prev, {
-            role: 'assistant',
-            content: '✨ Excellent choices! Just a few details to reach you:'
-          }]);
-          setTimeout(() => {
-            setMessages(prev => [...prev, { role: 'assistant', content: CONTACT_STEPS[0].question }]);
-          }, 500);
-        }
+        setMode('contact');
+        setCurrentStep(0);
+        setMessages(prev => [...prev, { role: 'assistant', content: conciergeStrings.excellent[lang] }]);
+        setTimeout(() => {
+          setMessages(prev => [...prev, { role: 'assistant', content: conciergeStrings.contactQuestions.name[lang] }]);
+        }, 500);
       }
     }, 300);
   };
@@ -364,6 +400,13 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
   const showQuickReplies = mode === 'guided' && currentOptions.length > 0;
   const needsTextInput = mode === 'contact';
   const isComplete = mode === 'complete';
+
+  const placeholders: Record<Language, string[]> = {
+    en: ['John Smith', '+34 600 000 000', 'email@example.com'],
+    fr: ['Jean Dupont', '+33 6 00 00 00 00', 'email@example.com'],
+    es: ['Juan García', '+34 600 000 000', 'email@example.com'],
+    de: ['Max Müller', '+49 170 000 0000', 'email@example.com'],
+  };
 
   return (
     <div className="fixed bottom-8 right-8 lg:bottom-12 lg:right-12 z-[100]">
@@ -399,10 +442,10 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
             {showMainOptions && (
               <div className="grid grid-cols-2 gap-2 pt-2">
                 {[
-                  { id: 'villa' as const, emoji: '🏡', label: 'Villa' },
-                  { id: 'boat' as const, emoji: '⛵', label: 'Yacht' },
-                  { id: 'service' as const, emoji: '✨', label: 'Services' },
-                  { id: 'property' as const, emoji: '🔑', label: 'Buy' },
+                  { id: 'villa' as const, emoji: '🏡', label: conciergeStrings.mainOptions.villa[lang] },
+                  { id: 'boat' as const, emoji: '⛵', label: conciergeStrings.mainOptions.boat[lang] },
+                  { id: 'service' as const, emoji: '✨', label: conciergeStrings.mainOptions.service[lang] },
+                  { id: 'property' as const, emoji: '🔑', label: conciergeStrings.mainOptions.property[lang] },
                 ].map(opt => (
                   <button
                     key={opt.id}
@@ -450,7 +493,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={currentStep === 0 ? 'John Smith' : currentStep === 1 ? '+34 600 000 000' : 'email@example.com'}
+                placeholder={placeholders[lang][currentStep]}
                 className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-luxury-gold/50"
               />
               <button
@@ -472,7 +515,7 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
                 onClick={resetFlow}
                 className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm hover:bg-white/10 transition-all"
               >
-                Start new conversation
+                {conciergeStrings.newConversation[lang]}
               </button>
             </div>
           )}
