@@ -1052,7 +1052,7 @@ const App: React.FC = () => {
             {/* Blog Preview Section */}
             <BlogPreview onNavigate={(view, slug) => {
               if (slug) {
-                setView(`blog-article:${slug}`);
+                setView(`blog-${slug}`);
               } else {
                 setView(view);
               }
