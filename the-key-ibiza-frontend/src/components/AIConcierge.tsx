@@ -263,15 +263,17 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
           setMessages(prev => [...prev, { role: 'assistant', content: steps[currentStep + 1].question }]);
           setIsLoading(false);
         } else {
-          // All questions answered - get AI suggestion then move to contact
-          setIsLoading(true);
-          await fetchAISuggestion();
+          // All questions answered - move to contact
           setMode('contact');
           setCurrentStep(0);
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: 'Perfect! Let me take your contact details so our team can prepare personalized recommendations.'
+          }]);
           setTimeout(() => {
             setMessages(prev => [...prev, { role: 'assistant', content: CONTACT_STEPS[0].question }]);
             setIsLoading(false);
-          }, 2000);
+          }, 1000);
         }
       }, 400);
     }
@@ -329,13 +331,6 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
                     <span className="text-white/40 text-xs ml-2">{opt.desc}</span>
                   </button>
                 ))}
-                <button
-                  onClick={handleAskAI}
-                  className="w-full p-3.5 rounded-2xl bg-luxury-gold/10 border border-luxury-gold/30 text-left hover:bg-luxury-gold/20 transition-all"
-                >
-                  <span className="text-luxury-gold">💬 Ask me anything</span>
-                  <span className="text-white/40 text-xs ml-2">Free conversation</span>
-                </button>
               </div>
             )}
 
