@@ -27,21 +27,21 @@ export const seoConfig: Record<string, PageSEO> = {
   'holiday-rentals': {
     en: {
       title: 'Luxury Villa Rental Ibiza | Holiday Villas with Pool | The Key Ibiza',
-      description: 'Rent exclusive luxury villas in Ibiza with private pool, sea views, and concierge service. Premium holiday rentals in Cala Jondal, Es Cubells, San Jose. Book your dream villa.',
+      description: 'Rent luxury villas in Ibiza with private pool, sea views, and concierge. Premium rentals in Cala Jondal, Es Cubells. Book now.',
       keywords: ['luxury villa rental ibiza', 'ibiza villa with pool', 'holiday villa ibiza', 'private villa ibiza', 'villa rental cala jondal', 'es cubells villa', 'san jose villa rental', 'ibiza holiday home', 'exclusive villa ibiza'],
       h1: 'Luxury Villa Rentals in Ibiza',
       h2: 'Exclusive Holiday Villas with Pool & Sea Views'
     },
     fr: {
       title: 'Location Villa de Luxe Ibiza | Villas Vacances avec Piscine | The Key Ibiza',
-      description: 'Louez des villas de luxe exclusives à Ibiza avec piscine privée, vue mer et service de conciergerie. Locations premium à Cala Jondal, Es Cubells, San Jose. Réservez votre villa de rêve.',
+      description: 'Louez des villas de luxe à Ibiza avec piscine privée et vue mer. Locations premium à Cala Jondal, Es Cubells. Réservez maintenant.',
       keywords: ['location villa luxe ibiza', 'villa ibiza avec piscine', 'location vacances ibiza', 'villa privée ibiza', 'louer villa ibiza', 'villa cala jondal', 'location villa es cubells', 'maison vacances ibiza', 'villa prestige ibiza'],
       h1: 'Location de Villas de Luxe à Ibiza',
       h2: 'Villas Exclusives avec Piscine & Vue Mer'
     },
     es: {
       title: 'Alquiler Villa de Lujo Ibiza | Villas Vacaciones con Piscina | The Key Ibiza',
-      description: 'Alquile villas de lujo exclusivas en Ibiza con piscina privada, vistas al mar y servicio de conserjería. Alquileres premium en Cala Jondal, Es Cubells, San Jose.',
+      description: 'Alquile villas de lujo en Ibiza con piscina privada y vistas al mar. Alquileres premium en Cala Jondal, Es Cubells. Reserve ahora.',
       keywords: ['alquiler villa lujo ibiza', 'villa ibiza con piscina', 'alquiler vacacional ibiza', 'villa privada ibiza', 'alquilar villa ibiza', 'villa cala jondal', 'villa es cubells', 'casa vacaciones ibiza', 'villa exclusiva ibiza'],
       h1: 'Alquiler de Villas de Lujo en Ibiza',
       h2: 'Villas Exclusivas con Piscina y Vistas al Mar'
@@ -96,7 +96,7 @@ export const seoConfig: Record<string, PageSEO> = {
     },
     fr: {
       title: 'Propriété de Luxe à Vendre Ibiza | Acheter Villa Ibiza | The Key Ibiza',
-      description: 'Propriétés de luxe exclusives à vendre à Ibiza. Achetez votre villa de rêve dans les meilleurs emplacements. Biens off-market et opportunités d\'investissement.',
+      description: 'Propriétés de luxe à vendre à Ibiza. Achetez votre villa de rêve. Biens off-market et opportunités d\'investissement.',
       keywords: ['propriété à vendre ibiza', 'acheter villa ibiza', 'immobilier luxe ibiza', 'investissement immobilier ibiza', 'villa à vendre ibiza', 'bien off-market ibiza', 'achat maison ibiza'],
       h1: 'Propriétés de Luxe à Vendre à Ibiza',
       h2: 'Villas Exclusives & Opportunités d\'Investissement'
