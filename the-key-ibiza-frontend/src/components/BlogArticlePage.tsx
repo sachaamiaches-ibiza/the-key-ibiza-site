@@ -53,6 +53,82 @@ const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNavigate, lan
     window.scrollTo(0, 0);
   }, [slug]);
 
+  // SEO: Meta tags and Article schema
+  useEffect(() => {
+    if (!article) return;
+
+    const originalTitle = document.title;
+    document.title = `${article.title} | The Key Ibiza`;
+
+    // Helper to update/create meta tags
+    const setMeta = (property: string, content: string, isName = false) => {
+      const attr = isName ? 'name' : 'property';
+      let meta = document.querySelector(`meta[${attr}="${property}"]`) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute(attr, property);
+        document.head.appendChild(meta);
+      }
+      meta.content = content;
+    };
+
+    // Meta description
+    const description = article.excerpt || article.title;
+    setMeta('description', description, true);
+    setMeta('og:title', article.title);
+    setMeta('og:description', description);
+    setMeta('og:type', 'article');
+    setMeta('og:image', article.image_url || 'https://thekey-ibiza.com/og-image.jpg');
+    setMeta('og:url', `https://thekey-ibiza.com/blog-${article.slug}`);
+    setMeta('twitter:card', 'summary_large_image', true);
+    setMeta('twitter:title', article.title, true);
+    setMeta('twitter:description', description, true);
+    setMeta('article:published_time', article.published_at);
+    setMeta('article:author', article.author || 'The Key Ibiza');
+
+    // Article Schema (JSON-LD)
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      'headline': article.title,
+      'description': description,
+      'image': article.image_url || 'https://thekey-ibiza.com/og-image.jpg',
+      'datePublished': article.published_at,
+      'author': {
+        '@type': 'Person',
+        'name': article.author || 'The Key Ibiza'
+      },
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'The Key Ibiza',
+        'logo': {
+          '@type': 'ImageObject',
+          'url': 'https://thekey-ibiza.com/logo.png'
+        }
+      },
+      'mainEntityOfPage': {
+        '@type': 'WebPage',
+        '@id': `https://thekey-ibiza.com/blog-${article.slug}`
+      }
+    };
+
+    const scriptId = 'article-schema';
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.type = 'application/ld+json';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(schema);
+
+    return () => {
+      document.title = originalTitle;
+      const el = document.getElementById(scriptId);
+      if (el) el.remove();
+    };
+  }, [article]);
+
   // Format date
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
