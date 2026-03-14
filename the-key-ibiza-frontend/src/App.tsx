@@ -15,6 +15,7 @@ import FrancescaDetail from './components/FrancescaDetail';
 import BlogPage from './components/BlogPage';
 import BlogArticlePage from './components/BlogArticlePage';
 import BlogPreview from './components/BlogPreview';
+import Testimonials from './components/Testimonials';
 import FooterSEO from './components/FooterSEO';
 import VipLogin from './components/VipLogin';
 import ComingSoon from './components/ComingSoon';
@@ -1048,6 +1049,9 @@ const App: React.FC = () => {
                 </div>
               </div>
             </section>
+
+            {/* Testimonials Section */}
+            <Testimonials />
 
             {/* Blog Preview Section */}
             <BlogPreview onNavigate={(view, slug) => {
