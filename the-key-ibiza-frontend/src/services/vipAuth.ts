@@ -74,8 +74,8 @@ export const vipAuth = {
     return session?.name || 'VIP Guest';
   },
 
-  // Get VIP level (vip or vip_pro)
-  getVipLevel: (): 'vip' | 'vip_pro' => {
+  // Get VIP level (vip, vip_pro, or admin)
+  getVipLevel: (): 'vip' | 'vip_pro' | 'admin' => {
     const session = getSession();
     return session?.vipLevel || 'vip';
   },
