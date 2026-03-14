@@ -593,21 +593,21 @@ export const seoConfig: Record<string, PageSEO> = {
   'home': {
     en: {
       title: 'The Key Ibiza | Luxury Concierge & Villa Rentals | Ibiza',
-      description: 'The Key Ibiza - Your exclusive gateway to luxury villas, yacht charters, and bespoke concierge services in Ibiza. Unlock extraordinary experiences on the White Isle.',
+      description: 'Your gateway to luxury villas, yacht charters, and bespoke concierge services in Ibiza. Unlock extraordinary experiences.',
       keywords: ['the key ibiza', 'ibiza concierge', 'luxury ibiza', 'ibiza villa rental', 'ibiza yacht charter', 'ibiza luxury services', 'vip ibiza', 'ibiza experiences'],
       h1: 'The Key Ibiza',
       h2: 'Luxury Concierge & Villa Rentals'
     },
     fr: {
       title: 'The Key Ibiza | Conciergerie de Luxe & Location de Villas | Ibiza',
-      description: 'The Key Ibiza - Votre accès exclusif aux villas de luxe, location de yachts et services de conciergerie sur mesure à Ibiza. Découvrez des expériences extraordinaires.',
+      description: 'Votre accès aux villas de luxe, yachts et services de conciergerie sur mesure à Ibiza. Vivez des expériences extraordinaires.',
       keywords: ['the key ibiza', 'conciergerie ibiza', 'luxe ibiza', 'location villa ibiza', 'location yacht ibiza', 'services luxe ibiza', 'vip ibiza', 'expériences ibiza'],
       h1: 'The Key Ibiza',
       h2: 'Conciergerie de Luxe & Location de Villas'
     },
     es: {
       title: 'The Key Ibiza | Conserjería de Lujo & Alquiler de Villas | Ibiza',
-      description: 'The Key Ibiza - Tu acceso exclusivo a villas de lujo, alquiler de yates y servicios de conserjería a medida en Ibiza. Desbloquea experiencias extraordinarias.',
+      description: 'Tu acceso a villas de lujo, yates y servicios de conserjería a medida en Ibiza. Vive experiencias extraordinarias.',
       keywords: ['the key ibiza', 'conserjería ibiza', 'lujo ibiza', 'alquiler villa ibiza', 'alquiler yate ibiza', 'servicios lujo ibiza', 'vip ibiza', 'experiencias ibiza'],
       h1: 'The Key Ibiza',
       h2: 'Conserjería de Lujo & Alquiler de Villas'
@@ -624,7 +624,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'about': {
     en: {
       title: 'About Us | The Key Ibiza | Luxury Concierge Team',
-      description: 'Meet the team behind The Key Ibiza. Local experts with 15+ years of experience curating luxury experiences, villa rentals, and bespoke services on the island.',
+      description: 'Meet the team behind The Key Ibiza. Local experts with 15+ years curating luxury experiences, villa rentals, and bespoke services.',
       keywords: ['about the key ibiza', 'ibiza concierge team', 'luxury ibiza experts', 'ibiza local experts', 'villa rental experts ibiza', 'who is the key ibiza'],
       h1: 'About The Key Ibiza',
       h2: 'Your Local Luxury Experts'
@@ -645,7 +645,7 @@ export const seoConfig: Record<string, PageSEO> = {
     },
     de: {
       title: 'Über Uns | The Key Ibiza | Luxus Concierge Team',
-      description: 'Lernen Sie das Team von The Key Ibiza kennen. Lokale Experten mit über 15 Jahren Erfahrung in Luxuserlebnissen, Villenvermietung und maßgeschneiderten Services.',
+      description: 'Das Team von The Key Ibiza. Lokale Experten mit über 15 Jahren Erfahrung in Luxuserlebnissen, Villenvermietung und Services.',
       keywords: ['über the key ibiza', 'concierge team ibiza', 'luxus experten ibiza', 'lokale experten ibiza', 'villa spezialisten ibiza'],
       h1: 'Über The Key Ibiza',
       h2: 'Ihre Lokalen Luxus-Experten'
@@ -717,7 +717,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'services': {
     en: {
       title: 'Luxury Concierge Services Ibiza | The Key Ibiza',
-      description: 'Full-service luxury concierge in Ibiza. Private chef, yacht charter, event planning, wellness, security, drivers, and more. 24/7 availability for your every need.',
+      description: 'Full-service luxury concierge in Ibiza. Private chef, yacht charter, events, wellness, security, drivers and more. Available 24/7.',
       keywords: ['concierge services ibiza', 'luxury services ibiza', 'private chef ibiza', 'ibiza vip services', 'personal assistant ibiza', '24/7 concierge ibiza', 'ibiza lifestyle services'],
       h1: 'Luxury Concierge Services',
       h2: '24/7 Bespoke Services for Your Perfect Stay'
