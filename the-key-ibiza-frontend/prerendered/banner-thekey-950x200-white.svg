@@ -1,0 +1,62 @@
+<svg width="950" height="200" viewBox="0 0 950 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&amp;display=swap');
+      .logo-text { font-family: 'Playfair Display', Georgia, serif; }
+      .service-text { font-family: 'Playfair Display', Georgia, serif; }
+    </style>
+  </defs>
+
+  <!-- Background WHITE -->
+  <rect width="950" height="200" fill="#FFFFFF"/>
+
+  <!-- LOGO GROUP (key + THE KEY Ibiza) - LEFT -->
+  <!-- Key Icon -->
+  <g transform="translate(20, 20) scale(0.52)">
+    <circle cx="50" cy="35" r="32" stroke="#C9B27C" stroke-width="3.5" fill="none"/>
+    <circle cx="50" cy="35" r="18" stroke="#C9B27C" stroke-width="2.5" stroke-dasharray="80 20" fill="none"/>
+    <path d="M50 35V130" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 65H70" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 82H82" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 99H75" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 116H88" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M50 130H65" stroke="#C9B27C" stroke-width="5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- THE KEY text -->
+  <text x="100" y="55" class="logo-text" fill="#C9B27C" font-size="20" font-weight="400" letter-spacing="4">THE KEY</text>
+  <text x="112" y="75" class="logo-text" fill="rgba(201,178,124,0.7)" font-size="13" font-style="italic" letter-spacing="2">Ibiza</text>
+
+  <!-- Tagline -->
+  <text x="125" y="125" class="service-text" fill="rgba(0,0,0,0.5)" font-size="13" text-anchor="middle">Architects of bespoke stays</text>
+  <text x="125" y="145" class="service-text" fill="rgba(0,0,0,0.5)" font-size="13" text-anchor="middle">and tailored experiences.</text>
+
+  <!-- LEFT COLUMN (services) -->
+  <text x="245" y="42" class="service-text" fill="#1a1a1a" font-size="17">Villa rental</text>
+  <text x="245" y="66" class="service-text" fill="#1a1a1a" font-size="17">Boat charter</text>
+  <text x="245" y="90" class="service-text" fill="#1a1a1a" font-size="17">Private jet</text>
+  <text x="245" y="114" class="service-text" fill="#1a1a1a" font-size="17">VIP Table Reservation</text>
+  <text x="245" y="138" class="service-text" fill="#1a1a1a" font-size="17">Catering &amp; Bottle Service</text>
+  <text x="245" y="162" class="service-text" fill="#1a1a1a" font-size="17">Personalized Events</text>
+  <text x="245" y="186" class="service-text" fill="#1a1a1a" font-size="17">Night Life</text>
+
+  <!-- CENTER SPACE FOR BUTTON (420-530 approx) -->
+
+  <!-- RIGHT COLUMN (services) -->
+  <text x="560" y="42" class="service-text" fill="#1a1a1a" font-size="17">Health &amp; Beauty Program</text>
+  <text x="560" y="66" class="service-text" fill="#1a1a1a" font-size="17">Yoga &amp; Personal Growth</text>
+  <text x="560" y="90" class="service-text" fill="#1a1a1a" font-size="17">Professional Photographer</text>
+  <text x="560" y="114" class="service-text" fill="#1a1a1a" font-size="17">Security Services</text>
+  <text x="560" y="138" class="service-text" fill="#1a1a1a" font-size="17">Cleaning Services</text>
+  <text x="560" y="162" class="service-text" fill="#1a1a1a" font-size="17">Driver Services</text>
+  <text x="560" y="186" class="service-text" fill="#1a1a1a" font-size="17">Babysitting</text>
+
+  <!-- FAR RIGHT COLUMN -->
+  <text x="780" y="42" class="service-text" fill="#1a1a1a" font-size="17">Deliveries</text>
+  <text x="780" y="66" class="service-text" fill="#1a1a1a" font-size="17">Furniture</text>
+  <text x="780" y="90" class="service-text" fill="#1a1a1a" font-size="17">Car rental</text>
+  <text x="780" y="114" class="service-text" fill="#1a1a1a" font-size="17">Airport Transfer</text>
+  <text x="780" y="138" class="service-text" fill="#1a1a1a" font-size="17">Personal Shopping</text>
+  <text x="780" y="162" class="service-text" fill="#1a1a1a" font-size="17">Luxury Experiences</text>
+  <text x="780" y="186" class="service-text" fill="#1a1a1a" font-size="17">24/7 Concierge</text>
+</svg>

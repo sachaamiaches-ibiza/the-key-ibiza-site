@@ -14,7 +14,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Output to prerendered/ folder (committed to repo) or dist/ if running locally after build
 const DIST_DIR = path.join(__dirname, '../dist');
+const PRERENDERED_DIR = path.join(__dirname, '../prerendered');
 const PORT = 4173;
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 
