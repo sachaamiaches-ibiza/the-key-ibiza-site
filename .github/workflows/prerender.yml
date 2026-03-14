@@ -61,10 +61,10 @@ jobs:
 
       - name: Commit and push changes
         if: steps.changes.outputs.changed == 'true'
-        working-directory: the-key-ibiza-frontend
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
-          git add prerendered/
+          git add the-key-ibiza-frontend/prerendered/
           git commit -m "Auto-update pre-rendered pages [skip ci]"
+          git pull --rebase origin main
           git push
