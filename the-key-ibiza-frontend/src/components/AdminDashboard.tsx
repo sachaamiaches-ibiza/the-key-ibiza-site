@@ -118,7 +118,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'google' | 'advanced' | 'sessions' | 'actions' | 'vip' | 'reviews'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'google' | 'advanced' | 'sessions' | 'actions' | 'vip' | 'reviews' | 'indexing'>('overview');
   const [period, setPeriod] = useState('30d');
   const [vipUsers, setVipUsers] = useState<VipUser[]>([]);
   const [selectedVip, setSelectedVip] = useState<string | null>(null);
@@ -128,6 +128,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [gaError, setGaError] = useState<string | null>(null);
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [indexUrl, setIndexUrl] = useState('');
+  const [indexing, setIndexing] = useState(false);
+  const [indexResult, setIndexResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [blogArticles, setBlogArticles] = useState<{ slug: string; title: string }[]>([]);
 
   // Check if user is admin
   useEffect(() => {
@@ -272,6 +276,76 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     }
   };
 
+  // Fetch blog articles for indexing
+  useEffect(() => {
+    if (activeTab === 'indexing') {
+      const fetchBlogs = async () => {
+        try {
+          const res = await fetch(`${BACKEND_URL}/blog`);
+          if (res.ok) {
+            const data = await res.json();
+            setBlogArticles(data.map((a: any) => ({ slug: a.slug, title: a.title })));
+          }
+        } catch (err) {
+          console.error('Failed to fetch blogs:', err);
+        }
+      };
+      fetchBlogs();
+    }
+  }, [activeTab]);
+
+  const submitToGoogle = async (url: string) => {
+    setIndexing(true);
+    setIndexResult(null);
+    try {
+      const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+      const res = await fetch(`${BACKEND_URL}/api/google/index`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setIndexResult({ success: true, message: `Submitted: ${url}` });
+      } else {
+        setIndexResult({ success: false, message: data.error || 'Failed to index' });
+      }
+    } catch (err) {
+      setIndexResult({ success: false, message: 'Connection error' });
+    }
+    setIndexing(false);
+  };
+
+  const indexAllBlogs = async () => {
+    setIndexing(true);
+    setIndexResult(null);
+    try {
+      const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+      const urls = blogArticles.map(a => `https://thekey-ibiza.com/blog-${a.slug}`);
+      const res = await fetch(`${BACKEND_URL}/api/google/index-batch`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ urls })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const successCount = data.results?.filter((r: any) => r.success).length || 0;
+        setIndexResult({ success: true, message: `Indexed ${successCount}/${urls.length} articles` });
+      } else {
+        setIndexResult({ success: false, message: data.error || 'Failed to batch index' });
+      }
+    } catch (err) {
+      setIndexResult({ success: false, message: 'Connection error' });
+    }
+    setIndexing(false);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('es-ES', {
       day: '2-digit',
@@ -359,7 +433,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {(['overview', 'google', 'advanced', 'sessions', 'actions', 'vip', 'reviews'] as const).map((tab) => (
+          {(['overview', 'google', 'advanced', 'sessions', 'actions', 'vip', 'reviews', 'indexing'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -369,7 +443,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   : 'bg-transparent border border-white/20 text-white/60 hover:border-luxury-gold/50'
               }`}
             >
-              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab === 'google' ? 'Google Analytics' : tab === 'reviews' ? 'Reviews' : tab}
+              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab === 'google' ? 'Google Analytics' : tab === 'reviews' ? 'Reviews' : tab === 'indexing' ? 'SEO Index' : tab}
             </button>
           ))}
         </div>
@@ -1025,6 +1099,87 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* SEO Indexing Tab */}
+        {activeTab === 'indexing' && (
+          <div className="space-y-6">
+            {/* Manual URL Submit */}
+            <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+              <h3 className="text-white text-lg font-serif mb-4">Submit URL to Google</h3>
+              <p className="text-white/40 text-sm mb-4">Request Google to index a specific URL immediately.</p>
+              <div className="flex gap-4">
+                <input
+                  type="url"
+                  value={indexUrl}
+                  onChange={(e) => setIndexUrl(e.target.value)}
+                  placeholder="https://thekey-ibiza.com/blog-..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-luxury-gold"
+                />
+                <button
+                  onClick={() => submitToGoogle(indexUrl)}
+                  disabled={indexing || !indexUrl}
+                  className="px-6 py-3 rounded-full bg-luxury-gold text-luxury-blue text-xs uppercase tracking-wider font-medium hover:bg-luxury-gold/90 transition-all disabled:opacity-50"
+                >
+                  {indexing ? 'Submitting...' : 'Index Now'}
+                </button>
+              </div>
+              {indexResult && (
+                <p className={`mt-4 text-sm ${indexResult.success ? 'text-green-400' : 'text-red-400'}`}>
+                  {indexResult.message}
+                </p>
+              )}
+            </div>
+
+            {/* Blog Articles */}
+            <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-white text-lg font-serif">Blog Articles</h3>
+                  <p className="text-white/40 text-sm">{blogArticles.length} articles found</p>
+                </div>
+                <button
+                  onClick={indexAllBlogs}
+                  disabled={indexing || blogArticles.length === 0}
+                  className="px-6 py-3 rounded-full bg-green-500/20 text-green-400 text-xs uppercase tracking-wider font-medium hover:bg-green-500/30 transition-all disabled:opacity-50"
+                >
+                  {indexing ? 'Indexing...' : 'Index All Articles'}
+                </button>
+              </div>
+              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                {blogArticles.map((article) => (
+                  <div key={article.slug} className="flex items-center justify-between py-3 border-b border-white/5">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm truncate">{article.title}</p>
+                      <p className="text-white/30 text-xs truncate">thekey-ibiza.com/blog-{article.slug}</p>
+                    </div>
+                    <button
+                      onClick={() => submitToGoogle(`https://thekey-ibiza.com/blog-${article.slug}`)}
+                      disabled={indexing}
+                      className="ml-4 px-4 py-2 rounded-full bg-luxury-gold/20 text-luxury-gold text-xs hover:bg-luxury-gold/30 transition-all disabled:opacity-50"
+                    >
+                      Index
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6">
+              <h4 className="text-amber-400 font-medium mb-2">Setup Required</h4>
+              <p className="text-white/60 text-sm">
+                Pour que l'indexation fonctionne, configure ces variables dans Vercel:
+              </p>
+              <ul className="text-white/40 text-sm mt-2 space-y-1 list-disc list-inside">
+                <li>GOOGLE_INDEXING_CLIENT_EMAIL</li>
+                <li>GOOGLE_INDEXING_PRIVATE_KEY</li>
+              </ul>
+              <p className="text-white/40 text-sm mt-2">
+                Ces credentials viennent d'un Service Account Google Cloud avec l'API Indexing activée.
+              </p>
+            </div>
           </div>
         )}
       </div>
