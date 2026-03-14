@@ -2,69 +2,134 @@
 import { GoogleGenAI } from "@google/genai";
 import { Message, Language } from "../types";
 
-export const getAIConciergeResponse = async (userPrompt: string, history: Message[], lang: Language = 'en') => {
-  if (typeof window !== 'undefined' && (window as any).aistudio) {
-    const hasKey = await (window as any).aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      await (window as any).aistudio.openSelectKey();
-    }
+// Use Vite environment variable
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+
+// System prompt for The Key Ibiza concierge
+const getSystemPrompt = (lang: Language) => {
+  const langName = lang === 'fr' ? 'French' : (lang === 'es' ? 'Spanish' : (lang === 'de' ? 'German' : 'English'));
+
+  return `You are the ultimate luxury concierge for "The Key Ibiza", a premium villa rental and concierge service in Ibiza, Spain.
+
+YOUR ROLE:
+- Help clients find the perfect villa based on their preferences
+- Recommend yachts and catamarans for charter
+- Suggest services (private chef, events, wellness, security, etc.)
+- Answer questions about Ibiza (best beaches, restaurants, clubs)
+
+VILLA KNOWLEDGE (real properties):
+- CAN FLUXA: Modern luxury, infinity pool, sea views, 6 bedrooms
+- CASA CIGALA (Cala Jondal): Traditional Ibizan style, fireplace in bathroom, terracotta floors
+- CAN KEF (S'Estanyol): Minimalist modern, 8 bedrooms, 22m pool
+- NUI BLAU (Santa Eulalia): Traditional architecture, peaceful, ocean views
+
+SERVICES WE OFFER:
+- Villa rentals (holiday, long-term, purchase)
+- Yacht & catamaran charters
+- Private chef & catering
+- Event planning & DJ booking
+- Wellness (yoga, massage, personal training)
+- Security & bodyguards
+- Private drivers
+- Babysitting
+
+TONE:
+- Sophisticated but warm
+- Knowledgeable about luxury lifestyle
+- Helpful and proactive with suggestions
+- Never pushy, always elegant
+
+RULES:
+- Always respond in ${langName}
+- Keep responses concise (2-3 sentences max unless asked for details)
+- When recommending villas, mention 2-3 options with brief highlights
+- If you don't know something specific, say you'll have the team follow up
+
+IMPORTANT: You're chatting with potential high-net-worth clients. Be discreet, professional, and make them feel special.`;
+};
+
+export const getAIConciergeResponse = async (
+  userPrompt: string,
+  history: Message[],
+  lang: Language = 'en',
+  context?: { requestType?: string; collectedData?: Record<string, string> }
+) => {
+  if (!GEMINI_API_KEY) {
+    console.error('Gemini API key not configured');
+    return lang === 'fr'
+      ? "Service temporairement indisponible. Notre équipe vous contactera bientôt."
+      : (lang === 'es'
+        ? "Servicio temporalmente no disponible. Nuestro equipo le contactará pronto."
+        : (lang === 'de'
+          ? "Service vorübergehend nicht verfügbar. Unser Team wird Sie bald kontaktieren."
+          : "Service temporarily unavailable. Our team will contact you soon."));
   }
 
-  const targetLangName = lang === 'fr' ? 'French' : (lang === 'es' ? 'Spanish' : 'English');
-
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+    // Build conversation history
     const contents = history.map(msg => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
+      role: msg.role === 'assistant' ? 'model' as const : 'user' as const,
       parts: [{ text: msg.content }]
     }));
 
+    // Add context about collected data if available
+    let enrichedPrompt = userPrompt;
+    if (context?.requestType && context?.collectedData) {
+      const dataStr = Object.entries(context.collectedData)
+        .filter(([_, v]) => v)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(', ');
+      enrichedPrompt = `[Client is looking for: ${context.requestType}. Details: ${dataStr}]\n\nUser message: ${userPrompt}`;
+    }
+
     contents.push({
       role: 'user',
-      parts: [{ text: userPrompt }]
+      parts: [{ text: enrichedPrompt }]
     });
 
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: contents,
       config: {
-        systemInstruction: `Eres el conserje de lujo definitivo para "The Key Ibiza". 
-        Tu conocimiento de las propiedades es preciso y basado en la realidad arquitectónica de la isla:
-        
-        1. CASA CIGALA (Cala Jondal): Estilo tradicional ibicenco de alta gama. 
-           - INTERIOR: Suelos de terracota auténtica y paredes blancas de mampostería. Mobiliario de madera maciza.
-           - BAÑO ÚNICO: El baño de la suite principal tiene una chimenea de obra integrada, lavabos dobles sobre encimera de mampostería blanca y detalles rústicos.
-           - EXTERIOR: Dormitorio con acceso directo a terraza con vistas a palmeras y al mar.
-           
-        2. NUI BLAU (Santa Eulalia): Gemela estética de Casa Cigala, centrada en la paz y la arquitectura tradicional con baños de obra.
-        
-        3. CAN KEF (S'Estanyol): El contraste moderno. Minimalismo, 8 dormitorios, piscina de 22m.
-        
-        REGLA DE ORO: No inventes características. Si el usuario pregunta por detalles de las fotos, confirma que el diseño es orgánico, con materiales naturales como el barro y la madera, y destaca la chimenea del baño de Casa Cigala como su rasgo más distintivo.
-        
-        Tono: Discreto, extremadamente culto en diseño de interiores y servicial. 
-        Responde siempre en ${targetLangName}.`,
-        temperature: 0.5, // Reducimos temperatura para mayor precisión en los datos
+        systemInstruction: getSystemPrompt(lang),
+        temperature: 0.7,
+        maxOutputTokens: 500,
       },
     });
 
-    if (!response.text) throw new Error("Empty response");
-    return response.text;
+    const text = response.text;
+    if (!text) throw new Error("Empty response");
+    return text;
 
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    
-    if (error?.message?.includes("Requested entity was not found") && typeof window !== 'undefined' && (window as any).aistudio) {
-      await (window as any).aistudio.openSelectKey();
-    }
 
-    const errorMsg = lang === 'fr' 
+    const errorMsg = lang === 'fr'
       ? "Une interruption technique m'empêche de répondre. Veuillez réessayer."
-      : (lang === 'es' 
+      : (lang === 'es'
         ? "Una interrupción técnica me impide responder. Por favor, inténtelo de nuevo."
-        : "A technical interruption prevents me from responding. Please try again.");
+        : (lang === 'de'
+          ? "Ein technisches Problem verhindert meine Antwort. Bitte versuchen Sie es erneut."
+          : "A technical issue prevents me from responding. Please try again."));
 
     return errorMsg;
   }
+};
+
+// Quick suggestion based on preferences (for hybrid flow)
+export const getAISuggestion = async (
+  requestType: 'villa' | 'boat' | 'service' | 'property',
+  preferences: Record<string, string>,
+  lang: Language = 'en'
+) => {
+  const prompts: Record<string, string> = {
+    villa: `Based on these villa preferences, suggest 2-3 perfect options: ${JSON.stringify(preferences)}. Be brief but enticing, mention specific villa names if relevant.`,
+    boat: `Based on these charter preferences, suggest the ideal yacht or catamaran: ${JSON.stringify(preferences)}. Be brief and exciting.`,
+    service: `Based on this service/event request, suggest how we can create an unforgettable experience: ${JSON.stringify(preferences)}. Be brief and inspiring.`,
+    property: `Based on these property preferences, give a brief market insight: ${JSON.stringify(preferences)}. Be concise and professional.`,
+  };
+
+  return getAIConciergeResponse(prompts[requestType], [], lang);
 };
