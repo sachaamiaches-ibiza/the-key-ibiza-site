@@ -6,6 +6,7 @@ import { Language, Villa } from '../types';
 import { useIsMobile } from './useIsMobile';
 import MobileDatePickerModal from './MobileDatePickerModal';
 import { fetchVillas, getPublicVillas } from '../services/villaService';
+import { getSEO } from '../seoConfig';
 
 interface VillaListingPageProps {
   category: string;
@@ -177,6 +178,41 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isFiltersOpen]);
+
+  // Update SEO meta tags based on category and language
+  useEffect(() => {
+    const seo = getSEO(category, lang);
+    if (!seo) return;
+
+    const originalTitle = document.title;
+
+    document.title = seo.title;
+
+    const updateMeta = (property: string, content: string, isName = false) => {
+      const selector = isName ? `meta[name="${property}"]` : `meta[property="${property}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+      if (meta) {
+        meta.content = content;
+      } else {
+        meta = document.createElement('meta');
+        if (isName) meta.name = property;
+        else meta.setAttribute('property', property);
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    };
+
+    updateMeta('description', seo.description, true);
+    updateMeta('keywords', seo.keywords.join(', '), true);
+    updateMeta('og:title', seo.title);
+    updateMeta('og:description', seo.description);
+    updateMeta('twitter:title', seo.title);
+    updateMeta('twitter:description', seo.description);
+
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [category, lang]);
 
   // Use prop villas if provided, otherwise fetch from backend
   useEffect(() => {

@@ -3,6 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
 import { LogoTheKey } from './Navbar';
+import { getSEO } from '../seoConfig';
 
 // Watermark overlay component for images and videos
 const WatermarkOverlay = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) => {
@@ -130,6 +131,36 @@ const YachtsPage: React.FC<YachtsPageProps> = ({ onNavigate, lang, initialDate =
       onDateChange(searchFilters.fecha);
     }
   }, [searchFilters.fecha]);
+
+  // Update SEO meta tags
+  useEffect(() => {
+    const seo = getSEO('yachts', lang);
+    if (!seo) return;
+
+    const originalTitle = document.title;
+    document.title = seo.title;
+
+    const updateMeta = (property: string, content: string, isName = false) => {
+      const selector = isName ? `meta[name="${property}"]` : `meta[property="${property}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+      if (meta) {
+        meta.content = content;
+      } else {
+        meta = document.createElement('meta');
+        if (isName) meta.name = property;
+        else meta.setAttribute('property', property);
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    };
+
+    updateMeta('description', seo.description, true);
+    updateMeta('keywords', seo.keywords.join(', '), true);
+    updateMeta('og:title', seo.title);
+    updateMeta('og:description', seo.description);
+
+    return () => { document.title = originalTitle; };
+  }, [lang]);
 
   // Fetch yachts from backend
   useEffect(() => {

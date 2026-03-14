@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Language } from '../types';
+import { getSEO } from '../seoConfig';
 
 // Add lang to the props interface
 interface ServiceDetailProps {
@@ -331,6 +332,48 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ serviceId, onNavigate, la
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [serviceId]);
+
+  // Update SEO meta tags based on language
+  useEffect(() => {
+    const seo = getSEO(serviceId, lang);
+    if (!seo) return;
+
+    const originalTitle = document.title;
+
+    // Update title
+    document.title = seo.title;
+
+    // Helper to update meta tags
+    const updateMeta = (property: string, content: string, isName = false) => {
+      const selector = isName ? `meta[name="${property}"]` : `meta[property="${property}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+      if (meta) {
+        meta.content = content;
+      } else {
+        meta = document.createElement('meta');
+        if (isName) meta.name = property;
+        else meta.setAttribute('property', property);
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    };
+
+    // Update meta description with keywords
+    updateMeta('description', seo.description, true);
+    updateMeta('keywords', seo.keywords.join(', '), true);
+
+    // Update Open Graph
+    updateMeta('og:title', seo.title);
+    updateMeta('og:description', seo.description);
+
+    // Update Twitter
+    updateMeta('twitter:title', seo.title);
+    updateMeta('twitter:description', seo.description);
+
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [serviceId, lang]);
 
   // Get service-specific question
   const serviceQuestion = SERVICE_QUESTIONS[serviceId] || {
