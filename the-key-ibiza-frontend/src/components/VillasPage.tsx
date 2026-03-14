@@ -105,8 +105,9 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
   const [villaImages, setVillaImages] = useState<string[]>([]);
 
   // Inject FAQ Schema into document head for SEO (captured by pre-renderer)
+  // Always use English for SEO schema - Google indexes primarily in English
   useEffect(() => {
-    const faqs = villasFAQ[lang] || villasFAQ.en;
+    const faqs = villasFAQ.en;
     const schema = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',

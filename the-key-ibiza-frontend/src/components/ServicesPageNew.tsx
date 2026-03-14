@@ -195,8 +195,9 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
   };
 
   // Inject FAQ Schema into document head for SEO (captured by pre-renderer)
+  // Always use English for SEO schema - Google indexes primarily in English
   useEffect(() => {
-    const faqs = servicesFAQ[lang] || servicesFAQ.en;
+    const faqs = servicesFAQ.en;
     const schema = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
