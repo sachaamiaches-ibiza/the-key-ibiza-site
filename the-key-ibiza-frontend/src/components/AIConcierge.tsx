@@ -148,9 +148,13 @@ const SERVICE_STEPS: Step[] = [
     question: { en: 'What service do you need?', fr: 'Quel service recherchez-vous?', es: '¿Qué servicio necesitas?', de: 'Welchen Service benötigen Sie?' },
     options: [
       { label: '👨‍🍳', value: { en: 'Private Chef', fr: 'Chef Privé', es: 'Chef Privado', de: 'Privatkoch' } },
-      { label: '🎉', value: { en: 'Event Planning', fr: 'Organisation d\'événements', es: 'Organización de eventos', de: 'Eventplanung' } },
       { label: '💆', value: { en: 'Wellness & Spa', fr: 'Bien-être & Spa', es: 'Bienestar & Spa', de: 'Wellness & Spa' } },
       { label: '🚗', value: { en: 'Driver & Security', fr: 'Chauffeur & Sécurité', es: 'Conductor & Seguridad', de: 'Fahrer & Sicherheit' } },
+      { label: '👶', value: { en: 'Babysitting', fr: 'Babysitting', es: 'Niñera', de: 'Babysitter' } },
+      { label: '🛒', value: { en: 'Deliveries', fr: 'Livraisons', es: 'Entregas', de: 'Lieferungen' } },
+      { label: '💇', value: { en: 'Hair & Beauty', fr: 'Coiffeur & Beauté', es: 'Peluquería & Belleza', de: 'Friseur & Beauty' } },
+      { label: '🧘', value: { en: 'Yoga & Fitness', fr: 'Yoga & Fitness', es: 'Yoga & Fitness', de: 'Yoga & Fitness' } },
+      { label: '🧹', value: { en: 'Cleaning', fr: 'Ménage', es: 'Limpieza', de: 'Reinigung' } },
     ]
   },
   {
