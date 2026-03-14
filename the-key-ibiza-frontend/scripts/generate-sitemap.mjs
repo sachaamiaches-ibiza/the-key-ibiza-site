@@ -21,6 +21,7 @@ const LANGUAGES = ['en', 'fr', 'es', 'de'];
 // Static pages with their priorities and change frequencies
 const STATIC_PAGES = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
+  { path: '/villas', priority: '0.9', changefreq: 'weekly' },
   { path: '/holiday-rentals', priority: '0.9', changefreq: 'daily' },
   { path: '/long-term', priority: '0.8', changefreq: 'weekly' },
   { path: '/for-sale', priority: '0.8', changefreq: 'weekly' },

@@ -26,6 +26,7 @@ const LANGUAGES = ['en', 'fr', 'es', 'de'];
 // Static routes to pre-render
 const STATIC_ROUTES = [
   '/',
+  '/villas',
   '/holiday-rentals',
   '/long-term',
   '/for-sale',
