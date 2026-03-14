@@ -21,13 +21,13 @@ const ScrollToTop: React.FC = () => {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed top-24 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full bg-luxury-gold/90 text-luxury-blue flex items-center gap-2 shadow-lg hover:bg-luxury-gold transition-all hover:scale-105 text-xs uppercase tracking-wider font-medium"
+      className="fixed top-28 left-1/2 -translate-x-1/2 z-[9999] px-5 py-2.5 rounded-full bg-luxury-gold text-luxury-blue flex items-center gap-2 shadow-xl hover:bg-white hover:text-luxury-blue transition-all hover:scale-105 text-xs uppercase tracking-wider font-bold border-2 border-luxury-gold"
       aria-label="Scroll to top"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7" />
       </svg>
-      Top
+      Back to Top
     </button>
   );
 };
