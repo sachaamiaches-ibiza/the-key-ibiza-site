@@ -20,6 +20,9 @@ const PRERENDERED_DIR = path.join(__dirname, '../prerendered');
 const PORT = 4173;
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 
+// Languages to pre-render (en = default, no prefix)
+const LANGUAGES = ['en', 'fr', 'es', 'de'];
+
 // Static routes to pre-render
 const STATIC_ROUTES = [
   '/',
@@ -192,8 +195,22 @@ async function main() {
   // Fetch all routes
   console.log('📍 Collecting routes...');
   const dynamicRoutes = await fetchDynamicRoutes();
-  const allRoutes = [...STATIC_ROUTES, ...dynamicRoutes];
-  console.log(`   Total routes to pre-render: ${allRoutes.length}\n`);
+  const baseRoutes = [...STATIC_ROUTES, ...dynamicRoutes];
+  console.log(`   Base routes: ${baseRoutes.length}`);
+
+  // Generate routes for all languages
+  const allRoutes = [];
+  for (const route of baseRoutes) {
+    for (const lang of LANGUAGES) {
+      if (lang === 'en') {
+        allRoutes.push(route);
+      } else {
+        // Add language prefix
+        allRoutes.push(`/${lang}${route === '/' ? '' : route}`);
+      }
+    }
+  }
+  console.log(`   Total routes (${LANGUAGES.length} languages): ${allRoutes.length}\n`);
 
   // Start server
   console.log('🖥️  Starting static server...');
@@ -231,6 +248,7 @@ async function main() {
 
   // Summary
   console.log('\n📊 Summary:');
+  console.log(`   🌐 Languages: ${LANGUAGES.join(', ')}`);
   console.log(`   ✅ Success: ${success}`);
   console.log(`   ❌ Failed: ${failed}`);
   console.log(`   📁 Output: ${DIST_DIR}\n`);

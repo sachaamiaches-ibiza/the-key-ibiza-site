@@ -15,6 +15,9 @@ const __dirname = path.dirname(__filename);
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 const SITE_URL = 'https://thekey-ibiza.com';
 
+// Supported languages (en = default, no prefix)
+const LANGUAGES = ['en', 'fr', 'es', 'de'];
+
 // Static pages with their priorities and change frequencies
 const STATIC_PAGES = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
@@ -93,28 +96,47 @@ function generateSitemapXml(pages) {
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 `;
 
   for (const page of pages) {
-    xml += `  <url>
-    <loc>${SITE_URL}${page.path}</loc>
+    // For each page, generate entries for all languages
+    for (const lang of LANGUAGES) {
+      const langPrefix = lang === 'en' ? '' : `/${lang}`;
+      const fullPath = page.path === '/' ? (langPrefix || '/') : `${langPrefix}${page.path}`;
+
+      xml += `  <url>
+    <loc>${SITE_URL}${fullPath}</loc>
     <lastmod>${page.lastmod || today}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>`;
 
-    // Add image if available
-    if (page.image) {
+      // Add hreflang links for all language variants
+      for (const altLang of LANGUAGES) {
+        const altPrefix = altLang === 'en' ? '' : `/${altLang}`;
+        const altPath = page.path === '/' ? (altPrefix || '/') : `${altPrefix}${page.path}`;
+        xml += `
+    <xhtml:link rel="alternate" hreflang="${altLang}" href="${SITE_URL}${altPath}"/>`;
+      }
+      // Add x-default (pointing to English version)
+      const defaultPath = page.path === '/' ? '/' : page.path;
       xml += `
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${defaultPath}"/>`;
+
+      // Add image if available
+      if (page.image) {
+        xml += `
     <image:image>
       <image:loc>${page.image}</image:loc>
       <image:title>${(page.title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</image:title>
     </image:image>`;
-    }
+      }
 
-    xml += `
+      xml += `
   </url>
 `;
+    }
   }
 
   xml += `</urlset>`;
@@ -190,16 +212,19 @@ async function main() {
   const outputPath = path.join(__dirname, '../public/sitemap.xml');
   fs.writeFileSync(outputPath, sitemapXml, 'utf-8');
 
-  console.log(`✅ Sitemap generated with ${allPages.length} URLs`);
+  const totalUrls = allPages.length * LANGUAGES.length;
+  console.log(`✅ Sitemap generated with ${totalUrls} URLs (${allPages.length} pages × ${LANGUAGES.length} languages)`);
   console.log(`   Output: ${outputPath}`);
 
   // Summary
   console.log('\n📊 Summary:');
+  console.log(`   Languages: ${LANGUAGES.join(', ')}`);
   console.log(`   Static pages: ${STATIC_PAGES.length}`);
   console.log(`   Villas: ${villas.length}`);
   console.log(`   Yachts: ${yachts.length}`);
   console.log(`   Blog posts: ${posts.length}`);
-  console.log(`   Total URLs: ${allPages.length}`);
+  console.log(`   Base pages: ${allPages.length}`);
+  console.log(`   Total URLs (with languages): ${totalUrls}`);
 }
 
 main().catch(console.error);

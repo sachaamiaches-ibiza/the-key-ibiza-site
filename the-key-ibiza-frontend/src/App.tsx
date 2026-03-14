@@ -61,22 +61,42 @@ function nameToUrlSlug(name: string): string {
     .trim();
 }
 
+// Supported languages for URL prefixes
+const SUPPORTED_LANG_PREFIXES = ['fr', 'es', 'de'] as const;
+type LangPrefix = typeof SUPPORTED_LANG_PREFIXES[number];
+
+// Extract language from URL path
+function getLangFromPath(path: string): { lang: Language; pathWithoutLang: string } {
+  const segments = path.split('/').filter(Boolean);
+  const firstSegment = segments[0]?.toLowerCase();
+
+  if (firstSegment && SUPPORTED_LANG_PREFIXES.includes(firstSegment as LangPrefix)) {
+    return {
+      lang: firstSegment as Language,
+      pathWithoutLang: '/' + segments.slice(1).join('/')
+    };
+  }
+
+  return { lang: 'en', pathWithoutLang: path };
+}
+
 // URL routing helpers
-function viewToPath(view: View): string {
-  if (view === 'home') return '/';
-  if (view === 'villas-holiday') return '/holiday-rentals';
-  if (view === 'villas-longterm') return '/long-term';
-  if (view === 'villas-sale') return '/for-sale';
-  if (view === 'service-villas') return '/villas';
-  if (view === 'service-yacht') return '/boats';
-  if (view === 'boats-yachts') return '/yachts';
-  if (view === 'boats-catamarans') return '/catamarans';
-  if (view.startsWith('villa-')) return `/${view}`;
-  if (view.startsWith('yacht-')) return `/${view}`;
-  if (view.startsWith('blog-')) return `/${view}`;
-  if (view.startsWith('wishlist/')) return `/${view}`;
-  if (view.startsWith('service-')) return `/${view.replace('service-', '')}`;
-  return `/${view}`;
+function viewToPath(view: View, lang: Language = 'en'): string {
+  const langPrefix = lang !== 'en' ? `/${lang}` : '';
+  if (view === 'home') return langPrefix || '/';
+  if (view === 'villas-holiday') return `${langPrefix}/holiday-rentals`;
+  if (view === 'villas-longterm') return `${langPrefix}/long-term`;
+  if (view === 'villas-sale') return `${langPrefix}/for-sale`;
+  if (view === 'service-villas') return `${langPrefix}/villas`;
+  if (view === 'service-yacht') return `${langPrefix}/boats`;
+  if (view === 'boats-yachts') return `${langPrefix}/yachts`;
+  if (view === 'boats-catamarans') return `${langPrefix}/catamarans`;
+  if (view.startsWith('villa-')) return `${langPrefix}/${view}`;
+  if (view.startsWith('yacht-')) return `${langPrefix}/${view}`;
+  if (view.startsWith('blog-')) return `${langPrefix}/${view}`;
+  if (view.startsWith('wishlist/')) return `/${view}`; // Wishlist has no lang prefix
+  if (view.startsWith('service-')) return `${langPrefix}/${view.replace('service-', '')}`;
+  return `${langPrefix}/${view}`;
 }
 
 function pathToView(path: string): View {
@@ -232,12 +252,18 @@ const ContactForm: React.FC<ContactFormProps> = ({ lang }) => {
 };
 
 const App: React.FC = () => {
-  // Initialize view from URL
+  // Initialize view and language from URL
   const [view, setViewState] = useState<View>(() => {
-    return pathToView(window.location.pathname);
+    const { pathWithoutLang } = getLangFromPath(window.location.pathname);
+    return pathToView(pathWithoutLang);
   });
   const [lang, setLang] = useState<Language>(() => {
-    // Load language from localStorage on initial render
+    // First check URL for language prefix
+    const { lang: urlLang } = getLangFromPath(window.location.pathname);
+    if (urlLang !== 'en') {
+      return urlLang;
+    }
+    // Fallback to localStorage
     const savedLang = localStorage.getItem('thekey-language');
     if (savedLang && ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh', 'ar', 'hi', 'ru'].includes(savedLang)) {
       return savedLang as Language;
@@ -264,27 +290,36 @@ const App: React.FC = () => {
     }
   }, [isWhiteLabelDomain]);
 
-  // Custom setView that also updates the URL
+  // Custom setView that also updates the URL with language prefix
   const setView = (newView: View) => {
     setViewState(newView);
-    const newPath = viewToPath(newView);
+    const newPath = viewToPath(newView, lang);
     if (window.location.pathname !== newPath) {
-      window.history.pushState({ view: newView }, '', newPath);
+      window.history.pushState({ view: newView, lang }, '', newPath);
     }
   };
 
-  // Handle browser back/forward buttons
+  // Handle browser back/forward buttons (with language support)
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
+      const { lang: urlLang, pathWithoutLang } = getLangFromPath(window.location.pathname);
+
       if (event.state?.view) {
         setViewState(event.state.view);
       } else {
-        setViewState(pathToView(window.location.pathname));
+        setViewState(pathToView(pathWithoutLang));
+      }
+
+      // Update language if URL has a language prefix
+      if (event.state?.lang) {
+        setLang(event.state.lang);
+      } else if (urlLang !== lang) {
+        setLang(urlLang);
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [lang]);
 
   // Clean up ?loaded=true from URL (used by OG redirect system)
   // This ensures shared links go through the backend for correct meta tags
@@ -398,7 +433,8 @@ const App: React.FC = () => {
   const handleOpenContact = () => {
     setIsContactModalOpen(true);
     setViewState('contact');
-    window.history.pushState({ view: 'contact' }, '', '/contact');
+    const contactPath = viewToPath('contact', lang);
+    window.history.pushState({ view: 'contact', lang }, '', contactPath);
   };
 
   const handleCloseContact = () => {
@@ -408,7 +444,8 @@ const App: React.FC = () => {
     } else {
       // No history to go back to, navigate to home
       setViewState('home');
-      window.history.pushState({ view: 'home' }, '', '/');
+      const homePath = viewToPath('home', lang);
+      window.history.pushState({ view: 'home', lang }, '', homePath);
     }
   };
   const [yachtSearchDate, setYachtSearchDate] = useState<string>('');
@@ -513,6 +550,35 @@ const App: React.FC = () => {
   useEffect(() => {
     initGA();
   }, []);
+
+  // Add hreflang tags for SEO (multi-language support)
+  useEffect(() => {
+    // Remove existing hreflang tags
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(el => el.remove());
+
+    const baseUrl = 'https://thekey-ibiza.com';
+    const currentPath = viewToPath(view, 'en'); // Get path without language prefix
+
+    // Languages to include
+    const languages = ['en', 'fr', 'es', 'de'] as const;
+
+    languages.forEach(langCode => {
+      const link = document.createElement('link');
+      link.rel = 'alternate';
+      link.hreflang = langCode;
+      link.href = langCode === 'en'
+        ? `${baseUrl}${currentPath}`
+        : `${baseUrl}/${langCode}${currentPath === '/' ? '' : currentPath}`;
+      document.head.appendChild(link);
+    });
+
+    // Add x-default (fallback for unmatched languages)
+    const defaultLink = document.createElement('link');
+    defaultLink.rel = 'alternate';
+    defaultLink.hreflang = 'x-default';
+    defaultLink.href = `${baseUrl}${currentPath}`;
+    document.head.appendChild(defaultLink);
+  }, [view]);
 
   // Image protection: Watermarks are now embedded via Cloudinary
   // Downloads will include the logo - no need for aggressive blocking
