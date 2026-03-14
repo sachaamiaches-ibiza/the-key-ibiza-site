@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
 import { allServicesGrid } from './ServiceIcons';
@@ -194,8 +194,8 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
     onNavigate(serviceId === 'photographer' ? 'photographer' : `service-${serviceId}`);
   };
 
-  // Generate FAQ Schema for rich snippets
-  const faqSchemaJson = useMemo(() => {
+  // Inject FAQ Schema into document head for SEO (captured by pre-renderer)
+  useEffect(() => {
     const faqs = servicesFAQ[lang] || servicesFAQ.en;
     const schema = {
       '@context': 'https://schema.org',
@@ -209,16 +209,26 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
         }
       }))
     };
-    return JSON.stringify(schema);
+
+    // Create and inject script tag
+    const scriptId = 'faq-schema-services';
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.type = 'application/ld+json';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(schema);
+
+    // Cleanup on unmount
+    return () => {
+      const el = document.getElementById(scriptId);
+      if (el) el.remove();
+    };
   }, [lang]);
 
   return (
-    <>
-      {/* FAQ Schema for Google Rich Snippets */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqSchemaJson }}
-      />
     <div className="pt-40 pb-12" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
         {/* Header */}
@@ -337,7 +347,6 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
         />
       </div>
     </div>
-    </>
   );
 };
 

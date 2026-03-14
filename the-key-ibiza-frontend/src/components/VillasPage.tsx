@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language, Villa } from '../types';
 import FooterSEO from './FooterSEO';
 import { fetchVillas } from '../services/villaService';
@@ -104,8 +104,8 @@ interface VillasPageProps {
 const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
   const [villaImages, setVillaImages] = useState<string[]>([]);
 
-  // Generate FAQ Schema for rich snippets
-  const faqSchemaJson = useMemo(() => {
+  // Inject FAQ Schema into document head for SEO (captured by pre-renderer)
+  useEffect(() => {
     const faqs = villasFAQ[lang] || villasFAQ.en;
     const schema = {
       '@context': 'https://schema.org',
@@ -119,7 +119,23 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
         }
       }))
     };
-    return JSON.stringify(schema);
+
+    // Create and inject script tag
+    const scriptId = 'faq-schema-villas';
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.type = 'application/ld+json';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(schema);
+
+    // Cleanup on unmount
+    return () => {
+      const el = document.getElementById(scriptId);
+      if (el) el.remove();
+    };
   }, [lang]);
 
   // Fetch villas to get real images with Cloudinary optimization
@@ -182,12 +198,6 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
   ];
 
   return (
-    <>
-      {/* FAQ Schema for Google Rich Snippets */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqSchemaJson }}
-      />
       <div className="min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
       {/* Hero Section */}
       <div className="pt-40 pb-20 text-center px-6">
@@ -313,7 +323,6 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
         ]}
       />
     </div>
-    </>
   );
 };
 
