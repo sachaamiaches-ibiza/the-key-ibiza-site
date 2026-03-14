@@ -47,6 +47,50 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://thekey-ibiza.com/"/>
   </url>
   <url>
+    <loc>https://thekey-ibiza.com/villas</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thekey-ibiza.com/villas"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://thekey-ibiza.com/fr/villas"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://thekey-ibiza.com/es/villas"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://thekey-ibiza.com/de/villas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://thekey-ibiza.com/villas"/>
+  </url>
+  <url>
+    <loc>https://thekey-ibiza.com/fr/villas</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thekey-ibiza.com/villas"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://thekey-ibiza.com/fr/villas"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://thekey-ibiza.com/es/villas"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://thekey-ibiza.com/de/villas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://thekey-ibiza.com/villas"/>
+  </url>
+  <url>
+    <loc>https://thekey-ibiza.com/es/villas</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thekey-ibiza.com/villas"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://thekey-ibiza.com/fr/villas"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://thekey-ibiza.com/es/villas"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://thekey-ibiza.com/de/villas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://thekey-ibiza.com/villas"/>
+  </url>
+  <url>
+    <loc>https://thekey-ibiza.com/de/villas</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://thekey-ibiza.com/villas"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://thekey-ibiza.com/fr/villas"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://thekey-ibiza.com/es/villas"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://thekey-ibiza.com/de/villas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://thekey-ibiza.com/villas"/>
+  </url>
+  <url>
     <loc>https://thekey-ibiza.com/holiday-rentals</loc>
     <lastmod>2026-03-14</lastmod>
     <changefreq>daily</changefreq>
