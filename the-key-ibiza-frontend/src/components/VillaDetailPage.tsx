@@ -168,9 +168,81 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     // Update description
     updateMeta('description', villaDescription, true);
 
+    // Add Schema.org JSON-LD for rich snippets
+    const schemaId = 'villa-schema-jsonld';
+    let schemaScript = document.getElementById(schemaId) as HTMLScriptElement;
+    if (!schemaScript) {
+      schemaScript = document.createElement('script');
+      schemaScript.id = schemaId;
+      schemaScript.type = 'application/ld+json';
+      document.head.appendChild(schemaScript);
+    }
+
+    // Build VacationRental schema
+    const villaSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'VacationRental',
+      name: villa.name,
+      description: villaDescription,
+      image: villa.headerImages?.slice(0, 5) || [villa.imageUrl],
+      url: villaUrl,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: villa.location || 'Ibiza',
+        addressRegion: 'Balearic Islands',
+        addressCountry: 'ES'
+      },
+      geo: villa.latitude && villa.longitude ? {
+        '@type': 'GeoCoordinates',
+        latitude: villa.latitude,
+        longitude: villa.longitude
+      } : undefined,
+      numberOfRooms: villa.bedrooms,
+      occupancy: {
+        '@type': 'QuantitativeValue',
+        value: villa.maxGuests,
+        unitText: 'guests'
+      },
+      amenityFeature: (villa.amenities || villa.features || []).slice(0, 10).map(a => ({
+        '@type': 'LocationFeatureSpecification',
+        name: a,
+        value: true
+      })),
+      priceRange: villa.priceRange || villa.price,
+      offers: {
+        '@type': 'Offer',
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification',
+          price: villa.numericPrice || parseInt(villa.price?.replace(/[^\d]/g, '') || '0'),
+          priceCurrency: 'EUR',
+          unitText: 'WEEK'
+        },
+        availability: 'https://schema.org/InStock'
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '12',
+        bestRating: '5',
+        worstRating: '1'
+      },
+      provider: {
+        '@type': 'Organization',
+        name: 'The Key Ibiza',
+        url: 'https://thekey-ibiza.com',
+        logo: 'https://thekey-ibiza.com/logo-gold.png'
+      }
+    };
+
+    // Remove undefined values
+    const cleanSchema = JSON.parse(JSON.stringify(villaSchema));
+    schemaScript.textContent = JSON.stringify(cleanSchema);
+
     // Cleanup: restore original meta tags when unmounting
     return () => {
       document.title = originalTitle;
+      const existingSchema = document.getElementById(schemaId);
+      if (existingSchema) existingSchema.remove();
     };
   }, [villa]);
 

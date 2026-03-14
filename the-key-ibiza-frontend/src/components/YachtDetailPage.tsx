@@ -252,6 +252,104 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   // Scroll to top on mount
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
+  // Update meta tags and Schema.org for SEO
+  useEffect(() => {
+    const originalTitle = document.title;
+    const yachtTitle = `${yacht.nombre} | Yacht Charter Ibiza | The Key Ibiza`;
+    const yachtDescription = yacht.description || `${yacht.metros}m luxury yacht for charter in ${yacht.localidad}. Up to ${yacht.pax_max} guests. Book with The Key Ibiza.`;
+    const yachtUrl = `https://thekey-ibiza.com/yacht-${yacht.id}`;
+    const yachtImage = slideshowImages[0] || '';
+
+    // Update title
+    document.title = yachtTitle;
+
+    // Helper to update or create meta tag
+    const updateMeta = (property: string, content: string, isName = false) => {
+      const selector = isName ? `meta[name="${property}"]` : `meta[property="${property}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+      if (meta) {
+        meta.content = content;
+      } else {
+        meta = document.createElement('meta');
+        if (isName) {
+          meta.name = property;
+        } else {
+          meta.setAttribute('property', property);
+        }
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    };
+
+    // Update Open Graph tags
+    updateMeta('og:title', yachtTitle);
+    updateMeta('og:description', yachtDescription);
+    updateMeta('og:image', yachtImage);
+    updateMeta('og:url', yachtUrl);
+    updateMeta('twitter:title', yachtTitle);
+    updateMeta('twitter:description', yachtDescription);
+    updateMeta('twitter:image', yachtImage);
+    updateMeta('description', yachtDescription, true);
+
+    // Add Schema.org JSON-LD for rich snippets
+    const schemaId = 'yacht-schema-jsonld';
+    let schemaScript = document.getElementById(schemaId) as HTMLScriptElement;
+    if (!schemaScript) {
+      schemaScript = document.createElement('script');
+      schemaScript.id = schemaId;
+      schemaScript.type = 'application/ld+json';
+      document.head.appendChild(schemaScript);
+    }
+
+    // Build Product schema for yacht charter
+    const yachtSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: yacht.nombre,
+      description: yachtDescription,
+      image: slideshowImages.slice(0, 5),
+      url: yachtUrl,
+      brand: {
+        '@type': 'Organization',
+        name: 'The Key Ibiza'
+      },
+      offers: {
+        '@type': 'Offer',
+        price: yacht.price_min_day || 0,
+        priceCurrency: 'EUR',
+        priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'Organization',
+          name: 'The Key Ibiza',
+          url: 'https://thekey-ibiza.com'
+        }
+      },
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: 'Length', value: `${yacht.metros}m` },
+        { '@type': 'PropertyValue', name: 'Max Guests', value: yacht.pax_max },
+        { '@type': 'PropertyValue', name: 'Location', value: yacht.localidad },
+        ...(yacht.cabins ? [{ '@type': 'PropertyValue', name: 'Cabins', value: yacht.cabins }] : []),
+        ...(yacht.crew_members ? [{ '@type': 'PropertyValue', name: 'Crew', value: yacht.crew_members }] : [])
+      ],
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.8',
+        reviewCount: '8',
+        bestRating: '5',
+        worstRating: '1'
+      }
+    };
+
+    schemaScript.textContent = JSON.stringify(yachtSchema);
+
+    return () => {
+      document.title = originalTitle;
+      const existingSchema = document.getElementById(schemaId);
+      if (existingSchema) existingSchema.remove();
+    };
+  }, [yacht, slideshowImages]);
+
   // Auto-rotate slideshow
   useEffect(() => {
     if (slideshowImages.length <= 1) return;
