@@ -70,6 +70,4 @@ jobs:
           git config user.email "actions@github.com"
           git add the-key-ibiza-frontend/prerendered/
           git commit -m "Auto-update pre-rendered pages [skip ci]"
-          git fetch origin main
-          git rebase origin/main
-          git push origin main
+          git push origin main --force
