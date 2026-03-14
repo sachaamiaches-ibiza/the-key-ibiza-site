@@ -79,7 +79,11 @@
       "destination": "https://the-key-ibiza-backend.vercel.app/share/wishlist/:code"
     },
     {
-      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/|favicon|apple-touch).*)",
+      "source": "/:lang(fr|es|de)/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ],
