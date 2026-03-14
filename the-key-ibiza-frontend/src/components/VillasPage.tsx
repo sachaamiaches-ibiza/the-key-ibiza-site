@@ -1,8 +1,100 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Language, Villa } from '../types';
 import FooterSEO from './FooterSEO';
 import { fetchVillas } from '../services/villaService';
 import { getHeaderImageUrl } from '../utils/cloudinaryUrl';
+
+// FAQ content for Villas page (multi-language)
+const villasFAQ: Record<Language, { question: string; answer: string }[]> = {
+  en: [
+    {
+      question: "What is the minimum stay for villa rentals in Ibiza?",
+      answer: "During high season (June-September), the minimum stay is typically 7 nights. In low season, we can accommodate shorter stays of 3-5 nights depending on the property. Contact us for specific availability."
+    },
+    {
+      question: "What's included in a luxury villa rental?",
+      answer: "Our villa rentals include fully equipped kitchens, linens and towels, daily housekeeping (most properties), WiFi, and 24/7 concierge support. Many villas also include private pools, gardens, and parking. Additional services like private chef, transfers, and grocery provisioning are available upon request."
+    },
+    {
+      question: "Do you offer airport transfers for villa guests?",
+      answer: "Yes, we arrange private airport transfers in luxury vehicles. Our drivers meet you at Ibiza Airport and escort you directly to your villa. We also offer VIP services including fast-track through the airport and helicopter transfers."
+    },
+    {
+      question: "Can I book a villa for a wedding or special event?",
+      answer: "Selected villas in our portfolio are suitable for events and celebrations. We can help you organize everything from intimate dinners to large celebrations with catering, entertainment, and decoration. Contact us with your event requirements for personalized recommendations."
+    },
+    {
+      question: "Is there a security deposit required for villa rentals?",
+      answer: "Yes, most villas require a security deposit ranging from €3,000 to €15,000 depending on the property. This is typically held via credit card authorization and released within 7 days after check-out pending a satisfactory property inspection."
+    }
+  ],
+  fr: [
+    {
+      question: "Quelle est la durée minimum de location d'une villa à Ibiza ?",
+      answer: "En haute saison (juin-septembre), le séjour minimum est généralement de 7 nuits. En basse saison, nous pouvons accommoder des séjours plus courts de 3-5 nuits selon la propriété. Contactez-nous pour la disponibilité spécifique."
+    },
+    {
+      question: "Qu'est-ce qui est inclus dans la location d'une villa de luxe ?",
+      answer: "Nos locations incluent cuisines équipées, linge de maison, ménage quotidien (la plupart des propriétés), WiFi et conciergerie 24h/24. Beaucoup de villas incluent aussi piscine privée, jardins et parking. Services additionnels sur demande : chef privé, transferts, approvisionnement."
+    },
+    {
+      question: "Proposez-vous des transferts aéroport pour les clients des villas ?",
+      answer: "Oui, nous organisons des transferts privés en véhicules de luxe. Nos chauffeurs vous accueillent à l'aéroport d'Ibiza et vous conduisent directement à votre villa. Nous offrons aussi des services VIP incluant fast-track et transferts en hélicoptère."
+    },
+    {
+      question: "Puis-je réserver une villa pour un mariage ou un événement ?",
+      answer: "Certaines villas de notre portfolio sont adaptées aux événements et célébrations. Nous pouvons organiser des dîners intimes aux grandes fêtes avec traiteur, animation et décoration. Contactez-nous avec vos besoins pour des recommandations personnalisées."
+    },
+    {
+      question: "Y a-t-il une caution requise pour la location de villa ?",
+      answer: "Oui, la plupart des villas demandent une caution de 3 000 € à 15 000 € selon la propriété. Elle est généralement retenue par autorisation de carte bancaire et libérée sous 7 jours après le départ, après inspection satisfaisante."
+    }
+  ],
+  es: [
+    {
+      question: "¿Cuál es la estancia mínima para alquilar una villa en Ibiza?",
+      answer: "En temporada alta (junio-septiembre), la estancia mínima es típicamente de 7 noches. En temporada baja, podemos acomodar estancias más cortas de 3-5 noches dependiendo de la propiedad. Contáctenos para disponibilidad específica."
+    },
+    {
+      question: "¿Qué está incluido en el alquiler de una villa de lujo?",
+      answer: "Nuestros alquileres incluyen cocinas equipadas, ropa de cama y toallas, limpieza diaria (mayoría de propiedades), WiFi y conserjería 24/7. Muchas villas también incluyen piscina privada, jardines y parking. Servicios adicionales disponibles bajo petición."
+    },
+    {
+      question: "¿Ofrecen transfers de aeropuerto para huéspedes de villas?",
+      answer: "Sí, organizamos transfers privados en vehículos de lujo. Nuestros conductores le reciben en el Aeropuerto de Ibiza y le llevan directamente a su villa. También ofrecemos servicios VIP incluyendo fast-track y transfers en helicóptero."
+    },
+    {
+      question: "¿Puedo reservar una villa para una boda o evento especial?",
+      answer: "Algunas villas de nuestro portfolio son adecuadas para eventos y celebraciones. Podemos ayudarle a organizar desde cenas íntimas hasta grandes celebraciones con catering, entretenimiento y decoración. Contáctenos con sus requisitos."
+    },
+    {
+      question: "¿Se requiere depósito de seguridad para el alquiler de villas?",
+      answer: "Sí, la mayoría de las villas requieren un depósito de seguridad de 3.000 € a 15.000 € dependiendo de la propiedad. Se retiene típicamente mediante autorización de tarjeta de crédito y se libera en 7 días tras el check-out."
+    }
+  ],
+  de: [
+    {
+      question: "Was ist die Mindestaufenthaltsdauer für Villenmieten auf Ibiza?",
+      answer: "In der Hochsaison (Juni-September) beträgt der Mindestaufenthalt in der Regel 7 Nächte. In der Nebensaison können wir kürzere Aufenthalte von 3-5 Nächten je nach Objekt anbieten. Kontaktieren Sie uns für spezifische Verfügbarkeit."
+    },
+    {
+      question: "Was ist in einer Luxusvilla-Miete enthalten?",
+      answer: "Unsere Villenmieten beinhalten voll ausgestattete Küchen, Bettwäsche und Handtücher, tägliche Reinigung (die meisten Objekte), WiFi und 24/7 Concierge-Support. Viele Villen haben auch Privatpool, Gärten und Parkplatz. Zusätzliche Services auf Anfrage."
+    },
+    {
+      question: "Bieten Sie Flughafentransfers für Villengäste an?",
+      answer: "Ja, wir arrangieren private Transfers in Luxusfahrzeugen. Unsere Fahrer empfangen Sie am Flughafen Ibiza und bringen Sie direkt zu Ihrer Villa. Wir bieten auch VIP-Services wie Fast-Track und Helikoptertransfers."
+    },
+    {
+      question: "Kann ich eine Villa für eine Hochzeit oder ein Event buchen?",
+      answer: "Ausgewählte Villen in unserem Portfolio eignen sich für Events und Feiern. Wir können alles von intimen Abendessen bis zu großen Feiern mit Catering, Unterhaltung und Dekoration organisieren. Kontaktieren Sie uns mit Ihren Anforderungen."
+    },
+    {
+      question: "Ist eine Kaution für die Villenmiete erforderlich?",
+      answer: "Ja, die meisten Villen erfordern eine Kaution von 3.000 € bis 15.000 € je nach Objekt. Diese wird in der Regel per Kreditkartenautorisierung gehalten und innerhalb von 7 Tagen nach dem Check-out freigegeben."
+    }
+  ]
+};
 
 interface VillasPageProps {
   onNavigate: (view: string) => void;
@@ -11,6 +103,24 @@ interface VillasPageProps {
 
 const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
   const [villaImages, setVillaImages] = useState<string[]>([]);
+
+  // Generate FAQ Schema for rich snippets
+  const faqSchemaJson = useMemo(() => {
+    const faqs = villasFAQ[lang] || villasFAQ.en;
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map(faq => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer
+        }
+      }))
+    };
+    return JSON.stringify(schema);
+  }, [lang]);
 
   // Fetch villas to get real images with Cloudinary optimization
   useEffect(() => {
@@ -72,7 +182,13 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
+    <>
+      {/* FAQ Schema for Google Rich Snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqSchemaJson }}
+      />
+      <div className="min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
       {/* Hero Section */}
       <div className="pt-40 pb-20 text-center px-6">
         <span
@@ -197,6 +313,7 @@ const VillasPage: React.FC<VillasPageProps> = ({ onNavigate, lang }) => {
         ]}
       />
     </div>
+    </>
   );
 };
 

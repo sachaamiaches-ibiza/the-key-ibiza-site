@@ -1,8 +1,100 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Language } from '../types';
 import FooterSEO from './FooterSEO';
 import { allServicesGrid } from './ServiceIcons';
+
+// FAQ content for Services page (multi-language)
+const servicesFAQ: Record<Language, { question: string; answer: string }[]> = {
+  en: [
+    {
+      question: "What concierge services does The Key Ibiza offer?",
+      answer: "The Key Ibiza offers a comprehensive range of luxury concierge services including private chef and catering, yacht charter, event planning, wellness and spa, security services, professional drivers, villa cleaning, babysitting, and 24/7 personal assistance."
+    },
+    {
+      question: "Are your concierge services available 24/7?",
+      answer: "Yes, our concierge team is available around the clock, 365 days a year. Whether you need a last-minute restaurant reservation at 2 AM or an emergency service, we're always here to assist you."
+    },
+    {
+      question: "How do I book a private chef in Ibiza?",
+      answer: "Booking a private chef is simple. Contact us with your preferred dates, number of guests, dietary requirements, and cuisine preferences. We'll match you with a chef from our network of Michelin-starred and experienced culinary professionals."
+    },
+    {
+      question: "Do you provide security services for VIP clients?",
+      answer: "Absolutely. We offer discreet, professional security services including personal bodyguards, property security, and event security. Our team consists of trained professionals with experience in VIP protection."
+    },
+    {
+      question: "How far in advance should I book concierge services?",
+      answer: "We recommend booking at least 2-4 weeks in advance for peak season (June-September). However, we specialize in last-minute requests and will always do our best to accommodate your needs, even with short notice."
+    }
+  ],
+  fr: [
+    {
+      question: "Quels services de conciergerie The Key Ibiza propose-t-il ?",
+      answer: "The Key Ibiza propose une gamme complète de services de conciergerie de luxe : chef privé et traiteur, location de yacht, organisation d'événements, bien-être et spa, sécurité, chauffeurs professionnels, ménage, baby-sitting et assistance personnelle 24h/24."
+    },
+    {
+      question: "Vos services de conciergerie sont-ils disponibles 24h/24 ?",
+      answer: "Oui, notre équipe de conciergerie est disponible 24h/24, 365 jours par an. Que vous ayez besoin d'une réservation de restaurant à 2h du matin ou d'un service d'urgence, nous sommes toujours là pour vous aider."
+    },
+    {
+      question: "Comment réserver un chef privé à Ibiza ?",
+      answer: "Réserver un chef privé est simple. Contactez-nous avec vos dates, le nombre de convives, vos exigences alimentaires et vos préférences culinaires. Nous vous mettrons en relation avec un chef de notre réseau de professionnels étoilés Michelin."
+    },
+    {
+      question: "Proposez-vous des services de sécurité pour les clients VIP ?",
+      answer: "Absolument. Nous proposons des services de sécurité discrets et professionnels : gardes du corps personnels, sécurité de propriété et sécurité événementielle. Notre équipe est composée de professionnels formés à la protection VIP."
+    },
+    {
+      question: "Combien de temps à l'avance dois-je réserver les services ?",
+      answer: "Nous recommandons de réserver 2 à 4 semaines à l'avance en haute saison (juin-septembre). Cependant, nous sommes spécialisés dans les demandes de dernière minute et ferons toujours notre possible pour répondre à vos besoins."
+    }
+  ],
+  es: [
+    {
+      question: "¿Qué servicios de conserjería ofrece The Key Ibiza?",
+      answer: "The Key Ibiza ofrece una gama completa de servicios de conserjería de lujo: chef privado y catering, alquiler de yates, organización de eventos, bienestar y spa, seguridad, conductores profesionales, limpieza, niñera y asistencia personal 24/7."
+    },
+    {
+      question: "¿Sus servicios de conserjería están disponibles 24/7?",
+      answer: "Sí, nuestro equipo de conserjería está disponible las 24 horas, los 365 días del año. Ya sea que necesite una reserva de restaurante a las 2 AM o un servicio de emergencia, siempre estamos aquí para ayudarle."
+    },
+    {
+      question: "¿Cómo reservo un chef privado en Ibiza?",
+      answer: "Reservar un chef privado es sencillo. Contáctenos con sus fechas preferidas, número de invitados, requisitos dietéticos y preferencias culinarias. Le pondremos en contacto con un chef de nuestra red de profesionales con estrellas Michelin."
+    },
+    {
+      question: "¿Ofrecen servicios de seguridad para clientes VIP?",
+      answer: "Por supuesto. Ofrecemos servicios de seguridad discretos y profesionales: guardaespaldas personales, seguridad de propiedades y seguridad de eventos. Nuestro equipo está formado por profesionales capacitados en protección VIP."
+    },
+    {
+      question: "¿Con cuánta antelación debo reservar los servicios?",
+      answer: "Recomendamos reservar con 2-4 semanas de antelación en temporada alta (junio-septiembre). Sin embargo, nos especializamos en solicitudes de último momento y siempre haremos lo posible por satisfacer sus necesidades."
+    }
+  ],
+  de: [
+    {
+      question: "Welche Concierge-Services bietet The Key Ibiza an?",
+      answer: "The Key Ibiza bietet eine umfassende Palette von Luxus-Concierge-Services: Privatkoch und Catering, Yachtcharter, Eventplanung, Wellness und Spa, Sicherheit, professionelle Fahrer, Reinigung, Kinderbetreuung und 24/7 persönliche Assistenz."
+    },
+    {
+      question: "Sind Ihre Concierge-Services rund um die Uhr verfügbar?",
+      answer: "Ja, unser Concierge-Team ist rund um die Uhr, 365 Tage im Jahr verfügbar. Ob Sie um 2 Uhr morgens eine Restaurantreservierung oder einen Notfalldienst benötigen, wir sind immer für Sie da."
+    },
+    {
+      question: "Wie buche ich einen Privatkoch auf Ibiza?",
+      answer: "Einen Privatkoch zu buchen ist einfach. Kontaktieren Sie uns mit Ihren bevorzugten Daten, Gästezahl, Ernährungsanforderungen und kulinarischen Vorlieben. Wir verbinden Sie mit einem Koch aus unserem Netzwerk von Michelin-Sterneköchen."
+    },
+    {
+      question: "Bieten Sie Sicherheitsdienste für VIP-Kunden an?",
+      answer: "Absolut. Wir bieten diskrete, professionelle Sicherheitsdienste: persönliche Bodyguards, Objektschutz und Veranstaltungssicherheit. Unser Team besteht aus ausgebildeten Fachleuten mit VIP-Schutz-Erfahrung."
+    },
+    {
+      question: "Wie weit im Voraus sollte ich Services buchen?",
+      answer: "Wir empfehlen, in der Hochsaison (Juni-September) 2-4 Wochen im Voraus zu buchen. Wir sind jedoch auf kurzfristige Anfragen spezialisiert und werden immer unser Bestes tun, um Ihre Wünsche zu erfüllen."
+    }
+  ]
+};
 
 interface ServicesPageNewProps {
   onNavigate: (view: string) => void;
@@ -102,7 +194,31 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
     onNavigate(serviceId === 'photographer' ? 'photographer' : `service-${serviceId}`);
   };
 
+  // Generate FAQ Schema for rich snippets
+  const faqSchemaJson = useMemo(() => {
+    const faqs = servicesFAQ[lang] || servicesFAQ.en;
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map(faq => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer
+        }
+      }))
+    };
+    return JSON.stringify(schema);
+  }, [lang]);
+
   return (
+    <>
+      {/* FAQ Schema for Google Rich Snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqSchemaJson }}
+      />
     <div className="pt-40 pb-12" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6">
         {/* Header */}
@@ -221,6 +337,7 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
         />
       </div>
     </div>
+    </>
   );
 };
 
