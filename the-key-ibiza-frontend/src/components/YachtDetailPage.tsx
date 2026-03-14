@@ -80,6 +80,31 @@ interface YachtDetailPageProps {
   onDateChange?: (date: string) => void;
 }
 
+// Helper function to generate SEO-optimized yacht meta description (max 160 chars)
+const getYachtMetaDescription = (yacht: Yacht, lang: Language): string => {
+  const MAX_LENGTH = 157; // Leave room for "..."
+
+  // Multi-language fallbacks with CTAs
+  const fallbacks: Record<Language, string> = {
+    en: `${yacht.metros}m luxury yacht for charter in ${yacht.localidad}. Up to ${yacht.pax_max} guests. Book your Ibiza yacht experience now.`,
+    fr: `Yacht de luxe ${yacht.metros}m à louer à ${yacht.localidad}. Jusqu'à ${yacht.pax_max} invités. Réservez votre expérience yacht Ibiza.`,
+    es: `Yate de lujo ${yacht.metros}m en alquiler en ${yacht.localidad}. Hasta ${yacht.pax_max} invitados. Reserve su experiencia en yate en Ibiza.`,
+    de: `${yacht.metros}m Luxusyacht Charter in ${yacht.localidad}. Bis zu ${yacht.pax_max} Gäste. Buchen Sie Ihr Ibiza Yacht-Erlebnis.`
+  };
+
+  // Use description if available, otherwise fallback
+  let description = yacht.description || fallbacks[lang] || fallbacks.en;
+
+  // Truncate if too long
+  if (description.length > MAX_LENGTH) {
+    const truncated = description.substring(0, MAX_LENGTH);
+    const lastSpace = truncated.lastIndexOf(' ');
+    description = (lastSpace > 100 ? truncated.substring(0, lastSpace) : truncated).trim() + '...';
+  }
+
+  return description;
+};
+
 // Helper function to format date range "01-01_03-31" -> "1 Jan - 31 Mar"
 const formatDateRange = (dateStr: string): string => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -256,7 +281,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   useEffect(() => {
     const originalTitle = document.title;
     const yachtTitle = `${yacht.nombre} | Yacht Charter Ibiza | The Key Ibiza`;
-    const yachtDescription = yacht.description || `${yacht.metros}m luxury yacht for charter in ${yacht.localidad}. Up to ${yacht.pax_max} guests. Book with The Key Ibiza.`;
+    const yachtDescription = getYachtMetaDescription(yacht, lang);
     const yachtUrl = `https://thekey-ibiza.com/yacht-${yacht.id}`;
     const yachtImage = slideshowImages[0] || '';
 
@@ -294,11 +319,11 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
     return () => {
       document.title = originalTitle;
     };
-  }, [yacht, slideshowImages]);
+  }, [yacht, slideshowImages, lang]);
 
   // Build Product schema for yacht charter (rendered directly in JSX for SSR)
   const yachtSchemaJson = React.useMemo(() => {
-    const yachtDescription = yacht.descripcion_corta || yacht.descripcion_larga || `Luxury ${yacht.tipo} charter in Ibiza. ${yacht.metros}m, up to ${yacht.pax_max} guests.`;
+    const yachtDescription = getYachtMetaDescription(yacht, lang);
     const yachtUrl = `https://thekey-ibiza.com/yacht-${yacht.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`;
 
     const schema = {
@@ -340,7 +365,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
       }
     };
     return JSON.stringify(schema);
-  }, [yacht, slideshowImages]);
+  }, [yacht, slideshowImages, lang]);
 
   // Auto-rotate slideshow
   useEffect(() => {

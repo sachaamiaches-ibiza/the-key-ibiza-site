@@ -31,6 +31,32 @@ interface VillaDetailPageProps {
  * This approach keeps content management separate from code changes.
  */
 
+// Helper function to generate SEO-optimized villa meta description (max 160 chars)
+const getVillaMetaDescription = (villa: Villa, lang: Language): string => {
+  const MAX_LENGTH = 157; // Leave room for "..."
+
+  // Multi-language fallbacks with CTAs
+  const fallbacks: Record<Language, string> = {
+    en: `Luxury ${villa.beds ? villa.beds + 'BR ' : ''}villa in ${villa.location}, Ibiza. Private pool, stunning views. Book your exclusive stay now.`,
+    fr: `Villa de luxe ${villa.beds ? villa.beds + 'ch ' : ''}à ${villa.location}, Ibiza. Piscine privée, vues exceptionnelles. Réservez maintenant.`,
+    es: `Villa de lujo ${villa.beds ? villa.beds + 'hab ' : ''}en ${villa.location}, Ibiza. Piscina privada, vistas increíbles. Reserve ahora.`,
+    de: `Luxusvilla ${villa.beds ? villa.beds + ' SZ ' : ''}in ${villa.location}, Ibiza. Privatpool, atemberaubende Aussicht. Jetzt buchen.`
+  };
+
+  // Use shortDescription if available, otherwise fallback
+  let description = villa.shortDescription || fallbacks[lang] || fallbacks.en;
+
+  // Truncate if too long
+  if (description.length > MAX_LENGTH) {
+    // Try to cut at last space before limit
+    const truncated = description.substring(0, MAX_LENGTH);
+    const lastSpace = truncated.lastIndexOf(' ');
+    description = (lastSpace > 100 ? truncated.substring(0, lastSpace) : truncated).trim() + '...';
+  }
+
+  return description;
+};
+
 // Helper function to format date range "01-01 to 03-31" -> "1 Jan - 31 Mar"
 const formatDateRange = (dateStr: string): string => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -129,7 +155,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   useEffect(() => {
     const originalTitle = document.title;
     const villaTitle = `${villa.name} | The Key Ibiza`;
-    const villaDescription = villa.shortDescription || `Luxury villa in ${villa.location}. Book your exclusive stay with The Key Ibiza.`;
+    const villaDescription = getVillaMetaDescription(villa, lang);
     const villaImage = villa.headerImages?.[0] || villa.imageUrl || '';
     const villaUrl = `https://thekey-ibiza.com/villa-${villa.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`;
 
@@ -172,11 +198,11 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     return () => {
       document.title = originalTitle;
     };
-  }, [villa]);
+  }, [villa, lang]);
 
   // Build VacationRental schema for SSR/pre-rendering (rendered directly in JSX)
   const villaSchemaJson = React.useMemo(() => {
-    const villaDescription = villa.shortDescription || `Luxury villa in ${villa.location}. Book your exclusive stay with The Key Ibiza.`;
+    const villaDescription = getVillaMetaDescription(villa, lang);
     const villaUrl = `https://thekey-ibiza.com/villa-${villa.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`;
 
     const schema = {
@@ -235,7 +261,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     };
     // Remove undefined values
     return JSON.stringify(JSON.parse(JSON.stringify(schema)));
-  }, [villa]);
+  }, [villa, lang]);
 
   // Sync dates to parent when they change
   useEffect(() => {
