@@ -1,11 +1,8 @@
 name: Pre-render Pages for SEO
 
 on:
-  # Run daily at 3 AM UTC (4 AM Spain, 5 AM in summer)
   schedule:
     - cron: '0 3 * * *'
-
-  # Allow manual trigger from GitHub Actions tab
   workflow_dispatch:
 
 permissions:
@@ -18,13 +15,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull latest changes
-        run: |
-          git pull origin main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,37 +27,20 @@ jobs:
         working-directory: the-key-ibiza-frontend
         run: npm ci
 
-      - name: Install Chromium for Puppeteer
+      - name: Install Chromium
         run: npx puppeteer browsers install chrome
 
-      - name: Generate sitemap
-        working-directory: the-key-ibiza-frontend
-        run: node scripts/generate-sitemap.mjs
-
-      - name: Build frontend
-        working-directory: the-key-ibiza-frontend
-        run: npm run build
-
-      - name: Pre-render all pages
-        working-directory: the-key-ibiza-frontend
-        run: node scripts/prerender.mjs
-
-      - name: Copy pre-rendered files
+      - name: Build and pre-render
         working-directory: the-key-ibiza-frontend
         run: |
+          node scripts/generate-sitemap.mjs
+          npm run build
+          node scripts/prerender.mjs
           rm -rf prerendered/*
           cp -r dist/* prerendered/
 
-      - name: Check for changes
-        id: changes
-        run: |
-          git diff --quiet the-key-ibiza-frontend/prerendered/ || echo "changed=true" >> $GITHUB_OUTPUT
-
-      - name: Commit and push changes
-        if: steps.changes.outputs.changed == 'true'
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
-          git add the-key-ibiza-frontend/prerendered/
-          git commit -m "Auto-update pre-rendered pages [skip ci]"
-          git push origin main --force
+      - name: Commit and push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-update pre-rendered pages [skip ci]"
+          file_pattern: "the-key-ibiza-frontend/prerendered/*"
