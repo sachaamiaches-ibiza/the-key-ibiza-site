@@ -593,28 +593,28 @@ export const seoConfig: Record<string, PageSEO> = {
   'home': {
     en: {
       title: 'The Key Ibiza | Luxury Concierge & Villa Rentals | Ibiza',
-      description: 'Your gateway to luxury villas, yacht charters, and bespoke concierge services in Ibiza. Unlock extraordinary experiences.',
+      description: 'Discover 50+ luxury villas, yacht charters, and 24/7 concierge services in Ibiza. Book your dream holiday today.',
       keywords: ['the key ibiza', 'ibiza concierge', 'luxury ibiza', 'ibiza villa rental', 'ibiza yacht charter', 'ibiza luxury services', 'vip ibiza', 'ibiza experiences'],
       h1: 'The Key Ibiza',
       h2: 'Luxury Concierge & Villa Rentals'
     },
     fr: {
       title: 'The Key Ibiza | Conciergerie de Luxe & Location de Villas | Ibiza',
-      description: 'Votre accès aux villas de luxe, yachts et services de conciergerie sur mesure à Ibiza. Vivez des expériences extraordinaires.',
+      description: 'Découvrez 50+ villas de luxe, yachts et services de conciergerie sur mesure à Ibiza. Réservez votre séjour de rêve.',
       keywords: ['the key ibiza', 'conciergerie ibiza', 'luxe ibiza', 'location villa ibiza', 'location yacht ibiza', 'services luxe ibiza', 'vip ibiza', 'expériences ibiza'],
       h1: 'The Key Ibiza',
       h2: 'Conciergerie de Luxe & Location de Villas'
     },
     es: {
       title: 'The Key Ibiza | Conserjería de Lujo & Alquiler de Villas | Ibiza',
-      description: 'Tu acceso a villas de lujo, yates y servicios de conserjería a medida en Ibiza. Vive experiencias extraordinarias.',
+      description: 'Descubre 50+ villas de lujo, yates y servicios de conserjería a medida en Ibiza. Reserva tu estancia de ensueño.',
       keywords: ['the key ibiza', 'conserjería ibiza', 'lujo ibiza', 'alquiler villa ibiza', 'alquiler yate ibiza', 'servicios lujo ibiza', 'vip ibiza', 'experiencias ibiza'],
       h1: 'The Key Ibiza',
       h2: 'Conserjería de Lujo & Alquiler de Villas'
     },
     de: {
       title: 'The Key Ibiza | Luxus Concierge & Villen Vermietung | Ibiza',
-      description: 'The Key Ibiza - Ihr exklusiver Zugang zu Luxusvillen, Yachtcharter und maßgeschneiderten Concierge-Services auf Ibiza. Erleben Sie außergewöhnliche Momente.',
+      description: 'Entdecken Sie 50+ Luxusvillen, Yachtcharter und 24/7 Concierge-Services auf Ibiza. Buchen Sie Ihren Traumurlaub.',
       keywords: ['the key ibiza', 'concierge ibiza', 'luxus ibiza', 'villa mieten ibiza', 'yacht mieten ibiza', 'luxus services ibiza', 'vip ibiza', 'erlebnisse ibiza'],
       h1: 'The Key Ibiza',
       h2: 'Luxus Concierge & Villen Vermietung'
@@ -624,28 +624,28 @@ export const seoConfig: Record<string, PageSEO> = {
   'about': {
     en: {
       title: 'About Us | The Key Ibiza | Luxury Concierge Team',
-      description: 'Meet the team behind The Key Ibiza. Local experts with 15+ years curating luxury experiences, villa rentals, and bespoke services.',
+      description: 'Meet the team behind The Key Ibiza. 15+ years of local expertise in luxury villas and concierge services. Let us plan your trip.',
       keywords: ['about the key ibiza', 'ibiza concierge team', 'luxury ibiza experts', 'ibiza local experts', 'villa rental experts ibiza', 'who is the key ibiza'],
       h1: 'About The Key Ibiza',
       h2: 'Your Local Luxury Experts'
     },
     fr: {
       title: 'À Propos | The Key Ibiza | Équipe de Conciergerie de Luxe',
-      description: 'Découvrez l\'équipe de The Key Ibiza. Experts locaux avec plus de 15 ans d\'expérience dans les expériences de luxe, location de villas et services sur mesure.',
+      description: 'Découvrez l\'équipe The Key Ibiza. 15+ ans d\'expertise locale en villas de luxe et conciergerie. Planifions votre séjour.',
       keywords: ['à propos the key ibiza', 'équipe conciergerie ibiza', 'experts luxe ibiza', 'experts locaux ibiza', 'spécialistes villa ibiza'],
       h1: 'À Propos de The Key Ibiza',
       h2: 'Vos Experts Locaux du Luxe'
     },
     es: {
       title: 'Sobre Nosotros | The Key Ibiza | Equipo de Conserjería de Lujo',
-      description: 'Conoce al equipo de The Key Ibiza. Expertos locales con más de 15 años de experiencia en experiencias de lujo, alquiler de villas y servicios a medida.',
+      description: 'Conoce al equipo de The Key Ibiza. 15+ años de experiencia local en villas de lujo y conserjería. Planifiquemos tu viaje.',
       keywords: ['sobre the key ibiza', 'equipo conserjería ibiza', 'expertos lujo ibiza', 'expertos locales ibiza', 'especialistas villa ibiza'],
       h1: 'Sobre The Key Ibiza',
       h2: 'Tus Expertos Locales en Lujo'
     },
     de: {
       title: 'Über Uns | The Key Ibiza | Luxus Concierge Team',
-      description: 'Das Team von The Key Ibiza. Lokale Experten mit über 15 Jahren Erfahrung in Luxuserlebnissen, Villenvermietung und Services.',
+      description: 'Das Team von The Key Ibiza. Über 15 Jahre lokale Expertise in Luxusvillen und Concierge-Services. Planen Sie mit uns.',
       keywords: ['über the key ibiza', 'concierge team ibiza', 'luxus experten ibiza', 'lokale experten ibiza', 'villa spezialisten ibiza'],
       h1: 'Über The Key Ibiza',
       h2: 'Ihre Lokalen Luxus-Experten'
@@ -655,28 +655,28 @@ export const seoConfig: Record<string, PageSEO> = {
   'contact': {
     en: {
       title: 'Contact Us | The Key Ibiza | Get in Touch',
-      description: 'Contact The Key Ibiza for luxury villa rentals, yacht charters, and concierge services. WhatsApp, email, or schedule a call with our team.',
+      description: 'Contact The Key Ibiza for luxury villas, yacht charters, and concierge services. WhatsApp, email, or call – response within 24h.',
       keywords: ['contact the key ibiza', 'ibiza concierge contact', 'book villa ibiza', 'ibiza inquiry', 'the key ibiza phone', 'the key ibiza email', 'ibiza villa booking'],
       h1: 'Contact The Key Ibiza',
       h2: 'We\'re Here to Help'
     },
     fr: {
       title: 'Contactez-Nous | The Key Ibiza | Nous Contacter',
-      description: 'Contactez The Key Ibiza pour la location de villas de luxe, location de yachts et services de conciergerie. WhatsApp, email ou planifiez un appel.',
+      description: 'Contactez The Key Ibiza pour villas de luxe, yachts et conciergerie. WhatsApp, email ou appelez-nous – réponse sous 24h.',
       keywords: ['contact the key ibiza', 'conciergerie ibiza contact', 'réserver villa ibiza', 'demande ibiza', 'téléphone the key ibiza', 'email the key ibiza'],
       h1: 'Contactez The Key Ibiza',
       h2: 'Nous Sommes à Votre Écoute'
     },
     es: {
       title: 'Contáctanos | The Key Ibiza | Ponte en Contacto',
-      description: 'Contacta con The Key Ibiza para alquiler de villas de lujo, alquiler de yates y servicios de conserjería. WhatsApp, email o programa una llamada.',
+      description: 'Contacta con The Key Ibiza para villas de lujo, yates y conserjería. WhatsApp, email o llámanos – respuesta en 24h.',
       keywords: ['contacto the key ibiza', 'conserjería ibiza contacto', 'reservar villa ibiza', 'consulta ibiza', 'teléfono the key ibiza', 'email the key ibiza'],
       h1: 'Contacta con The Key Ibiza',
       h2: 'Estamos Aquí para Ayudarte'
     },
     de: {
       title: 'Kontakt | The Key Ibiza | Kontaktieren Sie Uns',
-      description: 'Kontaktieren Sie The Key Ibiza für Luxusvillen, Yachtcharter und Concierge-Services. WhatsApp, E-Mail oder vereinbaren Sie einen Anruf.',
+      description: 'Kontaktieren Sie The Key Ibiza für Luxusvillen, Yachtcharter und Concierge-Services. WhatsApp, E-Mail oder Anruf – Antwort in 24h.',
       keywords: ['kontakt the key ibiza', 'concierge ibiza kontakt', 'villa buchen ibiza', 'anfrage ibiza', 'telefon the key ibiza', 'email the key ibiza'],
       h1: 'Kontaktieren Sie The Key Ibiza',
       h2: 'Wir Sind für Sie Da'
@@ -686,28 +686,28 @@ export const seoConfig: Record<string, PageSEO> = {
   'blog': {
     en: {
       title: 'Blog | The Key Ibiza | Ibiza Lifestyle & Travel Tips',
-      description: 'Discover Ibiza through The Key Ibiza blog. Insider tips, best restaurants, hidden beaches, nightlife guides, and luxury lifestyle articles.',
+      description: 'Insider tips, best restaurants, hidden beaches, and nightlife guides for Ibiza. Explore the blog and plan your perfect trip.',
       keywords: ['ibiza blog', 'ibiza travel tips', 'ibiza insider guide', 'best restaurants ibiza', 'ibiza beaches', 'ibiza nightlife guide', 'ibiza lifestyle', 'things to do ibiza'],
       h1: 'The Key Ibiza Blog',
       h2: 'Ibiza Lifestyle & Insider Tips'
     },
     fr: {
       title: 'Blog | The Key Ibiza | Lifestyle Ibiza & Conseils Voyage',
-      description: 'Découvrez Ibiza à travers le blog The Key Ibiza. Conseils d\'initiés, meilleurs restaurants, plages secrètes, guides vie nocturne et articles lifestyle luxe.',
+      description: 'Conseils d\'initiés, meilleurs restaurants, plages secrètes et guides vie nocturne à Ibiza. Explorez le blog et planifiez votre séjour.',
       keywords: ['blog ibiza', 'conseils voyage ibiza', 'guide initié ibiza', 'meilleurs restaurants ibiza', 'plages ibiza', 'guide vie nocturne ibiza', 'lifestyle ibiza'],
       h1: 'Blog The Key Ibiza',
       h2: 'Lifestyle Ibiza & Conseils d\'Initiés'
     },
     es: {
       title: 'Blog | The Key Ibiza | Lifestyle Ibiza & Consejos de Viaje',
-      description: 'Descubre Ibiza a través del blog The Key Ibiza. Consejos de expertos, mejores restaurantes, playas secretas, guías de vida nocturna y artículos de lifestyle.',
+      description: 'Consejos de expertos, mejores restaurantes, playas secretas y guías de vida nocturna en Ibiza. Explora el blog y planifica tu viaje.',
       keywords: ['blog ibiza', 'consejos viaje ibiza', 'guía insider ibiza', 'mejores restaurantes ibiza', 'playas ibiza', 'guía vida nocturna ibiza', 'lifestyle ibiza'],
       h1: 'Blog The Key Ibiza',
       h2: 'Lifestyle Ibiza & Consejos de Expertos'
     },
     de: {
       title: 'Blog | The Key Ibiza | Ibiza Lifestyle & Reisetipps',
-      description: 'Entdecken Sie Ibiza durch den The Key Ibiza Blog. Insider-Tipps, beste Restaurants, versteckte Strände, Nachtleben-Guides und Luxus-Lifestyle-Artikel.',
+      description: 'Insider-Tipps, beste Restaurants, versteckte Strände und Nachtleben-Guides für Ibiza. Erkunden Sie den Blog und planen Sie Ihre Reise.',
       keywords: ['ibiza blog', 'ibiza reisetipps', 'ibiza insider guide', 'beste restaurants ibiza', 'strände ibiza', 'nachtleben guide ibiza', 'lifestyle ibiza'],
       h1: 'The Key Ibiza Blog',
       h2: 'Ibiza Lifestyle & Insider-Tipps'
@@ -717,28 +717,28 @@ export const seoConfig: Record<string, PageSEO> = {
   'services': {
     en: {
       title: 'Luxury Concierge Services Ibiza | The Key Ibiza',
-      description: 'Full-service luxury concierge in Ibiza. Private chef, yacht charter, events, wellness, security, drivers and more. Available 24/7.',
+      description: 'Full-service luxury concierge in Ibiza: private chef, yacht charter, events, wellness, security. Available 24/7. Request a quote.',
       keywords: ['concierge services ibiza', 'luxury services ibiza', 'private chef ibiza', 'ibiza vip services', 'personal assistant ibiza', '24/7 concierge ibiza', 'ibiza lifestyle services'],
       h1: 'Luxury Concierge Services',
       h2: '24/7 Bespoke Services for Your Perfect Stay'
     },
     fr: {
       title: 'Services de Conciergerie de Luxe Ibiza | The Key Ibiza',
-      description: 'Conciergerie de luxe complète à Ibiza. Chef privé, location yacht, organisation événements, bien-être, sécurité, chauffeurs et plus. Disponible 24/7.',
+      description: 'Conciergerie de luxe à Ibiza: chef privé, yacht, événements, bien-être, sécurité. Disponible 24/7. Demandez un devis.',
       keywords: ['services conciergerie ibiza', 'services luxe ibiza', 'chef privé ibiza', 'services vip ibiza', 'assistant personnel ibiza', 'conciergerie 24/7 ibiza'],
       h1: 'Services de Conciergerie de Luxe',
       h2: 'Services Sur Mesure 24/7 pour un Séjour Parfait'
     },
     es: {
       title: 'Servicios de Conserjería de Lujo Ibiza | The Key Ibiza',
-      description: 'Conserjería de lujo completa en Ibiza. Chef privado, alquiler de yate, planificación de eventos, bienestar, seguridad, conductores y más. Disponible 24/7.',
+      description: 'Conserjería de lujo en Ibiza: chef privado, yate, eventos, bienestar, seguridad. Disponible 24/7. Solicita presupuesto.',
       keywords: ['servicios conserjería ibiza', 'servicios lujo ibiza', 'chef privado ibiza', 'servicios vip ibiza', 'asistente personal ibiza', 'conserjería 24/7 ibiza'],
       h1: 'Servicios de Conserjería de Lujo',
       h2: 'Servicios a Medida 24/7 para una Estancia Perfecta'
     },
     de: {
       title: 'Luxus Concierge Services Ibiza | The Key Ibiza',
-      description: 'Vollständiger Luxus-Concierge-Service auf Ibiza. Privatkoch, Yachtcharter, Eventplanung, Wellness, Sicherheit, Fahrer und mehr. 24/7 verfügbar.',
+      description: 'Luxus-Concierge auf Ibiza: Privatkoch, Yachtcharter, Events, Wellness, Sicherheit. 24/7 verfügbar. Angebot anfordern.',
       keywords: ['concierge services ibiza', 'luxus services ibiza', 'privatkoch ibiza', 'vip services ibiza', 'persönlicher assistent ibiza', '24/7 concierge ibiza'],
       h1: 'Luxus Concierge Services',
       h2: 'Maßgeschneiderte Services 24/7 für Ihren Perfekten Aufenthalt'
