@@ -168,18 +168,18 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
     // Update description
     updateMeta('description', villaDescription, true);
 
-    // Add Schema.org JSON-LD for rich snippets
-    const schemaId = 'villa-schema-jsonld';
-    let schemaScript = document.getElementById(schemaId) as HTMLScriptElement;
-    if (!schemaScript) {
-      schemaScript = document.createElement('script');
-      schemaScript.id = schemaId;
-      schemaScript.type = 'application/ld+json';
-      document.head.appendChild(schemaScript);
-    }
+    // Cleanup: restore original meta tags when unmounting
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [villa]);
 
-    // Build VacationRental schema
-    const villaSchema = {
+  // Build VacationRental schema for SSR/pre-rendering (rendered directly in JSX)
+  const villaSchemaJson = React.useMemo(() => {
+    const villaDescription = villa.shortDescription || `Luxury villa in ${villa.location}. Book your exclusive stay with The Key Ibiza.`;
+    const villaUrl = `https://thekey-ibiza.com/villa-${villa.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`;
+
+    const schema = {
       '@context': 'https://schema.org',
       '@type': 'VacationRental',
       name: villa.name,
@@ -203,7 +203,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         value: villa.maxGuests,
         unitText: 'guests'
       },
-      amenityFeature: (villa.amenities || villa.features || []).slice(0, 10).map(a => ({
+      amenityFeature: (villa.amenities || villa.features || []).slice(0, 10).map((a: string) => ({
         '@type': 'LocationFeatureSpecification',
         name: a,
         value: true
@@ -233,17 +233,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
         logo: 'https://thekey-ibiza.com/logo-gold.png'
       }
     };
-
     // Remove undefined values
-    const cleanSchema = JSON.parse(JSON.stringify(villaSchema));
-    schemaScript.textContent = JSON.stringify(cleanSchema);
-
-    // Cleanup: restore original meta tags when unmounting
-    return () => {
-      document.title = originalTitle;
-      const existingSchema = document.getElementById(schemaId);
-      if (existingSchema) existingSchema.remove();
-    };
+    return JSON.stringify(JSON.parse(JSON.stringify(schema)));
   }, [villa]);
 
   // Sync dates to parent when they change
@@ -1083,7 +1074,13 @@ const handlePdfPasswordSubmit = async () => {
   );
 
   return (
-    <div style={{ backgroundColor: '#0B1C26' }}>
+    <>
+      {/* Schema.org VacationRental for SEO rich snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: villaSchemaJson }}
+      />
+      <div style={{ backgroundColor: '#0B1C26' }}>
       {/* ===== HEADER SLIDESHOW ===== */}
       <div className="relative w-full h-[60vh] md:h-[80vh] overflow-hidden group">
         {slideshowImages.map((img, index) => (
@@ -2207,6 +2204,7 @@ const handlePdfPasswordSubmit = async () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

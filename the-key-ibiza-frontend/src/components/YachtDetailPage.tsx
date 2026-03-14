@@ -291,18 +291,17 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
     updateMeta('twitter:image', yachtImage);
     updateMeta('description', yachtDescription, true);
 
-    // Add Schema.org JSON-LD for rich snippets
-    const schemaId = 'yacht-schema-jsonld';
-    let schemaScript = document.getElementById(schemaId) as HTMLScriptElement;
-    if (!schemaScript) {
-      schemaScript = document.createElement('script');
-      schemaScript.id = schemaId;
-      schemaScript.type = 'application/ld+json';
-      document.head.appendChild(schemaScript);
-    }
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [yacht, slideshowImages]);
 
-    // Build Product schema for yacht charter
-    const yachtSchema = {
+  // Build Product schema for yacht charter (rendered directly in JSX for SSR)
+  const yachtSchemaJson = React.useMemo(() => {
+    const yachtDescription = yacht.descripcion_corta || yacht.descripcion_larga || `Luxury ${yacht.tipo} charter in Ibiza. ${yacht.metros}m, up to ${yacht.pax_max} guests.`;
+    const yachtUrl = `https://thekey-ibiza.com/yacht-${yacht.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`;
+
+    const schema = {
       '@context': 'https://schema.org',
       '@type': 'Product',
       name: yacht.nombre,
@@ -340,14 +339,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
         worstRating: '1'
       }
     };
-
-    schemaScript.textContent = JSON.stringify(yachtSchema);
-
-    return () => {
-      document.title = originalTitle;
-      const existingSchema = document.getElementById(schemaId);
-      if (existingSchema) existingSchema.remove();
-    };
+    return JSON.stringify(schema);
   }, [yacht, slideshowImages]);
 
   // Auto-rotate slideshow
@@ -588,7 +580,13 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
   );
 
   return (
-    <div style={{ backgroundColor: '#0B1C26' }}>
+    <>
+      {/* Schema.org Product for SEO rich snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: yachtSchemaJson }}
+      />
+      <div style={{ backgroundColor: '#0B1C26' }}>
       {/* ===== HEADER VIDEO/SLIDESHOW ===== */}
       <div className="relative w-full h-[60vh] md:h-[80vh] overflow-hidden group">
         {imagesLoading ? (
@@ -1017,6 +1015,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
         />
       </div>
     </div>
+    </>
   );
 };
 
