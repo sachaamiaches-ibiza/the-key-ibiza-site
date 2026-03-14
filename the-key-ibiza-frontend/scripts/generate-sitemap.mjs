@@ -157,7 +157,7 @@ async function main() {
     const slug = villa.slug || villa.id;
     if (slug) {
       allPages.push({
-        path: `/villa/${slug}`,
+        path: `/villa-${slug}`,
         priority: '0.8',
         changefreq: 'weekly',
         lastmod: villa.updated_at?.split('T')[0] || undefined,
@@ -176,7 +176,7 @@ async function main() {
     const id = yacht.id || yacht.slug;
     if (id) {
       allPages.push({
-        path: `/yacht/${id}`,
+        path: `/yacht-${id}`,
         priority: '0.7',
         changefreq: 'weekly',
         image: yacht.image_url || yacht.header_image || undefined,
@@ -194,7 +194,7 @@ async function main() {
     const slug = post.slug || post.id;
     if (slug && post.status !== 'draft') {
       allPages.push({
-        path: `/blog/${slug}`,
+        path: `/blog-${slug}`,
         priority: '0.7',
         changefreq: 'monthly',
         lastmod: post.published_at?.split('T')[0] || post.created_at?.split('T')[0] || undefined,
