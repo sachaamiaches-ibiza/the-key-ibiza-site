@@ -68,7 +68,8 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
-          git pull --rebase origin main
           git add the-key-ibiza-frontend/prerendered/
           git commit -m "Auto-update pre-rendered pages [skip ci]"
-          git push origin main --force-with-lease
+          git fetch origin main
+          git rebase origin/main
+          git push origin main
