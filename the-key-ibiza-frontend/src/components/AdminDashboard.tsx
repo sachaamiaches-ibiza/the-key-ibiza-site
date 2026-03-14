@@ -105,11 +105,20 @@ interface GoogleAnalyticsData {
   dailyTrend: Array<{ date: string; sessions: number; users: number }>;
 }
 
+interface PendingReview {
+  id: string;
+  name: string;
+  location: string;
+  quote: string;
+  email: string | null;
+  created_at: string;
+}
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'google' | 'advanced' | 'sessions' | 'actions' | 'vip'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'google' | 'advanced' | 'sessions' | 'actions' | 'vip' | 'reviews'>('overview');
   const [period, setPeriod] = useState('30d');
   const [vipUsers, setVipUsers] = useState<VipUser[]>([]);
   const [selectedVip, setSelectedVip] = useState<string | null>(null);
@@ -117,6 +126,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [gaData, setGaData] = useState<GoogleAnalyticsData | null>(null);
   const [gaLoading, setGaLoading] = useState(false);
   const [gaError, setGaError] = useState<string | null>(null);
+  const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
@@ -208,6 +219,59 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     }
   }, [selectedVip]);
 
+  // Fetch pending reviews when reviews tab is active
+  useEffect(() => {
+    if (activeTab === 'reviews') {
+      const fetchPendingReviews = async () => {
+        setReviewsLoading(true);
+        try {
+          const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+          const res = await fetch(`${BACKEND_URL}/api/reviews/pending`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setPendingReviews(data.reviews || []);
+          }
+        } catch (err) {
+          console.error('Failed to fetch pending reviews:', err);
+        }
+        setReviewsLoading(false);
+      };
+      fetchPendingReviews();
+    }
+  }, [activeTab]);
+
+  const approveReview = async (id: string) => {
+    try {
+      const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+      const res = await fetch(`${BACKEND_URL}/api/reviews/${id}/approve`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setPendingReviews(prev => prev.filter(r => r.id !== id));
+      }
+    } catch (err) {
+      console.error('Failed to approve review:', err);
+    }
+  };
+
+  const deleteReview = async (id: string) => {
+    try {
+      const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+      const res = await fetch(`${BACKEND_URL}/api/reviews/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setPendingReviews(prev => prev.filter(r => r.id !== id));
+      }
+    } catch (err) {
+      console.error('Failed to delete review:', err);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('es-ES', {
       day: '2-digit',
@@ -295,7 +359,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {(['overview', 'google', 'advanced', 'sessions', 'actions', 'vip'] as const).map((tab) => (
+          {(['overview', 'google', 'advanced', 'sessions', 'actions', 'vip', 'reviews'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -305,7 +369,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   : 'bg-transparent border border-white/20 text-white/60 hover:border-luxury-gold/50'
               }`}
             >
-              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab === 'google' ? 'Google Analytics' : tab}
+              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab === 'google' ? 'Google Analytics' : tab === 'reviews' ? 'Reviews' : tab}
             </button>
           ))}
         </div>
@@ -917,6 +981,50 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <p className="text-white/40 text-sm">Select a VIP user from the list to see their activity</p>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Reviews Tab */}
+        {activeTab === 'reviews' && (
+          <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+            <h3 className="text-white text-lg font-serif mb-6">Pending Reviews</h3>
+            {reviewsLoading ? (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-2 border-luxury-gold/30 border-t-luxury-gold rounded-full animate-spin mx-auto"></div>
+              </div>
+            ) : pendingReviews.length === 0 ? (
+              <p className="text-white/40 text-sm text-center py-8">No pending reviews</p>
+            ) : (
+              <div className="space-y-4">
+                {pendingReviews.map((review) => (
+                  <div key={review.id} className="bg-white/5 rounded-xl p-6 border border-white/10">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-white font-medium">{review.name}</p>
+                        <p className="text-white/40 text-sm">{review.location}</p>
+                        {review.email && <p className="text-white/30 text-xs mt-1">{review.email}</p>}
+                      </div>
+                      <p className="text-white/30 text-xs">{formatDate(review.created_at)}</p>
+                    </div>
+                    <p className="text-white/70 text-sm italic mb-4">"{review.quote}"</p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => approveReview(review.id)}
+                        className="px-4 py-2 rounded-full bg-green-500/20 text-green-400 text-xs uppercase tracking-wider hover:bg-green-500/30 transition-all"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => deleteReview(review.id)}
+                        className="px-4 py-2 rounded-full bg-red-500/20 text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/30 transition-all"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
