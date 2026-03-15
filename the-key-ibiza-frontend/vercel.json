@@ -79,6 +79,18 @@
       "destination": "https://the-key-ibiza-backend.vercel.app/share/wishlist/:code"
     },
     {
+      "source": "/admin-dashboard",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/vip-login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/instagram-creator",
+      "destination": "/index.html"
+    },
+    {
       "source": "/:lang(fr|es|de)/:path*",
       "destination": "/index.html"
     },
