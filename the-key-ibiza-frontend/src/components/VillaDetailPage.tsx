@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Villa, Language } from '../types';
 import { translations } from '../translations';
@@ -37,10 +36,10 @@ const getVillaMetaDescription = (villa: Villa, lang: Language): string => {
 
   // Multi-language fallbacks with CTAs
   const fallbacks: Record<Language, string> = {
-    en: `Luxury ${villa.beds ? villa.beds + 'BR ' : ''}villa in ${villa.location}, Ibiza. Private pool, stunning views. Book your exclusive stay now.`,
-    fr: `Villa de luxe ${villa.beds ? villa.beds + 'ch ' : ''}à ${villa.location}, Ibiza. Piscine privée, vues exceptionnelles. Réservez maintenant.`,
-    es: `Villa de lujo ${villa.beds ? villa.beds + 'hab ' : ''}en ${villa.location}, Ibiza. Piscina privada, vistas increíbles. Reserve ahora.`,
-    de: `Luxusvilla ${villa.beds ? villa.beds + ' SZ ' : ''}in ${villa.location}, Ibiza. Privatpool, atemberaubende Aussicht. Jetzt buchen.`
+    en: `Luxury ${villa.bedrooms ? villa.bedrooms + 'BR ' : ''}villa in ${villa.location}, Ibiza. Private pool, stunning views. Book your exclusive stay now.`,
+    fr: `Villa de luxe ${villa.bedrooms ? villa.bedrooms + 'ch ' : ''}à ${villa.location}, Ibiza. Piscine privée, vues exceptionnelles. Réservez maintenant.`,
+    es: `Villa de lujo ${villa.bedrooms ? villa.bedrooms + 'hab ' : ''}en ${villa.location}, Ibiza. Piscina privada, vistas increíbles. Reserve ahora.`,
+    de: `Luxusvilla ${villa.bedrooms ? villa.bedrooms + ' SZ ' : ''}in ${villa.location}, Ibiza. Privatpool, atemberaubende Aussicht. Jetzt buchen.`
   };
 
   // Use shortDescription if available, otherwise fallback
@@ -269,6 +268,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
       onDatesChange(checkIn, checkOut);
     }
   }, [checkIn, checkOut, onDatesChange]);
+
+
   const touchStartX = useRef(0);
 
   // Use headerImages for the slideshow, fallback to main imageUrl
@@ -963,7 +964,7 @@ const handlePdfPasswordSubmit = async () => {
         <div>
           <label className="text-[8px] uppercase tracking-[0.15em] text-white/50 mb-1.5 block font-medium text-center">Check-out</label>
           <button
-            type="button"
+              type="button"
             onClick={() => { setDatePickerKey(k => k + 1); setMobileDatePickerOpen(true); }}
             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-luxury-gold/50 transition-colors cursor-pointer text-left hover:border-luxury-gold/30"
           >
@@ -1339,7 +1340,7 @@ const handlePdfPasswordSubmit = async () => {
               className="absolute top-4 right-4 md:top-8 md:right-8 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-luxury-gold hover:text-luxury-blue transition-all"
               style={{ zIndex: 9999999 }}
             >
-              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
             {/* Counter - top center */}
@@ -1941,7 +1942,7 @@ const handlePdfPasswordSubmit = async () => {
               className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
@@ -1950,7 +1951,7 @@ const handlePdfPasswordSubmit = async () => {
               <div className="text-center py-8">
                 <div className="w-16 h-16 rounded-full bg-luxury-gold/20 flex items-center justify-center mx-auto mb-6">
                   <svg className="w-8 h-8 text-luxury-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-serif text-white mb-3">Thank You!</h3>
@@ -1961,270 +1962,240 @@ const handlePdfPasswordSubmit = async () => {
                     setFeedbackStatus('idle');
                     setFeedbackForm({ name: '', email: '', villaName: villa.name, rating: 0, message: '', images: [], privacyAccepted: false });
                   }}
-                  className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-white transition-colors"
+                  className="px-8 py-3 rounded-xl font-semibold uppercase tracking-[0.15em] text-[10px] transition-all duration-300 hover:opacity-90"
+                  style={{ backgroundColor: '#C4A461', color: '#0B1C26' }}
                 >
                   Close
                 </button>
               </div>
-            ) : feedbackStatus === 'error' ? (
-              /* Error State */
-              <div className="text-center py-8">
-                <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-serif text-white mb-3">Oops!</h3>
-                <p className="text-white/60 text-sm mb-6">Something went wrong. Please try again later.</p>
-                <button
-                  onClick={() => setFeedbackStatus('idle')}
-                  className="px-8 py-3 bg-luxury-gold text-luxury-blue rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-white transition-colors"
-                >
-                  Try Again
-                </button>
-              </div>
             ) : (
-              /* Form State */
-              <>
-                {/* Header */}
-                <div className="text-center mb-6">
-                  <div className="w-12 h-12 rounded-full bg-luxury-gold/10 flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-luxury-gold" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-serif text-white mb-2">Share Your Experience</h3>
-                  <p className="text-white/50 text-xs">We'd love to hear about your stay</p>
-                </div>
+              /* Form */
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                setFeedbackStatus('submitting');
 
-                {/* Form */}
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  setFeedbackStatus('submitting');
+                try {
+                  // Upload images to Cloudinary first (if any)
+                  const imageUrls: string[] = [];
 
-                  try {
-                    // Upload images to Cloudinary first (if any)
-                    const imageUrls: string[] = [];
+                  if (feedbackForm.images.length > 0) {
+                    const CLOUDINARY_CLOUD_NAME = 'drxf80sho';
+                    const CLOUDINARY_UPLOAD_PRESET = 'the-key-feedback';
 
-                    if (feedbackForm.images.length > 0) {
-                      const CLOUDINARY_CLOUD_NAME = 'drxf80sho';
-                      const CLOUDINARY_UPLOAD_PRESET = 'the-key-feedback';
+                    for (const file of feedbackForm.images) {
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-                      for (const file of feedbackForm.images) {
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                      const cloudinaryRes = await fetch(
+                        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+                        { method: 'POST', body: formData }
+                      );
 
-                        const cloudinaryRes = await fetch(
-                          `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-                          { method: 'POST', body: formData }
-                        );
-
-                        if (cloudinaryRes.ok) {
-                          const cloudinaryData = await cloudinaryRes.json();
-                          imageUrls.push(cloudinaryData.secure_url);
-                        }
+                      if (cloudinaryRes.ok) {
+                        const cloudinaryData = await cloudinaryRes.json();
+                        imageUrls.push(cloudinaryData.secure_url);
                       }
                     }
+                  }
 
-                    // Submit feedback with image URLs
-                    const response = await fetch('https://the-key-ibiza-backend.vercel.app/feedback', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        name: feedbackForm.name,
-                        email: feedbackForm.email,
-                        villaName: feedbackForm.villaName,
-                        rating: feedbackForm.rating,
-                        message: feedbackForm.message,
-                        images: imageUrls
-                      })
-                    });
+                  // Submit feedback with image URLs
+                  const response = await fetch('https://the-key-ibiza-backend.vercel.app/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      name: feedbackForm.name,
+                      email: feedbackForm.email,
+                      villaName: feedbackForm.villaName,
+                      rating: feedbackForm.rating,
+                      message: feedbackForm.message,
+                      images: imageUrls
+                    })
+                  });
 
-                    if (response.ok) {
-                      setFeedbackStatus('success');
-                    } else {
-                      setFeedbackStatus('error');
-                    }
-                  } catch (error) {
-                    console.error('Error submitting feedback:', error);
+                  if (response.ok) {
+                    setFeedbackStatus('success');
+                  } else {
                     setFeedbackStatus('error');
                   }
-                }}>
-                  {/* Name */}
-                  <div className="mb-4">
-                    <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Your Name</label>
-                    <input
-                      type="text"
-                      value={feedbackForm.name}
-                      onChange={(e) => setFeedbackForm(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="John Smith"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30"
-                      required
-                    />
-                  </div>
+                } catch (error) {
+                  console.error('Error submitting feedback:', error);
+                  setFeedbackStatus('error');
+                }
+              }}>
+                {/* Name */}
+                <div className="mb-4">
+                  <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Your Name</label>
+                  <input
+                    type="text"
+                    value={feedbackForm.name}
+                    onChange={(e) => setFeedbackForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="John Smith"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30"
+                    required
+                  />
+                </div>
 
-                  {/* Email */}
-                  <div className="mb-4">
-                    <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Email Address</label>
-                    <input
-                      type="email"
-                      value={feedbackForm.email}
-                      onChange={(e) => setFeedbackForm(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="john@example.com"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30"
-                      required
-                    />
-                  </div>
+                {/* Email */}
+                <div className="mb-4">
+                  <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    value={feedbackForm.email}
+                    onChange={(e) => setFeedbackForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="john@example.com"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30"
+                    required
+                  />
+                </div>
 
-                  {/* Villa Name */}
-                  <div className="mb-4">
-                    <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Villa Name</label>
-                    <input
-                      type="text"
-                      value={feedbackForm.villaName}
-                      onChange={(e) => setFeedbackForm(prev => ({ ...prev, villaName: e.target.value }))}
-                      placeholder="Villa name"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30"
-                      required
-                    />
-                  </div>
+                {/* Villa Name */}
+                <div className="mb-4">
+                  <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Villa Name</label>
+                  <input
+                    type="text"
+                    value={feedbackForm.villaName}
+                    onChange={(e) => setFeedbackForm(prev => ({ ...prev, villaName: e.target.value }))}
+                    placeholder="Villa name"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30"
+                    required
+                  />
+                </div>
 
-                  {/* Golden Keys Rating */}
-                  <div className="mb-5">
-                    <label className="block text-white/60 text-xs uppercase tracking-wider mb-3">Rate Your Experience</label>
-                    <div className="flex justify-center gap-3">
-                      {[1, 2, 3, 4, 5].map((keyNum) => (
-                        <button
-                          key={keyNum}
-                          type="button"
-                          onClick={() => setFeedbackForm(prev => ({ ...prev, rating: keyNum }))}
-                          className={`transition-all duration-300 transform ${feedbackForm.rating >= keyNum ? 'scale-110' : 'opacity-40 hover:opacity-70 hover:scale-105'}`}
-                          title={keyNum === 1 ? 'Poor' : keyNum === 2 ? 'Fair' : keyNum === 3 ? 'Good' : keyNum === 4 ? 'Very Good' : 'Excellent'}
-                        >
-                          {/* Golden Key Icon */}
-                          <div className={`transition-all duration-300 ${feedbackForm.rating >= keyNum ? 'drop-shadow-[0_0_8px_rgba(196,164,97,0.8)]' : ''}`}>
-                            <svg
-                              className={`w-8 h-8 transition-colors duration-300 ${feedbackForm.rating >= keyNum ? 'text-luxury-gold' : 'text-white/40'}`}
-                              viewBox="0 0 24 24"
-                              fill={feedbackForm.rating >= keyNum ? 'currentColor' : 'none'}
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                {/* Golden Keys Rating */}
+                <div className="mb-5">
+                  <label className="block text-white/60 text-xs uppercase tracking-wider mb-3">Rate Your Experience</label>
+                  <div className="flex justify-center gap-3">
+                    {[1, 2, 3, 4, 5].map((keyNum) => (
+                      <button
+                        key={keyNum}
+                        type="button"
+                        onClick={() => setFeedbackForm(prev => ({ ...prev, rating: keyNum }))}
+                        className={`transition-all duration-300 transform ${feedbackForm.rating >= keyNum ? 'scale-110' : 'opacity-40 hover:opacity-70 hover:scale-105'}`}
+                        title={keyNum === 1 ? 'Poor' : keyNum === 2 ? 'Fair' : keyNum === 3 ? 'Good' : keyNum === 4 ? 'Very Good' : 'Excellent'}
+                      >
+                        {/* Golden Key Icon */}
+                        <div className={`transition-all duration-300 ${feedbackForm.rating >= keyNum ? 'drop-shadow-[0_0_8px_rgba(196,164,97,0.8)]' : ''}`}>
+                          <svg
+                            className={`w-8 h-8 transition-colors duration-300 ${feedbackForm.rating >= keyNum ? 'text-luxury-gold' : 'text-white/40'}`}
+                            viewBox="0 0 24 24"
+                            fill={feedbackForm.rating >= keyNum ? 'currentColor' : 'none'}
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4a9 9 0 10-9 9h.01" />
+                          </svg>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-center text-white/50 text-xs mt-3 font-light">
+                    {feedbackForm.rating === 0 && 'Click to rate your stay'}
+                    {feedbackForm.rating === 1 && '1 Key - Needs Improvement'}
+                    {feedbackForm.rating === 2 && '2 Keys - Fair'}
+                    {feedbackForm.rating === 3 && '3 Keys - Good'}
+                    {feedbackForm.rating === 4 && '4 Keys - Very Good'}
+                    {feedbackForm.rating === 5 && '5 Keys - Outstanding!'}
+                  </p>
+                </div>
+
+                {/* Image Upload */}
+                <div className="mb-4">
+                  <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Upload Photos (Optional)</label>
+                  <input
+                    ref={feedbackFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      setFeedbackForm(prev => ({ ...prev, images: [...prev.images, ...files].slice(0, 5) }));
+                    }}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => feedbackFileInputRef.current?.click()}
+                    className="w-full py-4 border border-dashed border-white/20 rounded-xl text-white/40 text-sm hover:border-luxury-gold/50 hover:text-luxury-gold/70 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Click to upload photos
+                  </button>
+                  {feedbackForm.images.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {feedbackForm.images.map((file, idx) => (
+                        <div key={idx} className="relative group">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Upload ${idx + 1}`}
+                            className="w-16 h-16 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFeedbackForm(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }))}
+                            className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
-                          </div>
-                        </button>
+                          </button>
+                        </div>
                       ))}
                     </div>
-                    <p className="text-center text-white/50 text-xs mt-3 font-light">
-                      {feedbackForm.rating === 0 && 'Click to rate your stay'}
-                      {feedbackForm.rating === 1 && '1 Key - Needs Improvement'}
-                      {feedbackForm.rating === 2 && '2 Keys - Fair'}
-                      {feedbackForm.rating === 3 && '3 Keys - Good'}
-                      {feedbackForm.rating === 4 && '4 Keys - Very Good'}
-                      {feedbackForm.rating === 5 && '5 Keys - Outstanding!'}
-                    </p>
-                  </div>
+                  )}
+                  <p className="text-white/30 text-xs mt-2">Maximum 5 photos</p>
+                </div>
 
-                  {/* Image Upload */}
-                  <div className="mb-4">
-                    <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Upload Photos (Optional)</label>
+                {/* Message */}
+                <div className="mb-5">
+                  <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Your Experience</label>
+                  <textarea
+                    value={feedbackForm.message}
+                    onChange={(e) => setFeedbackForm(prev => ({ ...prev, message: e.target.value }))}
+                    placeholder="Tell us about your stay at the villa..."
+                    rows={4}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30 resize-none"
+                    required
+                  />
+                </div>
+
+                {/* Privacy Policy Checkbox */}
+                <div className="mb-6">
+                  <label className="flex items-start gap-3 cursor-pointer group">
                     <input
-                      ref={feedbackFileInputRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        setFeedbackForm(prev => ({ ...prev, images: [...prev.images, ...files].slice(0, 5) }));
-                      }}
-                      className="hidden"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => feedbackFileInputRef.current?.click()}
-                      className="w-full py-4 border border-dashed border-white/20 rounded-xl text-white/40 text-sm hover:border-luxury-gold/50 hover:text-luxury-gold/70 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Click to upload photos
-                    </button>
-                    {feedbackForm.images.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {feedbackForm.images.map((file, idx) => (
-                          <div key={idx} className="relative group">
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={`Upload ${idx + 1}`}
-                              className="w-16 h-16 object-cover rounded-lg"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setFeedbackForm(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }))}
-                              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <p className="text-white/30 text-xs mt-2">Maximum 5 photos</p>
-                  </div>
-
-                  {/* Message */}
-                  <div className="mb-5">
-                    <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">Your Experience</label>
-                    <textarea
-                      value={feedbackForm.message}
-                      onChange={(e) => setFeedbackForm(prev => ({ ...prev, message: e.target.value }))}
-                      placeholder="Tell us about your stay at the villa..."
-                      rows={4}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold/50 transition-colors placeholder:text-white/30 resize-none"
+                      type="checkbox"
+                      checked={feedbackForm.privacyAccepted}
+                      onChange={(e) => setFeedbackForm(prev => ({ ...prev, privacyAccepted: e.target.checked }))}
+                      className="mt-1 w-4 h-4 rounded border-white/30 bg-transparent text-luxury-gold focus:ring-luxury-gold focus:ring-offset-0 cursor-pointer"
                       required
                     />
-                  </div>
+                    <span className="text-white/50 text-xs leading-relaxed group-hover:text-white/70 transition-colors">
+                      You agree that your information will be used to process your request. Further information and revocation instructions can be found in our <a href="#" className="text-luxury-gold hover:underline">privacy policy</a>.
+                    </span>
+                  </label>
+                </div>
 
-                  {/* Privacy Policy Checkbox */}
-                  <div className="mb-6">
-                    <label className="flex items-start gap-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={feedbackForm.privacyAccepted}
-                        onChange={(e) => setFeedbackForm(prev => ({ ...prev, privacyAccepted: e.target.checked }))}
-                        className="mt-1 w-4 h-4 rounded border-white/30 bg-transparent text-luxury-gold focus:ring-luxury-gold focus:ring-offset-0 cursor-pointer"
-                        required
-                      />
-                      <span className="text-white/50 text-xs leading-relaxed group-hover:text-white/70 transition-colors">
-                        You agree that your information will be used to process your request. Further information and revocation instructions can be found in our <a href="#" className="text-luxury-gold hover:underline">privacy policy</a>.
-                      </span>
-                    </label>
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={feedbackStatus === 'submitting' || !feedbackForm.privacyAccepted || feedbackForm.rating === 0}
-                    className="w-full py-4 bg-luxury-gold text-luxury-blue rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {feedbackStatus === 'submitting' ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Submitting...
-                      </span>
-                    ) : 'Submit Feedback'}
-                  </button>
-                </form>
-              </>
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={feedbackStatus === 'submitting' || !feedbackForm.privacyAccepted || feedbackForm.rating === 0}
+                  className="w-full py-4 bg-luxury-gold text-luxury-blue rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {feedbackStatus === 'submitting' ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Submitting...
+                    </span>
+                  ) : 'Submit Feedback'}
+                </button>
+              </form>
             )}
           </div>
         </div>

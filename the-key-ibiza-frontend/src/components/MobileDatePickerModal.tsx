@@ -18,23 +18,36 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   checkOut,
   onDatesChange,
 }) => {
-  // Initialize state directly from props (component is remounted each time modal opens)
-  const [range, setRange] = useState<DateRange | undefined>(() => {
-    const fromDate = checkIn ? new Date(checkIn) : undefined;
-    const toDate = checkOut ? new Date(checkOut) : undefined;
-    return fromDate ? { from: fromDate, to: toDate } : undefined;
-  });
+
+  // Helper to parse "YYYY-MM-DD" as local date (midnight) to prevent timezone shifts
+  const parseLocal = useCallback((d: string) => {
+    if (!d) return undefined;
+    const parts = d.split('-');
+    if (parts.length === 3) {
+      return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    }
+    return new Date(d);
+  }, []);
+
+  // Derive range directly from props (stateless)
+  const range = React.useMemo(() => {
+    const from = parseLocal(checkIn);
+    const to = parseLocal(checkOut);
+    return from ? { from, to } : undefined;
+  }, [checkIn, checkOut, parseLocal]);
 
   const [selecting, setSelecting] = useState<'checkin' | 'checkout'>(() => {
     return (checkIn && checkOut) ? 'checkin' : (checkIn ? 'checkout' : 'checkin');
   });
 
   const [currentMonth, setCurrentMonth] = useState<Date>(() => {
-    return checkIn ? new Date(checkIn) : new Date();
+    const fromDate = parseLocal(checkIn);
+    return fromDate || new Date();
   });
 
   const touchStartX = useRef<number | null>(null);
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const handlePrevMonth = useCallback(() => {
     setCurrentMonth(prev => subMonths(prev, 1));
@@ -57,31 +70,37 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
     touchStartX.current = null;
   }, [handleNextMonth, handlePrevMonth]);
 
-  const handleSelect = useCallback((newRange: DateRange | undefined) => {
-    if (!newRange?.from) return;
+  const handleSelect = useCallback((newRange: DateRange | undefined, selectedDay: Date) => {
+    // If not valid click, ignore
+    if (!selectedDay) return;
 
     if (selecting === 'checkin') {
-      setRange({ from: newRange.from, to: undefined });
+      // Logic for selecting START date
+      // Always use the clicked day as new start, clear the end
+      onDatesChange(format(selectedDay, 'yyyy-MM-dd'), '');
       setSelecting('checkout');
     } else {
-      if (newRange.to) {
-        setRange(newRange);
-        onDatesChange(format(newRange.from, 'yyyy-MM-dd'), format(newRange.to, 'yyyy-MM-dd'));
+      // Logic for selecting END date or modifying range
+      if (newRange?.to) {
+        // We have a full range (start + end) provided by DayPicker
+        onDatesChange(format(newRange.from!, 'yyyy-MM-dd'), format(newRange.to, 'yyyy-MM-dd'));
         onClose();
-      } else if (range?.from && newRange.from > range.from) {
-        const finalRange = { from: range.from, to: newRange.from };
-        setRange(finalRange);
+      } else if (newRange?.from && range?.from && newRange.from > range.from) {
+        // User clicked a date AFTER current start, but DayPicker gave partial range
+        // Treat clicked date (newRange.from which is usually selectedDay) as end
         onDatesChange(format(range.from, 'yyyy-MM-dd'), format(newRange.from, 'yyyy-MM-dd'));
         onClose();
       } else {
-        setRange({ from: newRange.from, to: undefined });
+        // User clicked a date BEFORE current start, or same date
+        // Treat as new start date
+        onDatesChange(format(selectedDay, 'yyyy-MM-dd'), '');
         setSelecting('checkout');
       }
     }
   }, [selecting, range, onDatesChange, onClose]);
 
   const handleClear = () => {
-    setRange(undefined);
+    onDatesChange('', '');
     setSelecting('checkin');
   };
 
@@ -106,7 +125,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
 
         <div className="flex gap-2 mb-4">
           <button
-            onClick={() => { setSelecting('checkin'); setRange(undefined); }}
+            onClick={() => { setSelecting('checkin'); onDatesChange('', ''); }}
             className={`flex-1 p-2 rounded-lg border text-center text-xs transition-all ${
               selecting === 'checkin' ? 'border-luxury-gold bg-luxury-gold/10 text-luxury-gold' : 'border-white/10 text-white/50'
             }`}

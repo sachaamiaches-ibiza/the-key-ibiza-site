@@ -2,7 +2,7 @@
 // LANGUAGES
 // ============================================
 
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ru' | 'zh' | 'ar' | 'hi';
+export type Language = 'en' | 'es' | 'fr' | 'de';
 
 export interface LanguageOption {
   code: Language;
@@ -13,14 +13,17 @@ export const languages: LanguageOption[] = [
   { code: 'en', native: 'English' },
   { code: 'es', native: 'Español' },
   { code: 'fr', native: 'Français' },
-  { code: 'de', native: 'Deutsch' },
-  { code: 'it', native: 'Italiano' },
-  { code: 'pt', native: 'Português' },
-  { code: 'ru', native: 'Русский' },
-  { code: 'zh', native: '中文' },
-  { code: 'ar', native: 'العربية' },
-  { code: 'hi', native: 'हिन्दी' }
+  { code: 'de', native: 'Deutsch' }
 ];
+
+export type View =
+  | 'home' | 'services' | 'photographer' | 'about' | 'blog' | 'valerie-detail' | 'francesca-detail'
+  | 'service-villas' | 'villas-holiday' | 'villas-longterm' | 'villas-sale'
+  | 'service-yacht' | 'service-security' | 'service-wellness' | 'service-nightlife'
+  | 'service-events' | 'service-catering' | 'service-furniture' | 'service-health'
+  | 'service-yoga' | 'service-cleaning' | 'service-driver' | 'service-deliveries'
+  | 'service-babysitting'
+  | string;
 
 // ============================================
 // VILLA FILTER STATE
