@@ -526,10 +526,10 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ serviceId, onNavigate, la
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div className="aspect-square rounded-[40px] overflow-hidden border border-white/5 group">
-                <img src={data.imageGrid1} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="View 1" />
+                <img src={data.imageGrid1} className="block w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="View 1" />
               </div>
               <div className="aspect-square rounded-[40px] overflow-hidden border border-white/5 group">
-                <img src={data.imageGrid2} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="View 2" />
+                <img src={data.imageGrid2} className="block w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="View 2" />
               </div>
             </div>
           </div>
