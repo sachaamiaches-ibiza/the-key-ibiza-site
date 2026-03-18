@@ -269,8 +269,8 @@ const SERVICE_DATA: Record<string, any> = {
       "24/7 Spontaneous Availability"
     ],
     imageMain: "/images/services/driver-esvedra.jpg",
-    imageGrid1: "/images/services/driver-esvedra.jpg",
-    imageGrid2: "/images/services/driver-esvedra.jpg"
+    imageGrid1: "/images/services/driver-daltvila.jpg",
+    imageGrid2: "/images/services/driver-aviavip.jpg"
   },
   deliveries: {
     badge: "Convenience",
