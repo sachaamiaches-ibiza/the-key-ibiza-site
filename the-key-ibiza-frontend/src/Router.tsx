@@ -72,7 +72,7 @@ const LangWrapper: React.FC<{
         ? (paramLang as Language)
         : (langProp || 'en');
 
-    return <Component lang={effectiveLang} {...rest} />;
+    return <Component {...rest} lang={effectiveLang} />;
 };
 
 // --- Wrapper Components for Details ---
