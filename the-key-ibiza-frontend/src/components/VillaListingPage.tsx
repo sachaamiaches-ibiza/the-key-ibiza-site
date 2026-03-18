@@ -220,7 +220,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
       setVillas(propVillas);
       console.log('VILLAS FROM PROPS:', propVillas);
     } else {
-      fetchVillas()
+      fetchVillas(lang)
         .then(data => {
           const publicVillas = getPublicVillas(data);
           setVillas(publicVillas);
@@ -228,7 +228,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
         })
         .catch(err => console.error('Error fetching villas:', err));
     }
-  }, [propVillas]);
+  }, [propVillas, lang]);
 
   // Sync dates to parent when they change
   useEffect(() => {

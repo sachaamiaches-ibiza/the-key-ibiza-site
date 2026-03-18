@@ -214,7 +214,7 @@ async function loadCloudinaryImagesForVilla(villa: Villa, rawRow: any): Promise<
 }
 
 // ---------- FETCH ALL VILLAS FROM BACKEND ----------
-export async function fetchVillas(): Promise<Villa[]> {
+export async function fetchVillas(lang: string = 'en'): Promise<Villa[]> {
   try {
     // Include VIP token if available to see private villas (check both storages)
     const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
@@ -228,7 +228,7 @@ export async function fetchVillas(): Promise<Villa[]> {
       console.log('🔐 Sending Authorization header');
     }
 
-    const res = await fetch(`${BACKEND_URL}/villas`, { headers });
+    const res = await fetch(`${BACKEND_URL}/villas?lang=${lang}`, { headers });
     console.log('📡 Villas API response status:', res.status);
 
     if (!res.ok) {
@@ -262,7 +262,7 @@ export async function fetchVillas(): Promise<Villa[]> {
 }
 
 // ---------- FETCH SINGLE VILLA BY SLUG ----------
-export async function fetchVillaBySlug(slug: string): Promise<Villa | null> {
+export async function fetchVillaBySlug(slug: string, lang: string = 'en'): Promise<Villa | null> {
   try {
     const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
     const headers: HeadersInit = {
@@ -272,7 +272,7 @@ export async function fetchVillaBySlug(slug: string): Promise<Villa | null> {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND_URL}/villas/${slug}`, { headers });
+    const res = await fetch(`${BACKEND_URL}/villas/${slug}?lang=${lang}`, { headers });
 
     if (!res.ok) {
       console.error('❌ Backend error fetching villa:', res.status);

@@ -441,7 +441,7 @@ const App: React.FC = () => {
         const loadVillas = async () => {
             setVillasLoading(true);
             try {
-                const villas = await fetchVillas();
+                const villas = await fetchVillas(lang);
                 setAllVillas(villas);
                 console.log('✅ ALL VILLAS FROM BACKEND:', villas.length, isVip ? '(VIP)' : '(public)');
             } catch (error) {
@@ -450,7 +450,7 @@ const App: React.FC = () => {
             setVillasLoading(false);
         };
         loadVillas();
-    }, [isVip]);
+    }, [isVip, lang]);
 
     // Fetch single villa logic...
     // Updated constraint: logic depends on currentView being correct (villa-slug). 
@@ -465,9 +465,9 @@ const App: React.FC = () => {
 
             if (!villaInState && !directVilla) {
                 // Villa not in state, fetch directly from Backend by name slug
-                fetchVillaBySlug(villaUrlSlug).then(villa => {
+                fetchVillaBySlug(villaUrlSlug, lang).then(villa => {
                     if (villa) setDirectVilla(villa);
-                    else fetchVillaBySlug(`invenio-${villaUrlSlug}`).then(v => {
+                    else fetchVillaBySlug(`invenio-${villaUrlSlug}`, lang).then(v => {
                         if (v) setDirectVilla(v);
                     });
                 });
