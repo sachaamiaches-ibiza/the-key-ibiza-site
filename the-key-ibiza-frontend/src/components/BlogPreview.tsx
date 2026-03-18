@@ -26,7 +26,6 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
   const [loading, setLoading] = useState(true);
   const [mobileIndex, setMobileIndex] = useState(0);
   const touchStartX = useRef(0);
-  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -44,34 +43,7 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
     fetchArticles();
   }, []);
 
-  // Autoplay for mobile
-  useEffect(() => {
-    if (articles.length === 0) return;
-
-    const startAutoplay = () => {
-      autoplayRef.current = setInterval(() => {
-        setMobileIndex((prev) => (prev + 1) % articles.length);
-      }, 4000); // Change slide every 4 seconds
-    };
-
-    startAutoplay();
-
-    return () => {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current);
-      }
-    };
-  }, [articles.length]);
-
-  // Reset autoplay on manual interaction
-  const resetAutoplay = () => {
-    if (autoplayRef.current) {
-      clearInterval(autoplayRef.current);
-    }
-    autoplayRef.current = setInterval(() => {
-      setMobileIndex((prev) => (prev + 1) % articles.length);
-    }, 4000);
-  };
+  // Autoplay disabled - was causing header flicker
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -84,10 +56,8 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
 
     if (diff > threshold && mobileIndex < articles.length - 1) {
       setMobileIndex(mobileIndex + 1);
-      resetAutoplay();
     } else if (diff < -threshold && mobileIndex > 0) {
       setMobileIndex(mobileIndex - 1);
-      resetAutoplay();
     }
   };
 
@@ -192,10 +162,7 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
             {articles.map((_, i) => (
               <button
                 key={i}
-                onClick={() => {
-                  setMobileIndex(i);
-                  resetAutoplay();
-                }}
+                onClick={() => setMobileIndex(i)}
                 className={`h-1 rounded-full transition-all duration-300 ${
                   i === mobileIndex
                     ? 'bg-luxury-gold w-8'
