@@ -268,8 +268,8 @@ const SERVICE_DATA: Record<string, any> = {
       "Elite SUV & Sedan Fleet",
       "24/7 Spontaneous Availability"
     ],
-    imageMain: "/images/services/driver-esvedra.jpg",
-    imageGrid1: "/images/services/driver-daltvila.jpg",
+    imageMain: "/images/services/driver-daltvila.jpg",
+    imageGrid1: "/images/services/driver-esvedra.jpg",
     imageGrid2: "/images/services/driver-aviavip.jpg"
   },
   deliveries: {
