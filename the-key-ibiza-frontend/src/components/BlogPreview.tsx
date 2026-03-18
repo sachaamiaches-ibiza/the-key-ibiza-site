@@ -146,13 +146,13 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
   return (
     <section id="blog-preview" className="py-16 md:py-20 lg:py-24" style={{ backgroundColor: '#0B1C26' }}>
       <div className="container mx-auto px-6 lg:px-12">
-        {/* Header */}
+        {/* Header - static content */}
         <div className="text-center mb-16 md:mb-20">
           <span className="text-luxury-gold uppercase tracking-[0.6em] text-[10px] font-medium block mb-6">
-            {lang === 'es' ? 'Magazine' : 'Magazine'}
+            Magazine
           </span>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-4 text-white">
-            {lang === 'es' ? 'The Key Insights' : 'The Key Insights'}
+            The Key Insights
           </h2>
           <p className="text-white/40 text-sm md:text-base font-light tracking-wide max-w-2xl mx-auto">
             {lang === 'es'
