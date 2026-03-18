@@ -21,7 +21,7 @@ const BACKEND_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001'
   : 'https://the-key-ibiza-backend.vercel.app';
 
-const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
+const BlogPreview: React.FC<BlogPreviewProps> = React.memo(({ onNavigate, lang }) => {
   const [articles, setArticles] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [mobileIndex, setMobileIndex] = useState(0);
@@ -189,6 +189,6 @@ const BlogPreview: React.FC<BlogPreviewProps> = ({ onNavigate, lang }) => {
       </div>
     </section>
   );
-};
+});
 
 export default BlogPreview;

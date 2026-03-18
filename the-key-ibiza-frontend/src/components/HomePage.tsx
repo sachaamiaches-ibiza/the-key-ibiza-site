@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Hero from './Hero';
 import VillaCard from './VillaCard';
 import Testimonials from './Testimonials';
@@ -24,6 +24,15 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
   const mobileVillaTouchStart = useRef(0);
   
   const t = translations[lang].home;
+
+  // Memoized handler for BlogPreview to prevent re-renders from service slideshow
+  const handleBlogNavigate = useCallback((view: string, slug?: string) => {
+    if (slug) {
+      onNavigate(`blog-${slug}` as View);
+    } else {
+      onNavigate(view as View);
+    }
+  }, [onNavigate]);
 
   // Auto-transition slideshow
   useEffect(() => {
@@ -237,13 +246,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
       <Testimonials />
 
       {/* Blog Preview Section */}
-      <BlogPreview onNavigate={(view, slug) => {
-        if (slug) {
-        onNavigate(`blog-${slug}`);
-        } else {
-        onNavigate(view);
-        }
-      }} lang={lang} />
+      <BlogPreview onNavigate={handleBlogNavigate} lang={lang} />
 
       <FooterSEO
         onNavigate={onNavigate}
