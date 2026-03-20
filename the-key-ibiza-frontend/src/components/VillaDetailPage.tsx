@@ -1279,9 +1279,13 @@ const handlePdfPasswordSubmit = async () => {
         </div>
 
         {/* ===== RATES + INFO ===== */}
-        <div className={`grid gap-6 md:gap-8 py-10 md:py-12 ${isInvenioVilla ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-1 lg:grid-cols-2'}`}>
-          {/* Weekly Rates - Hidden for Invenio villas */}
-          {!isInvenioVilla && (
+        {/* Show Weekly Rates only if not Invenio villa AND has seasonal prices */}
+        {(() => {
+          const showWeeklyRates = !isInvenioVilla && villa.seasonalPrices && villa.seasonalPrices.length > 0;
+          return (
+        <div className={`grid gap-6 md:gap-8 py-10 md:py-12 ${showWeeklyRates ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 max-w-2xl mx-auto'}`}>
+          {/* Weekly Rates - Hidden for Invenio villas or when no prices */}
+          {showWeeklyRates && (
             <div
               className="p-6 md:p-8 lg:p-10 rounded-[24px] md:rounded-[32px] border border-white/6"
               style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)' }}
@@ -1331,6 +1335,8 @@ const handlePdfPasswordSubmit = async () => {
             </div>
           </div>
         </div>
+          );
+        })()}
 
         {/* ===== CONCIERGE NOTE ===== */}
         <div
