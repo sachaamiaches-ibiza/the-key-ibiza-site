@@ -177,7 +177,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onNavigate, lang, calculat
               <>
                 <span className="text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-white/30 font-bold mb-1">Weekly Price Range</span>
                 <span className="text-xs md:text-sm font-medium text-white/90 tracking-widest font-serif italic">
-                  {villa.priceRange || villa.price}
+                  {villa.priceRange || villa.price || 'Price on Request'}
                 </span>
               </>
             )}

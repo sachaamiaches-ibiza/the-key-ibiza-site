@@ -1197,12 +1197,16 @@ const handlePdfPasswordSubmit = async () => {
                 <span className="text-lg md:text-2xl font-serif text-luxury-gold">Price on Request</span>
               )
             ) : (
-              <>
-                <span className="text-lg md:text-2xl font-serif text-luxury-gold whitespace-nowrap">
-                  {minPrice.toLocaleString()}€ - {maxPrice.toLocaleString()}€
-                </span>
-                <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.25em] mt-1 font-light">per week</p>
-              </>
+              minPrice > 0 && villa.numericPrice ? (
+                <>
+                  <span className="text-lg md:text-2xl font-serif text-luxury-gold whitespace-nowrap">
+                    {minPrice.toLocaleString()}€ - {maxPrice.toLocaleString()}€
+                  </span>
+                  <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.25em] mt-1 font-light">per week</p>
+                </>
+              ) : (
+                <span className="text-lg md:text-2xl font-serif text-luxury-gold">Price on Request</span>
+              )
             )}
           </div>
         </div>
