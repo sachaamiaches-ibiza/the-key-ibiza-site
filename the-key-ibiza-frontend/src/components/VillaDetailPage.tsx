@@ -71,6 +71,14 @@ const formatDateRange = (dateStr: string): string => {
   return dateStr;
 };
 
+// Helper function to check if URL is a video
+const isVideoUrl = (url: string): boolean => {
+  if (!url) return false;
+  const videoExtensions = ['.mp4', '.mov', '.webm', '.ogg', '.m4v'];
+  const lowerUrl = url.toLowerCase();
+  return videoExtensions.some(ext => lowerUrl.includes(ext)) || lowerUrl.includes('/video/');
+};
+
 // Helper function to render text with formatting (bold, bullets, paragraphs)
 const renderFormattedText = (text: string) => {
   const paragraphs = text.split('\n').filter(p => p.trim());
@@ -1116,7 +1124,18 @@ const handlePdfPasswordSubmit = async () => {
             className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
             style={{ opacity: currentSlide === index ? 1 : 0 }}
           >
-            <img src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" />
+            {isVideoUrl(img) ? (
+              <video
+                src={img}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img src={img} alt={`${villa.name} - ${index + 1}`} className="w-full h-full object-cover" />
+            )}
             <div className="absolute inset-0 bg-gradient-to-b from-[#0B1C26]/60 via-transparent to-[#0B1C26]"></div>
           </div>
         ))}
