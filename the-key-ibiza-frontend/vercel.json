@@ -1,7 +1,31 @@
 {
   "redirects": [
     {
+      "source": "/villa/:slug",
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug",
+      "statusCode": 307,
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ]
+    },
+    {
       "source": "/villa-:slug(.*)",
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug",
+      "statusCode": 307,
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ]
+    },
+    {
+      "source": "/:lang(fr|es|de)/villa/:slug",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug",
       "statusCode": 307,
       "has": [
@@ -25,7 +49,31 @@
       ]
     },
     {
+      "source": "/yacht/:slug",
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug",
+      "statusCode": 307,
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ]
+    },
+    {
       "source": "/yacht-:slug(.*)",
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug",
+      "statusCode": 307,
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ]
+    },
+    {
+      "source": "/:lang(fr|es|de)/yacht/:slug",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/yacht/:slug",
       "statusCode": 307,
       "has": [
@@ -49,7 +97,31 @@
       ]
     },
     {
+      "source": "/blog/:slug",
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug",
+      "statusCode": 307,
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ]
+    },
+    {
       "source": "/blog-:slug(.*)",
+      "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug",
+      "statusCode": 307,
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot).*"
+        }
+      ]
+    },
+    {
+      "source": "/:lang(fr|es|de)/blog/:slug",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/blog/:slug",
       "statusCode": 307,
       "has": [
