@@ -91,6 +91,18 @@
       "destination": "/index.html"
     },
     {
+      "source": "/villa/:slug*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/yacht/:slug*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/blog/:slug*",
+      "destination": "/index.html"
+    },
+    {
       "source": "/:lang(fr|es|de)/:path*",
       "destination": "/index.html"
     },
