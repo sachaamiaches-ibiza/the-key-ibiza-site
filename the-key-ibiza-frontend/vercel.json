@@ -163,15 +163,15 @@
       "destination": "/index.html"
     },
     {
-      "source": "/villa/:slug*",
+      "source": "/villa/:path(.*)",
       "destination": "/index.html"
     },
     {
-      "source": "/yacht/:slug*",
+      "source": "/yacht/:path(.*)",
       "destination": "/index.html"
     },
     {
-      "source": "/blog/:slug*",
+      "source": "/blog/:path(.*)",
       "destination": "/index.html"
     },
     {
@@ -183,6 +183,5 @@
       "destination": "/index.html"
     }
   ],
-  "trailingSlash": false,
-  "cleanUrls": true
+  "trailingSlash": false
 }
