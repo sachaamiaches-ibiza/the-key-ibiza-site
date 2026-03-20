@@ -451,7 +451,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, onNavigate, la
   };
 
   const generateCalendarDays = (month: number, year: number) => {
-    const firstDay = new Date(year, month, 1).getDay();
+    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // Monday = 0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days: (number | null)[] = [];
     for (let i = 0; i < firstDay; i++) days.push(null);
@@ -1493,7 +1493,7 @@ const handlePdfPasswordSubmit = async () => {
                 >
                   <h4 className="text-center text-white/80 text-sm font-medium mb-4 md:mb-5 tracking-wide">{monthNames[m]} {y}</h4>
                   <div className="grid grid-cols-7 gap-1 text-center text-[9px] text-white/30 mb-2 md:mb-3 font-medium">
-                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <span key={i}>{d}</span>)}
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <span key={i}>{d}</span>)}
                   </div>
                   <div className="grid grid-cols-7 gap-1">
                     {days.map((day, i) => {
