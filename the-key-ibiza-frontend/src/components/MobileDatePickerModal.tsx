@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
 import { format, addMonths, subMonths } from 'date-fns';
 import 'react-day-picker/dist/style.css';
@@ -11,6 +11,16 @@ interface MobileDatePickerModalProps {
   onDatesChange: (checkIn: string, checkOut: string) => void;
 }
 
+// Helper pure function extracted to prevent timezone shifts and recreation on render
+const parseLocal = (d: string): Date | undefined => {
+  if (!d) return undefined;
+  const parts = d.split('-');
+  if (parts.length === 3) {
+    return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  }
+  return new Date(d);
+};
+
 const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   isOpen,
   onClose,
@@ -19,31 +29,34 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   onDatesChange,
 }) => {
 
-  // Helper to parse "YYYY-MM-DD" as local date (midnight) to prevent timezone shifts
-  const parseLocal = useCallback((d: string) => {
-    if (!d) return undefined;
-    const parts = d.split('-');
-    if (parts.length === 3) {
-      return new Date(+parts[0], +parts[1] - 1, +parts[2]);
-    }
-    return new Date(d);
-  }, []);
-
-  // Derive range directly from props (stateless)
-  const range = React.useMemo(() => {
-    const from = parseLocal(checkIn);
-    const to = parseLocal(checkOut);
-    return from ? { from, to } : undefined;
-  }, [checkIn, checkOut, parseLocal]);
-
   const [selecting, setSelecting] = useState<'checkin' | 'checkout'>(() => {
     return (checkIn && checkOut) ? 'checkin' : (checkIn ? 'checkout' : 'checkin');
   });
 
-  const [currentMonth, setCurrentMonth] = useState<Date>(() => {
-    const fromDate = parseLocal(checkIn);
-    return fromDate || new Date();
-  });
+  // Lazy init currentMonth based on checkIn, defaulting to today
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => 
+    parseLocal(checkIn) || new Date()
+  );
+
+  // Local state to maintain autonomy from parent props causing re-renders/resets
+  const [localCheckIn, setLocalCheckIn] = useState(checkIn);
+  const [localCheckOut, setLocalCheckOut] = useState(checkOut);
+
+  // Derive range directly from local state using extracted helper
+  const range = useMemo(() => {
+    const from = parseLocal(localCheckIn);
+    const to = parseLocal(localCheckOut);
+    return from ? { from, to } : undefined;
+  }, [localCheckIn, localCheckOut]);
+
+  // Sync state from props ONLY when modal opens (handled by key or mount)
+  // We do NOT listen to prop changes while open to avoid parent state interference
+
+  // Handle saving and closing
+  const handleCloseModal = useCallback(() => {
+    onDatesChange(localCheckIn, localCheckOut);
+    onClose();
+  }, [localCheckIn, localCheckOut, onDatesChange, onClose]);
 
   const touchStartX = useRef<number | null>(null);
   const today = new Date();
@@ -77,37 +90,54 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
     if (selecting === 'checkin') {
       // Logic for selecting START date
       // Always use the clicked day as new start, clear the end
-      onDatesChange(format(selectedDay, 'yyyy-MM-dd'), '');
+      const newStart = format(selectedDay, 'yyyy-MM-dd');
+      setLocalCheckIn(newStart);
+      setLocalCheckOut(null);
       setSelecting('checkout');
+      onDatesChange(newStart, null); 
+      
     } else {
       // Logic for selecting END date or modifying range
       if (newRange?.to) {
         // We have a full range (start + end) provided by DayPicker
-        onDatesChange(format(newRange.from!, 'yyyy-MM-dd'), format(newRange.to, 'yyyy-MM-dd'));
+        const s = format(newRange.from!, 'yyyy-MM-dd');
+        const e = format(newRange.to, 'yyyy-MM-dd');
+        setLocalCheckIn(s);
+        setLocalCheckOut(e);
+        onDatesChange(s, e);
         onClose();
       } else if (newRange?.from && range?.from && newRange.from > range.from) {
         // User clicked a date AFTER current start, but DayPicker gave partial range
         // Treat clicked date (newRange.from which is usually selectedDay) as end
-        onDatesChange(format(range.from, 'yyyy-MM-dd'), format(newRange.from, 'yyyy-MM-dd'));
+        const s = format(range.from, 'yyyy-MM-dd');
+        const e = format(newRange.from, 'yyyy-MM-dd');
+        setLocalCheckIn(s);
+        setLocalCheckOut(e);
+        onDatesChange(s, e);
         onClose();
       } else {
         // User clicked a date BEFORE current start, or same date
         // Treat as new start date
-        onDatesChange(format(selectedDay, 'yyyy-MM-dd'), '');
+        const newStart = format(selectedDay, 'yyyy-MM-dd');
+        setLocalCheckIn(newStart);
+        setLocalCheckOut('');
+        // Don't sync immediately
+        // onDatesChange(newStart, '');
         setSelecting('checkout');
       }
     }
   }, [selecting, range, onDatesChange, onClose]);
 
   const handleClear = () => {
-    onDatesChange('', '');
+    setLocalCheckIn('');
+    setLocalCheckOut('');
     setSelecting('checkin');
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999]" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[9999]" onClick={(e) => e.target === e.currentTarget && handleCloseModal()}>
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
       <div
@@ -116,7 +146,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-white font-serif text-lg">Select Dates</h3>
-          <button onClick={onClose} className="text-white/50 hover:text-white p-1">
+          <button onClick={handleCloseModal} className="text-white/50 hover:text-white p-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -125,7 +155,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
 
         <div className="flex gap-2 mb-4">
           <button
-            onClick={() => { setSelecting('checkin'); onDatesChange('', ''); }}
+            onClick={() => { setSelecting('checkin'); handleClear(); }}
             className={`flex-1 p-2 rounded-lg border text-center text-xs transition-all ${
               selecting === 'checkin' ? 'border-luxury-gold bg-luxury-gold/10 text-luxury-gold' : 'border-white/10 text-white/50'
             }`}
@@ -225,7 +255,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
           <button onClick={handleClear} className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-medium border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all">
             Clear
           </button>
-          <button onClick={onClose} className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-semibold bg-luxury-gold text-luxury-blue">
+          <button onClick={handleCloseModal} className="flex-1 py-3 rounded-xl text-[10px] uppercase tracking-widest font-semibold bg-luxury-gold text-luxury-blue">
             Close
           </button>
         </div>
