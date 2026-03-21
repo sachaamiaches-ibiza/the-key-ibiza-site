@@ -1,6 +1,51 @@
 {
   "redirects": [
     {
+      "source": "/traducteur",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de)/traducteur",
+      "destination": "/:lang",
+      "statusCode": 301
+    },
+    {
+      "source": "/no",
+      "destination": "/blog",
+      "statusCode": 301
+    },
+    {
+      "source": "/no/:path*",
+      "destination": "/blog",
+      "statusCode": 301
+    },
+    {
+      "source": "/photographer",
+      "destination": "/services",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de)/photographer",
+      "destination": "/:lang/services",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/:path*",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-admin/:path*",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-includes/:path*",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
       "source": "/villa/:slug",
       "destination": "https://the-key-ibiza-backend.vercel.app/share/villa/:slug",
       "statusCode": 307,
