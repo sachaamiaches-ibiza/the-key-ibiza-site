@@ -1,6 +1,31 @@
 {
   "redirects": [
     {
+      "source": "/villa/:villa/attachment/:path*",
+      "destination": "/villa/:villa",
+      "statusCode": 301
+    },
+    {
+      "source": "/mariage",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/mariage/:path*",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/nightlife",
+      "destination": "/services",
+      "statusCode": 301
+    },
+    {
+      "source": "/nightlife/:path*",
+      "destination": "/services",
+      "statusCode": 301
+    },
+    {
       "source": "/amp",
       "destination": "/",
       "statusCode": 301
