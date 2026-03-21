@@ -1,13 +1,188 @@
 {
   "redirects": [
     {
+      "source": "/amp",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/amp/:path*",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*/amp",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*/amp/",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
       "source": "/traducteur",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/traducteur/:path*",
       "destination": "/",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de)/traducteur",
       "destination": "/:lang",
+      "statusCode": 301
+    },
+    {
+      "source": "/reservation-en-ligne",
+      "destination": "/contact",
+      "statusCode": 301
+    },
+    {
+      "source": "/reservation-en-ligne/:path*",
+      "destination": "/contact",
+      "statusCode": 301
+    },
+    {
+      "source": "/service-de-chauffeurs",
+      "destination": "/driver",
+      "statusCode": 301
+    },
+    {
+      "source": "/service-de-chauffeurs/:path*",
+      "destination": "/driver",
+      "statusCode": 301
+    },
+    {
+      "source": "/event-a-la-carte",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/event-a-la-carte/:path*",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/evg-evjf-2",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/evg-evjf-2/:path*",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/anniversaire",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/anniversaire/:path*",
+      "destination": "/events",
+      "statusCode": 301
+    },
+    {
+      "source": "/photographe-professionnel",
+      "destination": "/services",
+      "statusCode": 301
+    },
+    {
+      "source": "/photographe-professionnel/:path*",
+      "destination": "/services",
+      "statusCode": 301
+    },
+    {
+      "source": "/services-de-proprete",
+      "destination": "/cleaning",
+      "statusCode": 301
+    },
+    {
+      "source": "/services-de-proprete/:path*",
+      "destination": "/cleaning",
+      "statusCode": 301
+    },
+    {
+      "source": "/livraisons",
+      "destination": "/deliveries",
+      "statusCode": 301
+    },
+    {
+      "source": "/livraisons/:path*",
+      "destination": "/deliveries",
+      "statusCode": 301
+    },
+    {
+      "source": "/baby-sitting",
+      "destination": "/babysitting",
+      "statusCode": 301
+    },
+    {
+      "source": "/baby-sitting/:path*",
+      "destination": "/babysitting",
+      "statusCode": 301
+    },
+    {
+      "source": "/services-de-securite",
+      "destination": "/security",
+      "statusCode": 301
+    },
+    {
+      "source": "/services-de-securite/:path*",
+      "destination": "/security",
+      "statusCode": 301
+    },
+    {
+      "source": "/programme-sante-beaute",
+      "destination": "/wellness",
+      "statusCode": 301
+    },
+    {
+      "source": "/programme-sante-beaute/:path*",
+      "destination": "/wellness",
+      "statusCode": 301
+    },
+    {
+      "source": "/formulaire-location-de-villa",
+      "destination": "/holiday-rentals",
+      "statusCode": 301
+    },
+    {
+      "source": "/formulaire-location-de-villa/:path*",
+      "destination": "/holiday-rentals",
+      "statusCode": 301
+    },
+    {
+      "source": "/yoga-experience",
+      "destination": "/yoga",
+      "statusCode": 301
+    },
+    {
+      "source": "/yoga-experience/:path*",
+      "destination": "/yoga",
+      "statusCode": 301
+    },
+    {
+      "source": "/politica-de-privacidad-fdnriugbndfiu",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/politica-de-privacidad-fdnriugbndfiu/:path*",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/contact/",
+      "destination": "/contact",
+      "statusCode": 301
+    },
+    {
+      "source": "/villa/villa-:slug",
+      "destination": "/villa/:slug",
       "statusCode": 301
     },
     {
