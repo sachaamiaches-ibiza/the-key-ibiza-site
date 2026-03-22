@@ -145,35 +145,29 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto">
             {/* Founder 1 */}
-            <div
-              className="group cursor-pointer"
-              onClick={() => onNavigate('valerie-detail')}
-            >
+            <div className="group">
               <div className="relative overflow-hidden rounded-[32px] mb-6">
-                <div className="w-full h-[350px] md:h-[400px] bg-gradient-to-br from-luxury-slate to-luxury-blue flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
-                  <span className="text-luxury-gold text-6xl md:text-7xl font-serif italic opacity-30 group-hover:opacity-50 transition-opacity">SA</span>
+                <div className="w-full h-[350px] md:h-[400px] bg-gradient-to-br from-luxury-slate to-luxury-blue flex items-center justify-center">
+                  <span className="text-luxury-gold text-6xl md:text-7xl font-serif italic opacity-30">SA</span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue via-transparent to-transparent"></div>
               </div>
               <div className="text-center">
-                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2 group-hover:text-luxury-gold transition-colors">Sacha Amiach</h3>
+                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2">Sacha Amiach</h3>
                 <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.3em] font-medium">Founder</p>
               </div>
             </div>
 
             {/* Founder 2 */}
-            <div
-              className="group cursor-pointer"
-              onClick={() => onNavigate('francesca-detail')}
-            >
+            <div className="group">
               <div className="relative overflow-hidden rounded-[32px] mb-6">
-                <div className="w-full h-[350px] md:h-[400px] bg-gradient-to-br from-luxury-slate to-luxury-blue flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
-                  <span className="text-luxury-gold text-6xl md:text-7xl font-serif italic opacity-30 group-hover:opacity-50 transition-opacity">AS</span>
+                <div className="w-full h-[350px] md:h-[400px] bg-gradient-to-br from-luxury-slate to-luxury-blue flex items-center justify-center">
+                  <span className="text-luxury-gold text-6xl md:text-7xl font-serif italic opacity-30">AS</span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-luxury-blue via-transparent to-transparent"></div>
               </div>
               <div className="text-center">
-                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2 group-hover:text-luxury-gold transition-colors">Angelina Stoycheva</h3>
+                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2">Angelina Stoycheva</h3>
                 <p className="text-luxury-gold/60 text-[10px] uppercase tracking-[0.3em] font-medium">Co-founder</p>
               </div>
             </div>
