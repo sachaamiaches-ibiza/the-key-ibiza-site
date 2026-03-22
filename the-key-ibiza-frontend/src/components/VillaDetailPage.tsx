@@ -884,20 +884,27 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       const fileName = `Villa_${villa.name.replace(/\s+/g, '_')}${withWatermark ? '' : '_full'}.pdf`;
 
       if (isMobileDevice) {
-        // Mobile: Create download link with proper filename
+        // Mobile: Use Web Share API for proper filename on iOS
         const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-        // Create a temporary link to trigger download with proper name
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        // Clean up after a delay
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
+        // Check if Web Share API is available and can share files
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          try {
+            await navigator.share({
+              files: [pdfFile],
+              title: `Villa ${villa.name}`,
+            });
+          } catch (err) {
+            // User cancelled or error - fallback to direct download
+            if ((err as Error).name !== 'AbortError') {
+              pdf.save(fileName);
+            }
+          }
+        } else {
+          // Fallback for browsers without Web Share API
+          pdf.save(fileName);
+        }
       } else {
         // Desktop: Direct download
         pdf.save(fileName);
