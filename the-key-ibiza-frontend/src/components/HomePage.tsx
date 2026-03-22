@@ -22,8 +22,21 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
   const [mobileVillaIndex, setMobileVillaIndex] = useState(0);
   const mobileVillaRef = useRef<HTMLDivElement>(null);
   const mobileVillaTouchStart = useRef(0);
-  
+
   const t = translations[lang].home;
+
+  // Curate featured villas: prioritize Bailey, exclude Style from top 3
+  const featuredVillas = React.useMemo(() => {
+    const bailey = villas.find(v => v.name.toLowerCase().includes('bailey'));
+    const others = villas.filter(v =>
+      !v.name.toLowerCase().includes('bailey') &&
+      !v.name.toLowerCase().includes('style')
+    );
+    if (bailey) {
+      return [bailey, ...others].slice(0, 3);
+    }
+    return others.slice(0, 3);
+  }, [villas]);
 
   // Memoized handler for BlogPreview to prevent re-renders from service slideshow
   const handleBlogNavigate = useCallback((view: string, slug?: string) => {
@@ -192,7 +205,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
 
         {/* Desktop: Grid layout */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 lg:gap-14">
-            {villas.slice(0, 3).map(villa => <VillaCard key={villa.id} villa={villa} onNavigate={onNavigate} lang={lang} />)}
+            {featuredVillas.map(villa => <VillaCard key={villa.id} villa={villa} onNavigate={onNavigate} lang={lang} />)}
         </div>
 
         {/* Mobile: Swipeable carousel */}
@@ -220,7 +233,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
                 className="flex transition-transform duration-300 ease-out"
                 style={{ transform: `translateX(-${mobileVillaIndex * 100}%)` }}
             >
-                {villas.slice(0, 3).map(villa => (
+                {featuredVillas.map(villa => (
                 <div key={villa.id} className="w-full flex-shrink-0 px-2">
                     <VillaCard villa={villa} onNavigate={onNavigate} lang={lang} />
                 </div>
@@ -230,7 +243,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
 
             {/* Dots indicator */}
             <div className="flex justify-center gap-2 mt-6">
-            {villas.slice(0, 3).map((_, i) => (
+            {featuredVillas.map((_, i) => (
                 <button
                 key={i}
                 onClick={() => setMobileVillaIndex(i)}
