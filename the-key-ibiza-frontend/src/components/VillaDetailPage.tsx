@@ -880,35 +880,9 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
         }
       }
 
-      // Save the PDF - with mobile-compatible method
+      // Save the PDF with villa name
       const fileName = `Villa_${villa.name.replace(/\s+/g, '_')}${withWatermark ? '' : '_full'}.pdf`;
-
-      if (isMobileDevice) {
-        // Mobile: Use Web Share API for proper filename on iOS
-        const pdfBlob = pdf.output('blob');
-        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
-        // Check if Web Share API is available and can share files
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          try {
-            await navigator.share({
-              files: [pdfFile],
-              title: `Villa ${villa.name}`,
-            });
-          } catch (err) {
-            // User cancelled or error - fallback to direct download
-            if ((err as Error).name !== 'AbortError') {
-              pdf.save(fileName);
-            }
-          }
-        } else {
-          // Fallback for browsers without Web Share API
-          pdf.save(fileName);
-        }
-      } else {
-        // Desktop: Direct download
-        pdf.save(fileName);
-      }
+      pdf.save(fileName);
 
     } catch (error) {
       console.error('Error generating PDF:', error);
