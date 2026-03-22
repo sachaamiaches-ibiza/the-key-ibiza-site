@@ -881,13 +881,21 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       }
 
       // Save the PDF - with mobile-compatible method
-      const fileName = `${villa.name.replace(/\s+/g, '_')}_${withWatermark ? 'preview' : 'full'}.pdf`;
+      const fileName = `Villa_${villa.name.replace(/\s+/g, '_')}${withWatermark ? '' : '_full'}.pdf`;
 
       if (isMobileDevice) {
-        // Mobile: Open PDF in new tab (works better on iOS Safari and Android)
+        // Mobile: Create download link with proper filename
         const pdfBlob = pdf.output('blob');
         const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
+
+        // Create a temporary link to trigger download with proper name
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
         // Clean up after a delay
         setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
       } else {
