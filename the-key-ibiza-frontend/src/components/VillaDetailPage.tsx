@@ -553,16 +553,6 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
 
     // Check if mobile device
     const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    // For iOS: Open window immediately (before async code) to avoid popup blocker
-    let pdfWindow: Window | null = null;
-    if (isIOS) {
-      pdfWindow = window.open('', '_blank');
-      if (pdfWindow) {
-        pdfWindow.document.write('<html><head><title>Generating PDF...</title></head><body style="display:flex;justify-content:center;align-items:center;height:100vh;margin:0;font-family:system-ui;background:#0B1C26;color:white;"><p>Generating PDF...</p></body></html>');
-      }
-    }
 
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -893,22 +883,21 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       // Save the PDF with villa name
       const fileName = `Villa_${villa.name.replace(/\s+/g, '_')}${withWatermark ? '' : '_full'}.pdf`;
 
-      if (isIOS && pdfWindow) {
-        // iOS: Use blob URL (more efficient than data URI)
+      if (isMobileDevice) {
+        // Mobile: Open PDF in new tab
         const pdfBlob = pdf.output('blob');
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        // Redirect the already-opened window to the PDF
-        pdfWindow.location.href = blobUrl;
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        // Clean up after a delay
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
       } else {
-        // Desktop/Android: Direct download
+        // Desktop: Direct download
         pdf.save(fileName);
       }
 
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
-      // Close the PDF window if it was opened
-      if (pdfWindow) pdfWindow.close();
     } finally {
       setPdfGenerating(false);
       setPdfDropdownOpen(false);
