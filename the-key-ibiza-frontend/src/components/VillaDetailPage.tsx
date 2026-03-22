@@ -537,13 +537,14 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
 
   // Close PDF dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (pdfDropdownRef.current && !pdfDropdownRef.current.contains(event.target as Node)) {
         setPdfDropdownOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    // Use 'click' instead of 'mousedown' for better mobile compatibility
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   // PDF Generation function
@@ -1114,9 +1115,15 @@ const handlePdfPasswordSubmit = async () => {
 
             {/* Dropdown Menu */}
             {pdfDropdownOpen && !pdfGenerating && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0B1C26] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+              <div
+                className="absolute top-full left-0 right-0 mt-2 bg-[#0B1C26] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button
-                  onClick={() => generateVillaPDF(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    generateVillaPDF(true);
+                  }}
                   className="w-full px-4 py-3 text-left text-xs text-white/70 hover:bg-white/5 hover:text-luxury-gold transition-colors flex items-center gap-3"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1128,7 +1135,8 @@ const handlePdfPasswordSubmit = async () => {
                   </div>
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setPdfDropdownOpen(false);
                     setPdfPasswordModalOpen(true);
                   }}
