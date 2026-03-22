@@ -462,10 +462,11 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
     const end = new Date(checkOut);
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const dateStr = d.toISOString().split('T')[0];
-      if (!occupiedDates.includes(dateStr)) 
-        return false;
+      if (occupiedDates.includes(dateStr)) {
+        return false; // Date is occupied, range not available
+      }
     }
-    return true;
+    return true; // All dates are available
   };
 
   const generateCalendarDays = (month: number, year: number) => {
