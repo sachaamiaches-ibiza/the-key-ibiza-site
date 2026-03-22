@@ -1061,6 +1061,7 @@ const handlePdfPasswordSubmit = async () => {
         onDatesChange={(newCheckIn, newCheckOut) => {
           updateDates(newCheckIn, newCheckOut);
         }}
+        disabledDates={occupiedDates}
       />
 
       {/* VIP PDF Download Button */}

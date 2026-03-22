@@ -9,6 +9,7 @@ interface MobileDatePickerModalProps {
   checkIn: string;
   checkOut: string;
   onDatesChange: (checkIn: string, checkOut: string) => void;
+  disabledDates?: string[]; // Array of dates in "YYYY-MM-DD" format that should be disabled
 }
 
 // Helper pure function extracted to prevent timezone shifts and recreation on render
@@ -27,14 +28,26 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
   checkIn,
   checkOut,
   onDatesChange,
+  disabledDates = [],
 }) => {
+
+  // Convert disabled date strings to Date objects for DayPicker
+  const disabledDateObjects = useMemo(() => {
+    return disabledDates.map(dateStr => {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+      }
+      return new Date(dateStr);
+    });
+  }, [disabledDates]);
 
   const [selecting, setSelecting] = useState<'checkin' | 'checkout'>(() => {
     return (checkIn && checkOut) ? 'checkin' : (checkIn ? 'checkout' : 'checkin');
   });
 
   // Lazy init currentMonth based on checkIn, defaulting to today
-  const [currentMonth, setCurrentMonth] = useState<Date>(() => 
+  const [currentMonth, setCurrentMonth] = useState<Date>(() =>
     parseLocal(checkIn) || new Date()
   );
 
@@ -92,10 +105,10 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
       // Always use the clicked day as new start, clear the end
       const newStart = format(selectedDay, 'yyyy-MM-dd');
       setLocalCheckIn(newStart);
-      setLocalCheckOut(null);
+      setLocalCheckOut('');
       setSelecting('checkout');
-      onDatesChange(newStart, null); 
-      
+      onDatesChange(newStart, '');
+
     } else {
       // Logic for selecting END date or modifying range
       if (newRange?.to) {
@@ -121,8 +134,6 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
         const newStart = format(selectedDay, 'yyyy-MM-dd');
         setLocalCheckIn(newStart);
         setLocalCheckOut('');
-        // Don't sync immediately
-        // onDatesChange(newStart, '');
         setSelecting('checkout');
       }
     }
@@ -233,7 +244,10 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
               color: #0B1C26 !important;
             }
             .mobile-calendar-wrapper .rdp-day_disabled {
-              color: rgba(255,255,255,0.2) !important;
+              color: rgba(255,255,255,0.3) !important;
+              background: rgba(127, 29, 29, 0.3) !important;
+              cursor: not-allowed !important;
+              text-decoration: line-through;
             }
             .mobile-calendar-wrapper .rdp-day_today:not(.rdp-day_selected) {
               border: 1px solid #C4A461;
@@ -245,7 +259,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             selected={range}
             onSelect={handleSelect}
             month={currentMonth}
-            disabled={{ before: today }}
+            disabled={[{ before: today }, ...disabledDateObjects]}
             numberOfMonths={1}
             showOutsideDays={false}
           />
