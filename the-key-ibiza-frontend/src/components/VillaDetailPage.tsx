@@ -1544,7 +1544,7 @@ const handlePdfPasswordSubmit = async () => {
                           className={`aspect-square flex items-center justify-center text-[10px] md:text-xs rounded-md md:rounded-lg transition-all font-medium ${
                             day
                               ? isOccupied
-                                ? 'bg-red-900/50 text-red-300/60 cursor-not-allowed border border-red-500/20'
+                                ? 'bg-red-900/20 text-white/20 cursor-not-allowed line-through opacity-50'
                                 : isPast
                                   ? 'bg-[#0B1C26] text-white/20 cursor-not-allowed border border-white/5'
                                   : isCheckIn || isCheckOut

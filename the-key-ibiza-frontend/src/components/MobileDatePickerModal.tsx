@@ -244,12 +244,13 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
               color: #0B1C26 !important;
             }
             .mobile-calendar-wrapper .rdp-day_disabled {
-              color: rgba(252, 165, 165, 0.7) !important;
-              background: rgba(127, 29, 29, 0.5) !important;
+              color: rgba(255, 255, 255, 0.2) !important;
+              background: rgba(127, 29, 29, 0.15) !important;
               cursor: not-allowed !important;
               text-decoration: line-through;
-              border: 1px solid rgba(239, 68, 68, 0.3) !important;
+              border: 1px solid rgba(239, 68, 68, 0.1) !important;
               border-radius: 6px;
+              opacity: 0.5;
             }
             .mobile-calendar-wrapper .rdp-day_today:not(.rdp-day_selected) {
               border: 1px solid #C4A461;
