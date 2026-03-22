@@ -553,6 +553,16 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
 
     // Check if mobile device
     const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    // For iOS: Open window immediately (before async code) to avoid popup blocker
+    let pdfWindow: Window | null = null;
+    if (isIOS) {
+      pdfWindow = window.open('', '_blank');
+      if (pdfWindow) {
+        pdfWindow.document.write('<html><head><title>Generating PDF...</title></head><body style="display:flex;justify-content:center;align-items:center;height:100vh;margin:0;font-family:system-ui;background:#0B1C26;color:white;"><p>Generating PDF...</p></body></html>');
+      }
+    }
 
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -883,24 +893,19 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       // Save the PDF with villa name
       const fileName = `Villa_${villa.name.replace(/\s+/g, '_')}${withWatermark ? '' : '_full'}.pdf`;
 
-      // Check if iOS Safari
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-      if (isIOS) {
-        // iOS: Open PDF directly in browser (Safari can view PDFs natively)
+      if (isIOS && pdfWindow) {
+        // iOS: Write PDF to the already-opened window
         const pdfDataUri = pdf.output('datauristring');
-        const newWindow = window.open();
-        if (newWindow) {
-          newWindow.document.write(`
-            <html>
-              <head><title>${fileName}</title></head>
-              <body style="margin:0;padding:0;">
-                <embed width="100%" height="100%" src="${pdfDataUri}" type="application/pdf" />
-              </body>
-            </html>
-          `);
-          newWindow.document.close();
-        }
+        pdfWindow.document.open();
+        pdfWindow.document.write(`
+          <html>
+            <head><title>${fileName}</title></head>
+            <body style="margin:0;padding:0;">
+              <embed width="100%" height="100%" src="${pdfDataUri}" type="application/pdf" />
+            </body>
+          </html>
+        `);
+        pdfWindow.document.close();
       } else {
         // Desktop/Android: Direct download
         pdf.save(fileName);
@@ -909,6 +914,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
+      // Close the PDF window if it was opened
+      if (pdfWindow) pdfWindow.close();
     } finally {
       setPdfGenerating(false);
       setPdfDropdownOpen(false);
