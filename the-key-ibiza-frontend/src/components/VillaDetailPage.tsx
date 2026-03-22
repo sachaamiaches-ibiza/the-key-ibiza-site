@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { Villa, Language } from '../types';
 import { LogoTheKey } from './Navbar';
 import VillaMap from './VillaMap';
@@ -111,36 +110,25 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
 
-  // URL State management for dates
-  const [searchParams, setSearchParams] = useSearchParams();
-  
-  const checkIn = searchParams.get('checkin') || initialCheckIn || '';
-  const checkOut = searchParams.get('checkout') || initialCheckOut || '';
+  // Date state management (simple state, no URL params)
+  const [checkIn, setCheckInState] = useState<string>(initialCheckIn);
+  const [checkOut, setCheckOutState] = useState<string>(initialCheckOut);
 
   // Initialize calendar based on checkIn date if present, otherwise today
   const initialDate = checkIn ? new Date(checkIn) : new Date();
   const [calendarMonth, setCalendarMonth] = useState(initialDate.getMonth());
   const [calendarYear, setCalendarYear] = useState(initialDate.getFullYear());
 
-  const updateDates = (newCheckIn: string, newCheckOut: string) => {
-    const newParams = new URLSearchParams(searchParams);
-    
-    if (newCheckIn) newParams.set('checkin', newCheckIn); 
-    else newParams.delete('checkin');
-    
-    if (newCheckOut) newParams.set('checkout', newCheckOut);
-    else newParams.delete('checkout');
-    
-    setSearchParams(newParams, { replace: true });
-    
-    // Notify parent if needed
-    if (onDatesChange) {
-        onDatesChange(newCheckIn, newCheckOut);
-    }
+  const setCheckIn = (date: string) => {
+    setCheckInState(date);
+    setCheckOutState(''); // Clear checkout when checkin changes
+    if (onDatesChange) onDatesChange(date, '');
   };
 
-  const setCheckIn = (date: string) => updateDates(date, ''); // Clear checkout when checkin changes
-  const setCheckOut = (date: string) => updateDates(checkIn, date);
+  const setCheckOut = (date: string) => {
+    setCheckOutState(date);
+    if (onDatesChange) onDatesChange(checkIn, date);
+  };
 
   const [reviewIndex, setReviewIndex] = useState(0);
 
@@ -1059,7 +1047,9 @@ const handlePdfPasswordSubmit = async () => {
         checkIn={checkIn}
         checkOut={checkOut}
         onDatesChange={(newCheckIn, newCheckOut) => {
-          updateDates(newCheckIn, newCheckOut);
+          setCheckInState(newCheckIn);
+          setCheckOutState(newCheckOut);
+          if (onDatesChange) onDatesChange(newCheckIn, newCheckOut);
         }}
         disabledDates={occupiedDates}
       />
