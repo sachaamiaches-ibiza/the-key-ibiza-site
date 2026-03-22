@@ -863,9 +863,23 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
         }
       }
 
-      // Save the PDF
+      // Save the PDF - with mobile-compatible method
       const fileName = `${villa.name.replace(/\s+/g, '_')}_${withWatermark ? 'preview' : 'full'}.pdf`;
-      pdf.save(fileName);
+
+      // Check if mobile device
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobileDevice) {
+        // Mobile: Open PDF in new tab (works better on iOS Safari and Android)
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        // Clean up after a delay
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
+      } else {
+        // Desktop: Direct download
+        pdf.save(fileName);
+      }
 
     } catch (error) {
       console.error('Error generating PDF:', error);
