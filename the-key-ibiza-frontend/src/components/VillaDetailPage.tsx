@@ -894,18 +894,11 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       const fileName = `Villa_${villa.name.replace(/\s+/g, '_')}${withWatermark ? '' : '_full'}.pdf`;
 
       if (isIOS && pdfWindow) {
-        // iOS: Write PDF to the already-opened window
-        const pdfDataUri = pdf.output('datauristring');
-        pdfWindow.document.open();
-        pdfWindow.document.write(`
-          <html>
-            <head><title>${fileName}</title></head>
-            <body style="margin:0;padding:0;">
-              <embed width="100%" height="100%" src="${pdfDataUri}" type="application/pdf" />
-            </body>
-          </html>
-        `);
-        pdfWindow.document.close();
+        // iOS: Use blob URL (more efficient than data URI)
+        const pdfBlob = pdf.output('blob');
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        // Redirect the already-opened window to the PDF
+        pdfWindow.location.href = blobUrl;
       } else {
         // Desktop/Android: Direct download
         pdf.save(fileName);
