@@ -1088,7 +1088,10 @@ const handlePdfPasswordSubmit = async () => {
         <div className="mt-6 pt-5 border-t border-white/8">
           <div className="relative" ref={pdfDropdownRef}>
             <button
-              onClick={() => setPdfDropdownOpen(!pdfDropdownOpen)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setPdfDropdownOpen(!pdfDropdownOpen);
+              }}
               disabled={pdfGenerating}
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-white/60 hover:text-luxury-gold border border-white/10 hover:border-luxury-gold/30 transition-all text-xs tracking-wide disabled:opacity-50"
             >
