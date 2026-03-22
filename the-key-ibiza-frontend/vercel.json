@@ -206,11 +206,6 @@
       "statusCode": 301
     },
     {
-      "source": "/villa/villa-:slug",
-      "destination": "/villa/:slug",
-      "statusCode": 301
-    },
-    {
       "source": "/no",
       "destination": "/blog",
       "statusCode": 301
