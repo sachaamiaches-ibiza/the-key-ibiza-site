@@ -537,12 +537,11 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
 
   // Close PDF dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (pdfDropdownRef.current && !pdfDropdownRef.current.contains(event.target as Node)) {
         setPdfDropdownOpen(false);
       }
     };
-    // Use 'click' instead of 'mousedown' for better mobile compatibility
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
@@ -550,10 +549,6 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
   // PDF Generation function
   const generateVillaPDF = async (withWatermark: boolean) => {
     setPdfGenerating(true);
-
-    // Check if mobile device
-    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = 210;
@@ -562,33 +557,26 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       const contentWidth = pageWidth - (margin * 2);
 
       // Helper to load image as base64 using our backend proxy
-      const loadImage = async (url: string): Promise<string | null> => {
+      const loadImage = async (url: string): Promise<string> => {
         // Use our own backend proxy to avoid CORS issues
         const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
         const proxyUrl = `${BACKEND_URL}/image-proxy?url=${encodeURIComponent(url)}`;
 
         try {
+          console.log('Loading image via backend proxy...');
           const response = await fetch(proxyUrl);
 
           if (!response.ok) {
-            console.error(`Proxy returned ${response.status} for ${url}`);
-            return null;
+            throw new Error(`Proxy returned ${response.status}`);
           }
 
           const blob = await response.blob();
 
-          return new Promise((resolve) => {
+          return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => {
               const base64 = reader.result as string;
-
-              // On mobile, skip canvas resize to avoid issues
-              if (isMobileDevice) {
-                resolve(base64);
-                return;
-              }
-
-              // Resize if needed using canvas (desktop only)
+              // Resize if needed using canvas
               const img = new Image();
               img.onload = () => {
                 const canvas = document.createElement('canvas');
@@ -607,12 +595,12 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
               img.onerror = () => resolve(base64);
               img.src = base64;
             };
-            reader.onerror = () => resolve(null);
+            reader.onerror = reject;
             reader.readAsDataURL(blob);
           });
         } catch (error) {
           console.error('Failed to load image:', url, error);
-          return null;
+          throw error;
         }
       };
 
@@ -727,19 +715,15 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       const mainImage = headerImages[0];
 
       if (mainImage) {
-        const imgData = await loadImage(mainImage);
-        if (imgData) {
+        try {
+          const imgData = await loadImage(mainImage);
           // Draw main image at top
           pdf.addImage(imgData, 'JPEG', margin, margin, contentWidth, 100);
+
           // Add watermark on main image
           drawImageWatermark(margin, margin, contentWidth, 100);
-        } else {
-          // Draw placeholder rectangle if image failed
-          pdf.setFillColor(230, 230, 230);
-          pdf.rect(margin, margin, contentWidth, 100, 'F');
-          pdf.setFontSize(12);
-          pdf.setTextColor(150, 150, 150);
-          pdf.text('Image not available', pageWidth / 2, margin + 50, { align: 'center' });
+        } catch (e) {
+          console.error('Failed to load main image:', e);
         }
       }
 
@@ -862,38 +846,26 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
         const pageImages = allImages.slice(pageStart, pageStart + imagesPerPage);
 
         for (let i = 0; i < pageImages.length; i++) {
-          const imgData = await loadImage(pageImages[i]);
-          const col = i % cols;
-          const row = Math.floor(i / cols);
-          const xPos = margin + (col * (imgWidth + gap));
-          const imgYPos = yPos + (row * (imgHeight + gap));
+          try {
+            const imgData = await loadImage(pageImages[i]);
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const xPos = margin + (col * (imgWidth + gap));
+            const imgYPos = yPos + (row * (imgHeight + gap));
 
-          if (imgData) {
             pdf.addImage(imgData, 'JPEG', xPos, imgYPos, imgWidth, imgHeight);
+
             // Watermark on each image
             drawImageWatermark(xPos, imgYPos, imgWidth, imgHeight);
-          } else {
-            // Draw placeholder for failed image
-            pdf.setFillColor(240, 240, 240);
-            pdf.rect(xPos, imgYPos, imgWidth, imgHeight, 'F');
+          } catch (e) {
+            console.error(`Failed to load gallery image ${pageStart + i}:`, e);
           }
         }
       }
 
-      // Save the PDF with villa name
-      const fileName = `Villa_${villa.name.replace(/\s+/g, '_')}${withWatermark ? '' : '_full'}.pdf`;
-
-      if (isMobileDevice) {
-        // Mobile: Open PDF in new tab
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
-        // Clean up after a delay
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
-      } else {
-        // Desktop: Direct download
-        pdf.save(fileName);
-      }
+      // Save the PDF
+      const fileName = `${villa.name.replace(/\s+/g, '_')}_${withWatermark ? 'preview' : 'full'}.pdf`;
+      pdf.save(fileName);
 
     } catch (error) {
       console.error('Error generating PDF:', error);
