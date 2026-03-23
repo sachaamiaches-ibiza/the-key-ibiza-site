@@ -165,8 +165,10 @@
         -moz-text-size-adjust: 100%;
         text-size-adjust: 100%;
     }
-    /* Remove zoom on touch devices to prevent touch coordinate mismatches */
-    @media (pointer: coarse) {
+    /* Remove zoom on mobile/tablet to prevent touch coordinate mismatches.
+       Using max-width is universally supported, unlike pointer:coarse
+       which some in-app browsers (Google Search WebView) may not support. */
+    @media (max-width: 1024px) {
         html {
             zoom: 1 !important;
         }
@@ -248,6 +250,14 @@
 </head>
 <body>
  <div id="root"></div>
+<script>
+  // Disable CSS zoom on touch devices to prevent click coordinate mismatches.
+  // This JS fallback covers in-app browsers (Google Search, Instagram, etc.)
+  // that may not properly support CSS media queries.
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    document.documentElement.style.setProperty('zoom', '1', 'important');
+  }
+</script>
 <script type="module" src="/src/index.tsx"></script>
 </body>
 </html>
