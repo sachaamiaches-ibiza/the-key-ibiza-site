@@ -68,10 +68,11 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
         {servicesWithIcons.map((s, idx) => {
             const IconComponent = s.icon;
             return (
-            <div
+            <button
+                type="button"
                 key={s.id}
                 onClick={() => onNavigate(s.id === 'photographer' ? 'photographer' : `service-${s.id}`)}
-                className="absolute inset-0 w-full h-full cursor-pointer flex flex-col items-center justify-center"
+                className="absolute inset-0 w-full h-full cursor-pointer flex flex-col items-center justify-center bg-transparent border-0 outline-none"
                 style={{
                 opacity: idx === serviceIndex ? (serviceVisible ? 1 : 0) : 0,
                 transform: idx === serviceIndex
@@ -79,6 +80,8 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
                     : 'translateX(-40px)',
                 transition: 'opacity 1.2s ease-out, transform 1.2s ease-out',
                 pointerEvents: idx === serviceIndex ? 'auto' : 'none',
+                touchAction: 'manipulation',
+                WebkitTapHighlightColor: 'transparent',
                 }}
             >
                 {/* Service Icon */}
@@ -96,7 +99,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
                 >
                 {s.title}
                 </span>
-            </div>
+            </button>
             );
         })}
         {/* Minimal dots */}
@@ -158,10 +161,12 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
             {allServicesGrid.map((service) => {
             const IconComponent = service.icon;
             return (
-                <div
+                <button
+                type="button"
                 key={service.id}
                 onClick={() => onNavigate(service.id === 'photographer' ? 'photographer' : `service-${service.id}`)}
-                className="flex flex-col items-center cursor-pointer group w-[calc(33.333%-22px)] md:w-auto"
+                className="flex flex-col items-center cursor-pointer group w-[calc(33.333%-22px)] md:w-auto bg-transparent border-0 outline-none p-0"
+                style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                 >
                 {/* Circular Icon Container */}
                 <div
@@ -188,7 +193,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
                 >
                     {service.title}
                 </span>
-                </div>
+                </button>
             );
             })}
         </div>
