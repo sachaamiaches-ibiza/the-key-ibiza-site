@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=0.75, maximum-scale=0.75, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=cover" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <title>The Key Ibiza | Luxury Concierge Services</title>
@@ -160,9 +160,16 @@
   <style>
     html {
         font-size: 16px !important;
+        zoom: 0.75;
         -webkit-text-size-adjust: 100%;
         -moz-text-size-adjust: 100%;
         text-size-adjust: 100%;
+    }
+    /* Remove zoom on touch devices to prevent touch coordinate mismatches */
+    @media (pointer: coarse) {
+        html {
+            zoom: 1 !important;
+        }
     }
     * {
         -webkit-font-smoothing: antialiased;

@@ -250,22 +250,24 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
           {allServicesGrid.map((service) => {
             const IconComponent = service.icon;
             return (
-              <div
+              <button
+                type="button"
                 key={service.id}
                 onClick={() => goToService(service.id)}
-                className="flex flex-col items-center cursor-pointer group"
+                className="flex flex-col items-center cursor-pointer group bg-transparent border-0 outline-none p-0"
+                style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
               >
                 <div
-                  className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center mb-3 transition-all duration-500 group-hover:scale-110 group-hover:border-luxury-gold/60"
+                  className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center mb-3 transition-all duration-500 group-hover:scale-110 group-hover:border-luxury-gold/60 pointer-events-none"
                   style={{
                     border: '1px solid rgba(201,178,124,0.3)',
                     backgroundColor: 'transparent',
                   }}
                 >
-                  <IconComponent className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" />
+                  <IconComponent className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 pointer-events-none" />
                 </div>
                 <span
-                  className="text-center transition-colors duration-300 group-hover:text-[#C9B27C]"
+                  className="text-center transition-colors duration-300 group-hover:text-[#C9B27C] pointer-events-none"
                   style={{
                     fontFamily: 'Plus Jakarta Sans, sans-serif',
                     fontSize: '9px',
@@ -278,7 +280,7 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
                 >
                   {service.title}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>

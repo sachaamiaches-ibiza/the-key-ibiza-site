@@ -85,9 +85,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
                 }}
             >
                 {/* Service Icon */}
-                <IconComponent className="w-20 h-20 md:w-24 md:h-24 mb-4" />
+                <IconComponent className="w-20 h-20 md:w-24 md:h-24 mb-4 pointer-events-none" />
                 {/* Service Title */}
                 <span
+                className="pointer-events-none"
                 style={{
                     color: '#C9B27C',
                     letterSpacing: '0.3em',
@@ -170,17 +171,17 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate, lang, onOpenContact, vi
                 >
                 {/* Circular Icon Container */}
                 <div
-                    className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110"
+                    className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110 pointer-events-none"
                     style={{
                     border: '1px solid rgba(201,178,124,0.3)',
                     backgroundColor: 'transparent',
                     }}
                 >
-                    <IconComponent className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14" />
+                    <IconComponent className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 pointer-events-none" />
                 </div>
                 {/* Service Title */}
                 <span
-                    className="text-center transition-colors duration-300 group-hover:text-[#C9B27C]"
+                    className="text-center transition-colors duration-300 group-hover:text-[#C9B27C] pointer-events-none"
                     style={{
                     fontFamily: 'Plus Jakarta Sans, sans-serif',
                     fontSize: '10px',
