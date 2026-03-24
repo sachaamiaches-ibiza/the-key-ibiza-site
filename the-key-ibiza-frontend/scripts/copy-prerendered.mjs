@@ -15,12 +15,17 @@ const DIST_DIR = path.join(__dirname, '../dist');
 
 // Extract asset hashes from index.html
 function extractAssetHashes(html) {
-  const jsMatch = html.match(/index-([A-Za-z0-9]+)\.js/);
-  const cssMatch = html.match(/index-([A-Za-z0-9]+)\.css/);
+  const jsMatch = html.match(/index-([A-Za-z0-9_-]+)\.js/);
+  const cssMatch = html.match(/index-([A-Za-z0-9_-]+)\.css/);
   return {
     js: jsMatch ? jsMatch[1] : null,
     css: cssMatch ? cssMatch[1] : null
   };
+}
+
+// Escape special regex characters in hash strings
+function escapeRegex(str) {
+  return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 // Replace old asset hashes with new ones
@@ -30,7 +35,7 @@ function updateAssetReferences(html, oldHashes, newHashes) {
   // Replace JS hash
   if (oldHashes.js && newHashes.js && oldHashes.js !== newHashes.js) {
     updated = updated.replace(
-      new RegExp(`index-${oldHashes.js}\\.js`, 'g'),
+      new RegExp(`index-${escapeRegex(oldHashes.js)}\\.js`, 'g'),
       `index-${newHashes.js}.js`
     );
   }
@@ -38,7 +43,7 @@ function updateAssetReferences(html, oldHashes, newHashes) {
   // Replace CSS hash
   if (oldHashes.css && newHashes.css && oldHashes.css !== newHashes.css) {
     updated = updated.replace(
-      new RegExp(`index-${oldHashes.css}\\.css`, 'g'),
+      new RegExp(`index-${escapeRegex(oldHashes.css)}\\.css`, 'g'),
       `index-${newHashes.css}.css`
     );
   }
