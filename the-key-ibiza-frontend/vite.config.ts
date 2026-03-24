@@ -18,13 +18,6 @@ export default defineConfig({
     include: ['react', 'react-dom'],
   },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-        },
-      },
-    },
     target: 'es2015',
     cssMinify: true,
   },
