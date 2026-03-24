@@ -115,6 +115,15 @@ function main() {
     }
   }
 
+  // Copy the home page (prerendered/index.html → dist/index.html)
+  const homePageSrc = path.join(PRERENDERED_DIR, 'index.html');
+  if (fs.existsSync(homePageSrc)) {
+    let html = fs.readFileSync(homePageSrc, 'utf-8');
+    html = updateAssetReferences(html, oldHashes, newHashes);
+    fs.writeFileSync(path.join(DIST_DIR, 'index.html'), html);
+    console.log('Copied pre-rendered home page (index.html)');
+  }
+
   // Process all pre-rendered directories
   let copied = 0;
   const items = fs.readdirSync(PRERENDERED_DIR);
