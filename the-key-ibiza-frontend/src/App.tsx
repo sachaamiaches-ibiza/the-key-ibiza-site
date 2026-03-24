@@ -774,13 +774,13 @@ const App: React.FC = () => {
 
             {/* ===== DISCLAIMER MODAL ===== */}
             {disclaimerModalOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/90 backdrop-blur-md z-[9998]"
+                        className="absolute inset-0 bg-black/90 backdrop-blur-md z-[199999]"
                         onClick={() => setDisclaimerModalOpen(false)}
                     />
                     <div
-                        className="relative z-[9999] bg-gradient-to-b from-[#1a2634] to-[#0f1923] rounded-2xl p-6 md:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+                        className="relative z-[200000] bg-gradient-to-b from-[#1a2634] to-[#0f1923] rounded-2xl p-6 md:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto"
                         style={{border: '1px solid rgba(196,164,97,0.2)'}}
                     >
                         <button
@@ -856,13 +856,13 @@ const App: React.FC = () => {
 
             {/* ===== IMPRINT MODAL ===== */}
             {imprintModalOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/90 backdrop-blur-md z-[9998]"
+                        className="absolute inset-0 bg-black/90 backdrop-blur-md z-[199999]"
                         onClick={() => setImprintModalOpen(false)}
                     />
                     <div
-                        className="relative z-[9999] bg-gradient-to-b from-[#1a2634] to-[#0f1923] rounded-2xl p-6 md:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+                        className="relative z-[200000] bg-gradient-to-b from-[#1a2634] to-[#0f1923] rounded-2xl p-6 md:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto"
                         style={{border: '1px solid rgba(196,164,97,0.2)'}}
                     >
                         <button
