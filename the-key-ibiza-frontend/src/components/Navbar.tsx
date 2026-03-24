@@ -299,7 +299,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
         <div className="absolute inset-0 z-0 pointer-events-none transition-all duration-1000 overflow-hidden">
           {/* Welcome logo - shows when hovering over Welcome */}
           <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${
-            !hoveredSubItem && (hoveredItem === t.welcome || expandedSection === t.welcome)
+            !hoveredSubItem && (
+              hoveredItem === t.welcome
+              || (expandedSection === t.welcome && !hoveredItem)
+              || (expandedSection === t.welcome && hoveredItem === t.welcome)
+            )
               ? 'opacity-100 scale-100'
               : 'opacity-0 scale-90'
           }`}>
@@ -324,7 +328,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                 muted
                 playsInline
                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-                  !hoveredSubItem && (hoveredItem === item.label || expandedSection === item.label)
+                  !hoveredSubItem && (
+                    hoveredItem === item.label
+                    || (expandedSection === item.label && !hoveredItem)
+                    || (expandedSection === item.label && hoveredItem === item.label)
+                  )
                     ? 'opacity-20 scale-105'
                     : 'opacity-0 scale-100'
                 }`}
@@ -334,7 +342,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                 key={item.label}
                 src={item.img}
                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-                  !hoveredSubItem && (hoveredItem === item.label || expandedSection === item.label)
+                  !hoveredSubItem && (
+                    hoveredItem === item.label
+                    || (expandedSection === item.label && !hoveredItem)
+                    || (expandedSection === item.label && hoveredItem === item.label)
+                  )
                     ? 'opacity-20 scale-105'
                     : 'opacity-0 scale-100'
                 }`}
