@@ -133,7 +133,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
     const start = new Date(checkIn);
     const end = new Date(checkOut);
 
-    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const dateStr = d.toISOString().split('T')[0];
       if (blockedDates.includes(dateStr)) {
         return false; // Found a blocked date in range
