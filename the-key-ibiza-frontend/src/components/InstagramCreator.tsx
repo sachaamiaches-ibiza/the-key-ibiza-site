@@ -64,6 +64,12 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
   // Edit modal
   const [editingPost, setEditingPost] = useState<InstagramPost | null>(null);
 
+  // Auth helper
+  const getAuthHeaders = (extra?: Record<string, string>) => {
+    const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+    return { 'Authorization': `Bearer ${token}`, ...extra };
+  };
+
   // Check if user is admin
   useEffect(() => {
     if (!vipAuth.isAdmin()) {
@@ -75,7 +81,9 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
   useEffect(() => {
     const fetchAccount = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/instagram/account`);
+        const res = await fetch(`${BACKEND_URL}/instagram/account`, {
+          headers: getAuthHeaders()
+        });
         if (res.ok) {
           const data = await res.json();
           setAccount(data);
@@ -92,7 +100,9 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${BACKEND_URL}/instagram/posts`);
+        const res = await fetch(`${BACKEND_URL}/instagram/posts`, {
+          headers: getAuthHeaders()
+        });
         if (res.ok) {
           const data = await res.json();
           setPosts(data.posts || []);
@@ -111,7 +121,9 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/instagram/templates`);
+        const res = await fetch(`${BACKEND_URL}/instagram/templates`, {
+          headers: getAuthHeaders()
+        });
         if (res.ok) {
           const data = await res.json();
           setTemplates(data.templates || []);
@@ -136,7 +148,7 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
     try {
       const res = await fetch(`${BACKEND_URL}/instagram/generate-caption`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ imageUrl })
       });
 
@@ -177,7 +189,7 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
     try {
       const res = await fetch(`${BACKEND_URL}/instagram/posts`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           image_url: imageUrl,
           caption,
@@ -225,7 +237,7 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
     try {
       const res = await fetch(`${BACKEND_URL}/instagram/publish`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(postToPublish)
       });
 
@@ -274,7 +286,8 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
 
     try {
       const res = await fetch(`${BACKEND_URL}/instagram/posts/${postId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       });
 
       if (res.ok) {
@@ -295,7 +308,7 @@ const InstagramCreator: React.FC<InstagramCreatorProps> = ({ onNavigate }) => {
     try {
       const res = await fetch(`${BACKEND_URL}/instagram/posts/${editingPost.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           caption: editingPost.caption,
           hashtags: editingPost.hashtags

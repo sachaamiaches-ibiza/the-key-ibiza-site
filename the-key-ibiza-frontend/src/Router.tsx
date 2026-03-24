@@ -16,6 +16,15 @@ import ValerieDetail from './components/ValerieDetail';
 import FrancescaDetail from './components/FrancescaDetail';
 import AdminDashboard from './components/AdminDashboard';
 import InstagramCreator from './components/InstagramCreator';
+import { vipAuth } from './services/vipAuth';
+
+// Auth guard for admin routes
+const AdminRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  if (!vipAuth.isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
 import ComingSoon from './components/ComingSoon';
 import BoatsPage from './components/BoatsPage';
 import YachtsPage from './components/YachtsPage';
@@ -263,9 +272,9 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
             <Route path="/yachts" element={<YachtsPage {...yachtProps} />}/>
             <Route path="/catamarans" element={<CatamaransPage {...common} />}/>
 
-            {/* --- Admin --- */}
-            <Route path="/admin-dashboard" element={<AdminDashboard onNavigate={onNavigate}/>}/>
-            <Route path="/instagram-creator" element={<InstagramCreator onNavigate={onNavigate}/>}/>
+            {/* --- Admin (protected) --- */}
+            <Route path="/admin-dashboard" element={<AdminRoute><AdminDashboard onNavigate={onNavigate}/></AdminRoute>}/>
+            <Route path="/instagram-creator" element={<AdminRoute><InstagramCreator onNavigate={onNavigate}/></AdminRoute>}/>
 
             {/* --- Dynamic Routes (Clean Paths) --- */}
             <Route path="/villa/:slug" element={<VillaDetailRoute {...props} />}/>

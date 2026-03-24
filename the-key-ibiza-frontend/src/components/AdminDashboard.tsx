@@ -145,7 +145,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${BACKEND_URL}/api/audit/stats?period=${period}`);
+        const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+        const res = await fetch(`${BACKEND_URL}/api/audit/stats?period=${period}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setStats(data);
@@ -188,7 +191,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         setGaLoading(true);
         setGaError(null);
         try {
-          const res = await fetch(`${BACKEND_URL}/api/analytics/google?period=${period}`);
+          const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+          const res = await fetch(`${BACKEND_URL}/api/analytics/google?period=${period}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
           if (res.ok) {
             const data = await res.json();
             setGaData(data);
@@ -210,7 +216,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     if (selectedVip) {
       const fetchVipHistory = async () => {
         try {
-          const res = await fetch(`${BACKEND_URL}/api/audit/vip/${selectedVip}`);
+          const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+          const res = await fetch(`${BACKEND_URL}/api/audit/vip/${selectedVip}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
           if (res.ok) {
             const data = await res.json();
             setVipHistory(data);
