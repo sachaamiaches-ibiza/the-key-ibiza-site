@@ -282,7 +282,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             </button>
           </div>
 
-          <button onClick={() => setIsMenuOpen(true)} className="p-2 text-luxury-gold hover:scale-110 transition-transform focus:outline-none">
+          <button onClick={() => setIsMenuOpen(true)} className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-luxury-gold hover:scale-110 transition-transform focus:outline-none">
             <svg className="w-8 h-8 md:w-9 md:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 8h16M4 16h16"></path>
             </svg>
