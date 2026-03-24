@@ -388,10 +388,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
           <div className="absolute inset-0 bg-gradient-to-b from-luxury-blue via-transparent to-luxury-blue"></div>
         </div>
 
-        <div className={`relative z-10 h-full w-full flex flex-col justify-start items-center md:items-start px-8 md:pl-24 pt-10 transition-transform duration-700 ${isMenuOpen ? 'translate-y-0' : 'translate-y-10'}`}>
-          
+        <div className={`relative z-10 h-full w-full flex flex-col justify-start items-center md:items-start px-8 md:pl-24 pt-6 transition-transform duration-700 ${isMenuOpen ? 'translate-y-0' : 'translate-y-10'}`}>
+
           {/* Header of Full Screen Menu */}
-          <div className="w-full flex justify-between items-center mb-10 max-w-7xl mx-auto">
+          <div className="w-full flex justify-between items-center mb-6 max-w-7xl mx-auto">
              {/* Language Selection - Only visible on mobile (hidden on lg and up since navbar has it) */}
             <div className="lg:hidden">
               <LanguageSelector
@@ -412,7 +412,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             </button>
           </div>
 
-          <div className="flex flex-col space-y-2 md:space-y-3 w-full max-w-4xl py-4 max-h-[65vh] overflow-y-auto no-scrollbar">
+          <div className="flex flex-col space-y-1 md:space-y-2 w-full max-w-4xl py-2 max-h-[75vh] overflow-y-auto no-scrollbar">
             {menuItems.map((item, idx) => (
               <div key={item.label} className="flex flex-col items-center md:items-start">
                 <button 
@@ -445,7 +445,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
                 </button>
                 
                 {item.subItems && (
-                  <div className={`flex flex-col items-center md:items-start space-y-2 md:space-y-2 md:pl-16 overflow-hidden transition-all duration-700 ${expandedSection === item.label ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <div className={`flex flex-col items-center md:items-start space-y-1 md:space-y-1 md:pl-16 overflow-hidden transition-all duration-700 ${expandedSection === item.label ? 'max-h-[500px] mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
                     {item.subItems.map(sub => (
                       <button
                         key={sub.label}
