@@ -208,7 +208,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
               {canGoBack && currentView !== 'home' && (
                 <button
                   onClick={onGoBack}
-                  className="flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-luxury-gold hover:border-luxury-gold/30 transition-all"
+                  className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-luxury-gold active:text-luxury-gold hover:border-luxury-gold/30 active:border-luxury-gold/30 transition-all"
                   title="Go back"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +282,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, lang, onLangua
             </button>
           </div>
 
-          <button onClick={() => setIsMenuOpen(true)} className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-luxury-gold hover:scale-110 transition-transform focus:outline-none">
+          <button onClick={() => setIsMenuOpen(true)} className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-luxury-gold hover:scale-110 active:scale-95 transition-transform focus:outline-none">
             <svg className="w-8 h-8 md:w-9 md:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 8h16M4 16h16"></path>
             </svg>

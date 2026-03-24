@@ -256,7 +256,7 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
                 className="flex flex-col items-center cursor-pointer group"
               >
                 <div
-                  className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center mb-3 transition-all duration-500 group-hover:scale-110 group-hover:border-luxury-gold/60"
+                  className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center mb-3 transition-all duration-500 group-hover:scale-110 active:scale-95 group-hover:border-luxury-gold/60"
                   style={{
                     border: '1px solid rgba(201,178,124,0.3)',
                     backgroundColor: 'transparent',
@@ -265,7 +265,7 @@ const ServicesPageNew: React.FC<ServicesPageNewProps> = ({ onNavigate, lang }) =
                   <IconComponent className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" />
                 </div>
                 <span
-                  className="text-center transition-colors duration-300 group-hover:text-[#C9B27C]"
+                  className="text-center transition-colors duration-300 group-hover:text-[#C9B27C] group-active:text-[#C9B27C]"
                   style={{
                     fontFamily: 'Plus Jakarta Sans, sans-serif',
                     fontSize: '9px',

@@ -11,11 +11,22 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname), // '@' apunta a la raíz del frontend
+      '@': path.resolve(__dirname),
     },
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
+    },
+    target: 'es2015',
+    cssMinify: true,
   },
 });
 

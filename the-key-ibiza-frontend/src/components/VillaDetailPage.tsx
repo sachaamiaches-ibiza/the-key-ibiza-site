@@ -1279,7 +1279,7 @@ const handlePdfPasswordSubmit = async () => {
                 onClick={() => { setGalleryIndex(i); setGalleryOpen(true); }}
                 className="aspect-[4/3] rounded-[16px] md:rounded-[24px] overflow-hidden cursor-pointer relative group"
               >
-                <img src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
+                <img src={img} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 active:scale-100" alt="" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C26]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 {i === 3 && allGalleryImages.length > 4 && (
                   <div className="absolute inset-0 bg-[#0B1C26]/60 flex items-center justify-center backdrop-blur-sm">

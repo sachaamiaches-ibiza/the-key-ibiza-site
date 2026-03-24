@@ -1,22 +1,39 @@
-﻿import React, {useState} from 'react';
+﻿import React, {useState, Suspense} from 'react';
 import {Routes, Route, Navigate, useParams} from 'react-router-dom';
 import {Language, Villa} from './types';
 import {nameToUrlSlug, SUPPORTED_LANG_PREFIXES} from './utils/urlHelpers';
+import { vipAuth } from './services/vipAuth';
 
-// Components
+// Core pages (eager load - most visited)
 import HomePage from './components/HomePage';
 import ServicesPageNew from './components/ServicesPageNew';
-import PhotographerPage from './components/PhotographerPage';
-import AboutPage from './components/AboutPage';
-import BlogPage from './components/BlogPage';
-import BlogArticlePage from './components/BlogArticlePage';
+import VillasPage from './components/VillasPage';
 import VillaDetailPage from './components/VillaDetailPage';
 import VillaListingPage from './components/VillaListingPage';
-import ValerieDetail from './components/ValerieDetail';
-import FrancescaDetail from './components/FrancescaDetail';
-import AdminDashboard from './components/AdminDashboard';
-import InstagramCreator from './components/InstagramCreator';
-import { vipAuth } from './services/vipAuth';
+import AboutPage from './components/AboutPage';
+
+// Lazy loaded pages (load on demand - less visited)
+const PhotographerPage = React.lazy(() => import('./components/PhotographerPage'));
+const BlogPage = React.lazy(() => import('./components/BlogPage'));
+const BlogArticlePage = React.lazy(() => import('./components/BlogArticlePage'));
+const ValerieDetail = React.lazy(() => import('./components/ValerieDetail'));
+const FrancescaDetail = React.lazy(() => import('./components/FrancescaDetail'));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
+const InstagramCreator = React.lazy(() => import('./components/InstagramCreator'));
+const ComingSoon = React.lazy(() => import('./components/ComingSoon'));
+const BoatsPage = React.lazy(() => import('./components/BoatsPage'));
+const YachtsPage = React.lazy(() => import('./components/YachtsPage'));
+const YachtDetailPage = React.lazy(() => import('./components/YachtDetailPage'));
+const CatamaransPage = React.lazy(() => import('./components/CatamaransPage'));
+const ServiceDetail = React.lazy(() => import('./components/ServiceDetail'));
+const WishlistPage = React.lazy(() => import('./components/WishlistPage'));
+
+// Loading fallback
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center" style={{backgroundColor: '#0B1C26'}}>
+    <div className="w-8 h-8 border-2 border-luxury-gold/30 border-t-luxury-gold rounded-full animate-spin"></div>
+  </div>
+);
 
 // Auth guard for admin routes
 const AdminRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -25,14 +42,6 @@ const AdminRoute: React.FC<{ children: React.ReactElement }> = ({ children }) =>
   }
   return children;
 };
-import ComingSoon from './components/ComingSoon';
-import BoatsPage from './components/BoatsPage';
-import YachtsPage from './components/YachtsPage';
-import YachtDetailPage from './components/YachtDetailPage';
-import CatamaransPage from './components/CatamaransPage';
-import VillasPage from './components/VillasPage';
-import ServiceDetail from './components/ServiceDetail';
-import WishlistPage from './components/WishlistPage';
 
 // --- Types ---
 interface AppRouterProps {
@@ -248,6 +257,7 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
     const yachtProps = {...common, initialDate: yachtSearchDate, onDateChange: setYachtSearchDate};
 
     return (
+        <Suspense fallback={<PageLoader />}>
         <Routes>
             {/* --- Home & Static Pages --- */}
             <Route path="/" element={<HomePage {...common} onOpenContact={props.onOpenContact}/>}/>
@@ -333,6 +343,7 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
 
             <Route path="*" element={<Navigate to="/" replace/>}/>
         </Routes>
+        </Suspense>
     );
 };
 
