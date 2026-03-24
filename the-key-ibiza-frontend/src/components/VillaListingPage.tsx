@@ -405,7 +405,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
     console.log('FILTERED VILLAS:', filtered.length, filtered);
     return filtered;
-  }, [searchFilters, villasOfType, sortBy]);
+  }, [searchFilters, villasOfType, sortBy, villaAvailability]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
