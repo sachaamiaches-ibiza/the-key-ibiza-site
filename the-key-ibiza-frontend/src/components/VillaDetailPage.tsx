@@ -863,9 +863,38 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
         }
       }
 
-      // Save the PDF
+      // Save the PDF - with mobile fallback
       const fileName = `${villa.name.replace(/\s+/g, '_')}_${withWatermark ? 'preview' : 'full'}.pdf`;
-      pdf.save(fileName);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      if (isIOS) {
+        // iOS Safari: open PDF in same tab as data URI (blob downloads don't work)
+        const pdfBlob = pdf.output('blob');
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        window.location.href = blobUrl;
+      } else if (isMobile) {
+        // Android: try blob download with fallback
+        try {
+          const pdfBlob = pdf.output('blob');
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
+          }, 1000);
+        } catch {
+          pdf.save(fileName);
+        }
+      } else {
+        // Desktop: standard save
+        pdf.save(fileName);
+      }
 
     } catch (error) {
       console.error('Error generating PDF:', error);
