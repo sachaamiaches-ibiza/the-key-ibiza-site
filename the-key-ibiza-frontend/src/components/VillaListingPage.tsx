@@ -96,40 +96,25 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
   const [villaAvailability, setVillaAvailability] = useState<Record<string, string[]>>({});
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
-  // Fetch availability for all villas
+  // Fetch availability for all villas in one request
   useEffect(() => {
     const fetchAllAvailability = async () => {
       if (villas.length === 0) return;
 
       setAvailabilityLoading(true);
-      const availability: Record<string, string[]> = {};
+      try {
+        const response = await fetch(
+          'https://the-key-ibiza-backend.vercel.app/villas/availability/bulk'
+        );
 
-      // Fetch availability for villas that have iCal URLs
-      const villasWithIcal = villas.filter(v => v.icalUrl);
-
-      await Promise.all(
-        villasWithIcal.map(async (villa) => {
-          try {
-            const villaSlug = nameToUrlSlug(villa.name);
-            const response = await fetch(
-              `https://the-key-ibiza-backend.vercel.app/villas/${villaSlug}/availability`
-            );
-
-            if (response.ok) {
-              const data = await response.json();
-              if (data.blockedDates && data.blockedDates.length > 0) {
-                availability[villaSlug] = data.blockedDates;
-              }
-            }
-          } catch (error) {
-            console.error(`Error fetching availability for ${villa.name}:`, error);
-          }
-        })
-      );
-
-      setVillaAvailability(availability);
+        if (response.ok) {
+          const data = await response.json();
+          setVillaAvailability(data.availability || {});
+        }
+      } catch (error) {
+        // Silently fail - villas show as available if no data
+      }
       setAvailabilityLoading(false);
-      console.log('📅 Loaded availability for', Object.keys(availability).length, 'villas');
     };
 
     fetchAllAvailability();
