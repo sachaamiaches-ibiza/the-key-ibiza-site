@@ -531,7 +531,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
                 <h3 className="text-white text-lg font-serif mb-4">By Browser</h3>
                 <div className="space-y-3">
-                  {Object.entries(stats.byBrowser)
+                  {Object.entries(stats.byBrowser || {})
                     .sort(([,a], [,b]) => b - a)
                     .map(([browser, count]) => {
                       const percentage = Math.round((count / stats.totalSessions) * 100);
@@ -557,7 +557,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
                 <h3 className="text-white text-lg font-serif mb-4">By Device</h3>
                 <div className="space-y-3">
-                  {Object.entries(stats.byDevice)
+                  {Object.entries(stats.byDevice || {})
                     .sort(([,a], [,b]) => b - a)
                     .map(([device, count]) => {
                       const percentage = Math.round((count / stats.totalSessions) * 100);
@@ -583,7 +583,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
                 <h3 className="text-white text-lg font-serif mb-4">By Action Type</h3>
                 <div className="space-y-3">
-                  {Object.entries(stats.byAction)
+                  {Object.entries(stats.byAction || {})
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 6)
                     .map(([action, count]) => {
@@ -611,7 +611,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
               <h3 className="text-white text-lg font-serif mb-4">Top Pages</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(stats.topPages)
+                {Object.entries(stats.topPages || {})
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 10)
                   .map(([page, count], index) => (
@@ -763,8 +763,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-red-500/10">
                   <h3 className="text-white text-lg font-serif mb-6">Google Analytics Trend</h3>
                   <div className="h-48 flex items-end gap-1">
-                    {gaData.dailyTrend.map((day) => {
-                      const maxSessions = Math.max(...gaData.dailyTrend.map(d => d.sessions), 1);
+                    {(gaData.dailyTrend || []).map((day) => {
+                      const maxSessions = Math.max(...(gaData.dailyTrend || []).map(d => d.sessions), 1);
                       return (
                         <div key={day.date} className="flex-1 group relative">
                           <div
@@ -932,7 +932,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 </tr>
               </thead>
               <tbody>
-                {stats.recentSessions.map((session: any) => (
+                {(stats.recentSessions || []).map((session: any) => (
                   <tr key={session.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="py-3 pr-4 text-white/60 text-sm">{formatDate(session.created_at)}</td>
                     <td className="py-3 pr-4 text-white/60 text-sm">
@@ -976,7 +976,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 </tr>
               </thead>
               <tbody>
-                {stats.recentActions.map((action: any) => (
+                {(stats.recentActions || []).map((action: any) => (
                   <tr key={action.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="py-3 pr-4 text-white/60 text-sm whitespace-nowrap">{formatDate(action.created_at)}</td>
                     <td className="py-3 pr-4">
