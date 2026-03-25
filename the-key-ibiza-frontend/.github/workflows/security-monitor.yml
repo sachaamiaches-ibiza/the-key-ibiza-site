@@ -1,0 +1,138 @@
+name: Daily Security Monitor
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Every day at 8:00 AM UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Frontend Security Headers
+        id: frontend
+        run: |
+          echo "## Frontend Headers" >> $GITHUB_STEP_SUMMARY
+
+          HEADERS=$(curl -sI "https://thekey-ibiza.com" 2>/dev/null)
+          FAILED=0
+
+          # Required headers
+          for header in "strict-transport-security" "x-frame-options" "x-content-type-options" "content-security-policy" "referrer-policy" "permissions-policy" "x-xss-protection"; do
+            if echo "$HEADERS" | grep -qi "$header"; then
+              echo "- :white_check_mark: $header" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- :x: **MISSING: $header**" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+          done
+
+          echo "FRONTEND_FAILED=$FAILED" >> $GITHUB_OUTPUT
+
+      - name: Check Backend Security Headers
+        id: backend
+        run: |
+          echo "## Backend Headers" >> $GITHUB_STEP_SUMMARY
+
+          HEADERS=$(curl -sI "https://the-key-ibiza-backend.vercel.app/" 2>/dev/null)
+          FAILED=0
+
+          for header in "strict-transport-security" "x-frame-options" "x-content-type-options" "referrer-policy" "permissions-policy" "cross-origin-opener-policy"; do
+            if echo "$HEADERS" | grep -qi "$header"; then
+              echo "- :white_check_mark: $header" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- :x: **MISSING: $header**" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+          done
+
+          echo "BACKEND_FAILED=$FAILED" >> $GITHUB_OUTPUT
+
+      - name: Check CORS Protection
+        id: cors
+        run: |
+          echo "## CORS" >> $GITHUB_STEP_SUMMARY
+
+          EVIL=$(curl -sI -H "Origin: https://evil.com" "https://the-key-ibiza-backend.vercel.app/" 2>/dev/null | grep -i "access-control-allow-origin" || true)
+
+          if [ -z "$EVIL" ]; then
+            echo "- :white_check_mark: Evil origin blocked" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- :x: **Evil origin NOT blocked: $EVIL**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check Admin Endpoints Protected
+        id: admin
+        run: |
+          echo "## Admin Endpoints" >> $GITHUB_STEP_SUMMARY
+          FAILED=0
+
+          for ep in "/api/audit/stats" "/api/analytics/google" "/instagram/posts" "/instagram/account" "/api-docs"; do
+            RESPONSE=$(curl -s "https://the-key-ibiza-backend.vercel.app$ep" 2>/dev/null | head -c 100)
+            if echo "$RESPONSE" | grep -q "Authentication required"; then
+              echo "- :white_check_mark: $ep protected" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- :x: **$ep NOT protected**" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+          done
+
+          echo "ADMIN_FAILED=$FAILED" >> $GITHUB_OUTPUT
+
+      - name: Check SSL Certificate
+        id: ssl
+        run: |
+          echo "## SSL Certificate" >> $GITHUB_STEP_SUMMARY
+
+          EXPIRY=$(echo | openssl s_client -connect thekey-ibiza.com:443 -servername thekey-ibiza.com 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
+          EXPIRY_EPOCH=$(date -d "$EXPIRY" +%s 2>/dev/null || date -j -f "%b %d %T %Y %Z" "$EXPIRY" +%s 2>/dev/null)
+          NOW_EPOCH=$(date +%s)
+          DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+
+          echo "- Certificate expires: $EXPIRY ($DAYS_LEFT days left)" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$DAYS_LEFT" -lt 14 ]; then
+            echo "- :x: **SSL certificate expires in less than 14 days!**" >> $GITHUB_STEP_SUMMARY
+            echo "SSL_FAILED=1" >> $GITHUB_OUTPUT
+          else
+            echo "- :white_check_mark: SSL certificate valid" >> $GITHUB_STEP_SUMMARY
+            echo "SSL_FAILED=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check SSRF Protection
+        id: ssrf
+        run: |
+          echo "## SSRF Protection" >> $GITHUB_STEP_SUMMARY
+
+          RESPONSE=$(curl -s "https://the-key-ibiza-backend.vercel.app/image-proxy?url=http://localhost:5432" 2>/dev/null)
+          if echo "$RESPONSE" | grep -q "Domain not allowed"; then
+            echo "- :white_check_mark: SSRF blocked" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- :x: **SSRF NOT blocked!**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check Page Content (pre-rendered)
+        run: |
+          echo "## Page Content" >> $GITHUB_STEP_SUMMARY
+
+          for page in "/" "/villas" "/services" "/about"; do
+            SIZE=$(curl -sL "https://thekey-ibiza.com$page" 2>/dev/null | wc -c)
+            if [ "$SIZE" -gt 20000 ]; then
+              echo "- :white_check_mark: $page — ${SIZE} bytes (pre-rendered)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- :x: **$page — only ${SIZE} bytes (possibly empty!)**" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Create Issue if Problems Found
+        if: steps.frontend.outputs.FRONTEND_FAILED == '1' || steps.backend.outputs.BACKEND_FAILED == '1' || steps.admin.outputs.ADMIN_FAILED == '1' || steps.ssl.outputs.SSL_FAILED == '1'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Security Monitor Alert - ' + new Date().toISOString().split('T')[0],
+              body: 'The daily security check found problems. Check the [workflow run](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions) for details.',
+              labels: ['security', 'automated']
+            });
