@@ -265,6 +265,7 @@ const MobileDatePickerModal: React.FC<MobileDatePickerModalProps> = ({
             disabled={[{ before: today }, ...disabledDateObjects]}
             numberOfMonths={1}
             showOutsideDays={false}
+            weekStartsOn={1}
           />
         </div>
 
