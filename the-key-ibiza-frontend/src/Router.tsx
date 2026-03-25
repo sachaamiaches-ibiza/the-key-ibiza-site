@@ -35,6 +35,12 @@ const PageLoader = () => (
   </div>
 );
 
+// Wishlist route wrapper - reads :code from URL params
+const WishlistRoute: React.FC<{ onNavigate: (page: string) => void; lang: Language }> = ({ onNavigate, lang }) => {
+  const { code } = useParams();
+  return <WishlistPage shareCode={code || ''} onNavigate={onNavigate} lang={lang} />;
+};
+
 // Auth guard for admin routes
 const AdminRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
   if (!vipAuth.isAdmin()) {
@@ -290,7 +296,7 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
             <Route path="/villa/:slug" element={<VillaDetailRoute {...props} />}/>
             <Route path="/yacht/:id" element={<YachtDetailRoute {...props} />}/>
             <Route path="/blog/:slug" element={<BlogDetailRoute {...props} />}/>
-            <Route path="/wishlist/:code" element={<WishlistPage shareCode="" onNavigate={onNavigate} lang={lang}/>}/>
+            <Route path="/wishlist/:code" element={<WishlistRoute onNavigate={onNavigate} lang={lang}/>}/>
 
             {/* --- Generic Services --- */}
             {['security', 'wellness', 'nightlife', 'events', 'catering', 'furniture', 'health', 'yoga', 'cleaning', 'driver', 'deliveries', 'babysitting'].map(s => (
