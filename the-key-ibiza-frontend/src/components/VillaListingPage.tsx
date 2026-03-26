@@ -681,7 +681,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
 
             {/* === TABLET & DESKTOP LAYOUT (>= md) === */}
             <div className="hidden md:block">
-              <div className="grid md:grid-cols-4 lg:grid-cols-7 gap-4 mb-4">
+              <div className="grid md:grid-cols-4 lg:grid-cols-7 gap-4 mb-4 [&>*]:min-w-0"
                 <div className="relative">
                   <input
                     type="date"
@@ -690,7 +690,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                       setSearchFilters({...searchFilters, checkIn: e.target.value});
                     }}
                     onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
                   <span className="absolute left-3 -top-2 text-xs uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-in</span>
@@ -703,7 +703,7 @@ const VillaListingPage: React.FC<VillaListingPageProps> = ({ category, onNavigat
                     min={searchFilters.checkIn}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchFilters({...searchFilters, checkOut: e.target.value})}
                     onFocus={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
+                    className="w-full min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-luxury-gold transition-colors cursor-pointer"
                     style={{ colorScheme: 'dark' }}
                   />
                   <span className="absolute left-3 -top-2 text-xs uppercase tracking-wider text-white/40 bg-[#141B24] px-1.5">Check-out</span>
