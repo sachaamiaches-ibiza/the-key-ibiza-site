@@ -23,7 +23,7 @@ jobs:
           for url in "https://thekey-ibiza.com|Home" "https://thekey-ibiza.com/villas|Villas" "https://thekey-ibiza.com/services|Services" "https://thekey-ibiza.com/about|About" "https://thekey-ibiza.com/blog|Blog" "https://thekey-ibiza.com/boats|Boats" "https://thekey-ibiza.com/yachts|Yachts" "https://elegantcollection.store|WhiteLabel"; do
             URL=$(echo $url | cut -d'|' -f1)
             NAME=$(echo $url | cut -d'|' -f2)
-            CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL" 2>/dev/null)
+            CODE=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 10 "$URL" 2>/dev/null)
             if [ "$CODE" = "200" ]; then
               echo "- ✅ $NAME" >> $GITHUB_STEP_SUMMARY
             else
