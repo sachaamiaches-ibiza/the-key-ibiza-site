@@ -1,0 +1,255 @@
+name: The Key Ibiza - Full Monitor
+
+on:
+  schedule:
+    - cron: '0 */1 * * *'  # Every hour
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run all checks
+        id: checks
+        run: |
+          FAILURES=""
+
+          echo "========================================" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 The Key Ibiza Monitor" >> $GITHUB_STEP_SUMMARY
+          echo "Time: $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # =============================================
+          # 1. UPTIME - Are pages loading?
+          # =============================================
+          echo "### 1. Uptime" >> $GITHUB_STEP_SUMMARY
+
+          for url in "https://thekey-ibiza.com|Home" "https://thekey-ibiza.com/villas|Villas" "https://thekey-ibiza.com/services|Services" "https://thekey-ibiza.com/about|About" "https://thekey-ibiza.com/blog|Blog" "https://thekey-ibiza.com/boats|Boats" "https://thekey-ibiza.com/yachts|Yachts" "https://elegantcollection.store|White Label"; do
+            URL=$(echo $url | cut -d'|' -f1)
+            NAME=$(echo $url | cut -d'|' -f2)
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL" 2>/dev/null)
+            if [ "$CODE" = "200" ]; then
+              echo "- ✅ $NAME ($CODE)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ❌ **$NAME FAILED ($CODE)**" >> $GITHUB_STEP_SUMMARY
+              FAILURES="${FAILURES}❌ ${NAME} no responde (HTTP ${CODE})\n"
+            fi
+          done
+
+          # =============================================
+          # 2. BACKEND API - Is the API working?
+          # =============================================
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 2. Backend API" >> $GITHUB_STEP_SUMMARY
+
+          # Status
+          STATUS=$(curl -s --max-time 10 "https://the-key-ibiza-backend.vercel.app/" 2>/dev/null)
+          if echo "$STATUS" | grep -q '"ok"'; then
+            echo "- ✅ Backend status OK" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Backend DOWN**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ Backend API no responde\n"
+          fi
+
+          # Villas API
+          VILLAS=$(curl -s --max-time 15 "https://the-key-ibiza-backend.vercel.app/villas" 2>/dev/null | head -c 50)
+          if echo "$VILLAS" | grep -q '"id"'; then
+            echo "- ✅ Villas API returns data" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Villas API broken**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ API de villas no devuelve datos\n"
+          fi
+
+          # Blog API
+          BLOG=$(curl -s --max-time 10 "https://the-key-ibiza-backend.vercel.app/blog" 2>/dev/null | head -c 50)
+          if echo "$BLOG" | grep -q '"id"'; then
+            echo "- ✅ Blog API returns data" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Blog API broken**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ API del blog no devuelve datos\n"
+          fi
+
+          # Availability bulk
+          AVAIL=$(curl -s --max-time 30 "https://the-key-ibiza-backend.vercel.app/villas/availability/bulk" 2>/dev/null | head -c 100)
+          if echo "$AVAIL" | grep -q '"availability"'; then
+            echo "- ✅ Availability API working" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Availability API broken**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ Calendario de disponibilidad no funciona\n"
+          fi
+
+          # =============================================
+          # 3. CONTENT - Are pages pre-rendered?
+          # =============================================
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 3. Page Content" >> $GITHUB_STEP_SUMMARY
+
+          for url in "https://thekey-ibiza.com|Home" "https://thekey-ibiza.com/villas|Villas" "https://thekey-ibiza.com/services|Services"; do
+            URL=$(echo $url | cut -d'|' -f1)
+            NAME=$(echo $url | cut -d'|' -f2)
+            SIZE=$(curl -sL --max-time 10 "$URL" 2>/dev/null | wc -c | tr -d ' ')
+            if [ "$SIZE" -gt 20000 ]; then
+              echo "- ✅ $NAME has content (${SIZE} bytes)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ❌ **$NAME may be empty (${SIZE} bytes)**" >> $GITHUB_STEP_SUMMARY
+              FAILURES="${FAILURES}❌ ${NAME} puede estar vacía (solo ${SIZE} bytes)\n"
+            fi
+          done
+
+          # Check JS bundle loads correctly
+          JS_FILE=$(curl -sL --max-time 10 "https://thekey-ibiza.com" 2>/dev/null | grep -oE 'index-[A-Za-z0-9_-]+\.js' | head -1)
+          if [ -n "$JS_FILE" ]; then
+            JS_TYPE=$(curl -sI --max-time 10 "https://thekey-ibiza.com/assets/$JS_FILE" 2>/dev/null | grep -i "content-type" | head -1)
+            if echo "$JS_TYPE" | grep -qi "javascript"; then
+              echo "- ✅ JS bundle loads correctly" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ❌ **JS bundle broken (returns wrong content-type)**" >> $GITHUB_STEP_SUMMARY
+              FAILURES="${FAILURES}❌ El JavaScript de la web no carga correctamente\n"
+            fi
+          fi
+
+          # Check CSS loads correctly
+          CSS_FILE=$(curl -sL --max-time 10 "https://thekey-ibiza.com" 2>/dev/null | grep -oE 'index-[A-Za-z0-9_-]+\.css' | head -1)
+          if [ -n "$CSS_FILE" ]; then
+            CSS_TYPE=$(curl -sI --max-time 10 "https://thekey-ibiza.com/assets/$CSS_FILE" 2>/dev/null | grep -i "content-type" | head -1)
+            if echo "$CSS_TYPE" | grep -qi "css"; then
+              echo "- ✅ CSS bundle loads correctly" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ❌ **CSS bundle broken (returns wrong content-type)**" >> $GITHUB_STEP_SUMMARY
+              FAILURES="${FAILURES}❌ Los estilos de la web no cargan correctamente\n"
+            fi
+          fi
+
+          # =============================================
+          # 4. SECURITY - Are protections in place?
+          # =============================================
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 4. Security" >> $GITHUB_STEP_SUMMARY
+
+          # Headers
+          HEADERS=$(curl -sI --max-time 10 "https://thekey-ibiza.com" 2>/dev/null)
+          for header in "strict-transport-security" "x-frame-options" "x-content-type-options" "content-security-policy"; do
+            if echo "$HEADERS" | grep -qi "$header"; then
+              echo "- ✅ $header" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ❌ **MISSING: $header**" >> $GITHUB_STEP_SUMMARY
+              FAILURES="${FAILURES}❌ Header de seguridad falta: ${header}\n"
+            fi
+          done
+
+          # CORS
+          EVIL=$(curl -sI --max-time 10 -H "Origin: https://evil.com" "https://the-key-ibiza-backend.vercel.app/" 2>/dev/null | grep -i "access-control-allow-origin" || true)
+          if [ -z "$EVIL" ]; then
+            echo "- ✅ CORS blocks unknown origins" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **CORS allows unknown origins**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ CORS permite orígenes desconocidos\n"
+          fi
+
+          # Admin endpoints
+          ADMIN_TEST=$(curl -s --max-time 10 "https://the-key-ibiza-backend.vercel.app/api/audit/stats" 2>/dev/null)
+          if echo "$ADMIN_TEST" | grep -q "Authentication required"; then
+            echo "- ✅ Admin endpoints protected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Admin endpoints NOT protected**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ Endpoints de admin accesibles sin autenticación\n"
+          fi
+
+          # SSRF
+          SSRF_TEST=$(curl -s --max-time 10 "https://the-key-ibiza-backend.vercel.app/image-proxy?url=http://localhost:5432" 2>/dev/null)
+          if echo "$SSRF_TEST" | grep -q "Domain not allowed"; then
+            echo "- ✅ SSRF protection active" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **SSRF protection broken**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ Protección SSRF no funciona\n"
+          fi
+
+          # SSL expiry
+          EXPIRY=$(echo | openssl s_client -connect thekey-ibiza.com:443 -servername thekey-ibiza.com 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
+          if [ -n "$EXPIRY" ]; then
+            EXPIRY_EPOCH=$(date -d "$EXPIRY" +%s 2>/dev/null)
+            NOW_EPOCH=$(date +%s)
+            DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+            if [ "$DAYS_LEFT" -lt 14 ]; then
+              echo "- ⚠️ **SSL expires in $DAYS_LEFT days!**" >> $GITHUB_STEP_SUMMARY
+              FAILURES="${FAILURES}⚠️ Certificado SSL expira en ${DAYS_LEFT} días\n"
+            else
+              echo "- ✅ SSL valid ($DAYS_LEFT days left)" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          # =============================================
+          # 5. WISHLIST - Can wishlists be loaded?
+          # =============================================
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 5. Wishlist" >> $GITHUB_STEP_SUMMARY
+
+          WL_CODE=$(curl -sI --max-time 10 "https://thekey-ibiza.com/wishlist/test" 2>/dev/null | head -1)
+          if echo "$WL_CODE" | grep -q "200"; then
+            echo "- ✅ Wishlist pages load" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Wishlist pages broken**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ Las páginas de wishlist no cargan\n"
+          fi
+
+          # =============================================
+          # 6. MAPS - Do map tiles load?
+          # =============================================
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 6. Maps" >> $GITHUB_STEP_SUMMARY
+
+          MAP_TEST=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://a.tile.openstreetmap.org/10/512/384.png" 2>/dev/null)
+          if [ "$MAP_TEST" = "200" ]; then
+            echo "- ✅ OpenStreetMap tiles available" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Map tiles unavailable**" >> $GITHUB_STEP_SUMMARY
+            FAILURES="${FAILURES}❌ Los mapas no funcionan (OpenStreetMap caído)\n"
+          fi
+
+          # =============================================
+          # SAVE FAILURES FOR TELEGRAM
+          # =============================================
+          if [ -n "$FAILURES" ]; then
+            echo "HAS_FAILURES=true" >> $GITHUB_OUTPUT
+            # Save failures to file for next step
+            printf "$FAILURES" > /tmp/failures.txt
+          else
+            echo "HAS_FAILURES=false" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### ✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Send Telegram Alert
+        if: steps.checks.outputs.HAS_FAILURES == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          FAILURES=$(cat /tmp/failures.txt)
+          MESSAGE="🚨 <b>ALERTA - The Key Ibiza</b>
+
+Se han detectado problemas:
+
+${FAILURES}
+🕐 $(date -u '+%Y-%m-%d %H:%M UTC')
+🔗 <a href=\"https://github.com/${{ github.repository }}/actions\">Ver detalles</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": $(echo "$MESSAGE" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'), \"parse_mode\": \"HTML\", \"disable_web_page_preview\": true}" > /dev/null
+
+      - name: Send Daily OK (8AM only)
+        if: steps.checks.outputs.HAS_FAILURES == 'false' && github.event.schedule == '0 8 * * *'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          MESSAGE="✅ <b>The Key Ibiza - Todo OK</b>
+
+Informe diario: todos los sistemas funcionan correctamente.
+
+🕐 $(date -u '+%Y-%m-%d %H:%M UTC')"
+
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": $(echo "$MESSAGE" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'), \"parse_mode\": \"HTML\"}" > /dev/null
