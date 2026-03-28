@@ -27,7 +27,6 @@ async function fetchCloudinaryFolder(folderPath: string): Promise<string[]> {
     // Cache the result
     cloudinaryCache[folderPath] = images;
 
-    console.log(`📁 Cloudinary folder ${folderPath}: ${images.length} images`);
     return images;
   } catch (e) {
     console.error(`❌ Error fetching Cloudinary folder ${folderPath}:`, e);
@@ -218,18 +217,15 @@ export async function fetchVillas(lang: string = 'en'): Promise<Villa[]> {
   try {
     // Include VIP token if available to see private villas (check both storages)
     const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
-    console.log('🔑 VIP Token found:', token ? 'YES' : 'NO');
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
-      console.log('🔐 Sending Authorization header');
     }
 
     const res = await fetch(`${BACKEND_URL}/villas?lang=${lang}`, { headers });
-    console.log('📡 Villas API response status:', res.status);
 
     if (!res.ok) {
       console.error('❌ Backend error:', res.status);
@@ -240,11 +236,6 @@ export async function fetchVillas(lang: string = 'en'): Promise<Villa[]> {
 
     // Parse response - handle both array and { data: [] } formats
     const rawVillas = Array.isArray(json) ? json : (json.data || []);
-    console.log('📦 Raw villas from API:', rawVillas.length);
-
-    // Check for vip_only villas
-    const vipOnlyRaw = rawVillas.filter((v: any) => v.vip_only === true);
-    console.log('🔒 VIP-only villas in response:', vipOnlyRaw.length, vipOnlyRaw.map((v: any) => v.villa_name));
 
     const villas = rawVillas.map(apiRowToVilla);
 
@@ -253,7 +244,6 @@ export async function fetchVillas(lang: string = 'en'): Promise<Villa[]> {
       villas.map((villa, index) => loadCloudinaryImagesForVilla(villa, rawVillas[index]))
     );
 
-    console.log('✅ VILLAS FETCHED FROM BACKEND:', villasWithImages.length);
     return villasWithImages;
   } catch (e) {
     console.error('❌ Error fetching villas:', e);
@@ -293,7 +283,6 @@ export async function fetchVillaBySlug(slug: string, lang: string = 'en'): Promi
       (villaWithImages as any).requiresPassword = true;
     }
 
-    console.log('✅ VILLA FETCHED FROM BACKEND:', villaWithImages.name);
     return villaWithImages;
   } catch (e) {
     console.error('❌ Error fetching villa:', e);
