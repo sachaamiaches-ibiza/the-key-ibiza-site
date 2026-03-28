@@ -141,25 +141,34 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   }, [onNavigate]);
 
   // Fetch stats with period
-  useEffect(() => {
-    const fetchStats = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
-        const res = await fetch(`${BACKEND_URL}/api/audit/stats?period=${period}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setStats(data);
-        } else {
-          setError('Failed to load statistics');
-        }
-      } catch (err) {
-        setError('Connection error');
+  const fetchStats = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+      if (!token) {
+        setError('No auth token found. Please log in again.');
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-    };
+      const res = await fetch(`${BACKEND_URL}/api/audit/stats?period=${period}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      } else {
+        let detail = '';
+        try { const errBody = await res.json(); detail = errBody.error || errBody.message || ''; } catch {}
+        setError(`Failed to load statistics (HTTP ${res.status}${detail ? ': ' + detail : ''}). Backend: ${BACKEND_URL}`);
+      }
+    } catch (err: any) {
+      setError(`Cannot connect to backend at ${BACKEND_URL}. Check that the backend is running. (${err?.message || 'Network error'})`);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchStats();
   }, [period]);
 
@@ -199,11 +208,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             const data = await res.json();
             setGaData(data);
           } else {
-            const errData = await res.json();
-            setGaError(errData.error || 'Failed to load Google Analytics');
+            let detail = '';
+            try { const errData = await res.json(); detail = errData.error || errData.message || ''; } catch {}
+            setGaError(`Failed to load Google Analytics (HTTP ${res.status}${detail ? ': ' + detail : ''})`);
           }
-        } catch (err) {
-          setGaError('Connection error');
+        } catch (err: any) {
+          setGaError(`Cannot connect to Google Analytics API (${err?.message || 'Network error'})`);
         }
         setGaLoading(false);
       };
@@ -387,17 +397,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     );
   }
 
-  if (error) {
+  if (error && !stats) {
     return (
       <div className="pt-40 pb-24 min-h-screen" style={{ backgroundColor: '#0B1C26' }}>
         <div className="container mx-auto px-6 text-center">
-          <p className="text-red-400 mb-4">{error}</p>
-          <button
-            onClick={() => onNavigate('home')}
-            className="px-6 py-2 rounded-full bg-luxury-gold text-luxury-blue text-sm"
-          >
-            Back to Home
-          </button>
+          <p className="text-red-400 mb-4 text-sm max-w-lg mx-auto">{error}</p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => fetchStats()}
+              className="px-6 py-2 rounded-full bg-luxury-gold text-luxury-blue text-sm"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => onNavigate('home')}
+              className="px-6 py-2 rounded-full border border-white/30 text-white/60 text-sm"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -439,6 +457,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             <p className="text-luxury-gold text-sm">{vipAuth.getUserName()}</p>
           </div>
         </div>
+
+        {/* Error banner (non-blocking when stats exist) */}
+        {error && stats && (
+          <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+            <p className="text-red-400 text-sm">{error}</p>
+            <button onClick={() => fetchStats()} className="text-red-400 text-xs uppercase tracking-wider hover:text-red-300 ml-4">Retry</button>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
@@ -531,7 +557,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
                 <h3 className="text-white text-lg font-serif mb-4">By Browser</h3>
                 <div className="space-y-3">
-                  {Object.entries(stats.byBrowser)
+                  {Object.entries(stats.byBrowser || {})
                     .sort(([,a], [,b]) => b - a)
                     .map(([browser, count]) => {
                       const percentage = Math.round((count / stats.totalSessions) * 100);
@@ -557,7 +583,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
                 <h3 className="text-white text-lg font-serif mb-4">By Device</h3>
                 <div className="space-y-3">
-                  {Object.entries(stats.byDevice)
+                  {Object.entries(stats.byDevice || {})
                     .sort(([,a], [,b]) => b - a)
                     .map(([device, count]) => {
                       const percentage = Math.round((count / stats.totalSessions) * 100);
@@ -583,7 +609,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
                 <h3 className="text-white text-lg font-serif mb-4">By Action Type</h3>
                 <div className="space-y-3">
-                  {Object.entries(stats.byAction)
+                  {Object.entries(stats.byAction || {})
                     .sort(([,a], [,b]) => b - a)
                     .slice(0, 6)
                     .map(([action, count]) => {
@@ -611,7 +637,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
               <h3 className="text-white text-lg font-serif mb-4">Top Pages</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(stats.topPages)
+                {Object.entries(stats.topPages || {})
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 10)
                   .map(([page, count], index) => (
@@ -763,8 +789,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-red-500/10">
                   <h3 className="text-white text-lg font-serif mb-6">Google Analytics Trend</h3>
                   <div className="h-48 flex items-end gap-1">
-                    {gaData.dailyTrend.map((day) => {
-                      const maxSessions = Math.max(...gaData.dailyTrend.map(d => d.sessions), 1);
+                    {(gaData.dailyTrend || []).map((day) => {
+                      const maxSessions = Math.max(...(gaData.dailyTrend || []).map(d => d.sessions), 1);
                       return (
                         <div key={day.date} className="flex-1 group relative">
                           <div
@@ -932,7 +958,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 </tr>
               </thead>
               <tbody>
-                {stats.recentSessions.map((session: any) => (
+                {(stats.recentSessions || []).map((session: any) => (
                   <tr key={session.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="py-3 pr-4 text-white/60 text-sm">{formatDate(session.created_at)}</td>
                     <td className="py-3 pr-4 text-white/60 text-sm">
@@ -976,7 +1002,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 </tr>
               </thead>
               <tbody>
-                {stats.recentActions.map((action: any) => (
+                {(stats.recentActions || []).map((action: any) => (
                   <tr key={action.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="py-3 pr-4 text-white/60 text-sm whitespace-nowrap">{formatDate(action.created_at)}</td>
                     <td className="py-3 pr-4">
