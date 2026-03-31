@@ -420,6 +420,11 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
     const totalNights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     if (totalNights <= 0) return null;
 
+    // If no pricing data at all, return null (show "Price on Request")
+    if (!villa.numericPrice && (!villa.seasonalPrices || villa.seasonalPrices.length === 0)) {
+      return { totalNights, breakdown: [], total: 0, noPricing: true };
+    }
+
     const nightsByMonth: { [key: string]: number } = {};
     const priceByMonth: { [key: string]: number } = {};
     const monthlyPrices: { [monthIndex: number]: number } = {};
@@ -428,12 +433,12 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       const monthKey = Object.keys(monthNameToIndex).find(m => sp.month.includes(m));
       if (monthKey) {
         const monthIdx = monthNameToIndex[monthKey];
-        const price = parseInt(sp.price.replace(/[^\d]/g, '')) || villa.numericPrice || 15000;
+        const price = parseInt(sp.price.replace(/[^\d]/g, '')) || villa.numericPrice || 0;
         monthlyPrices[monthIdx] = price;
       }
     });
 
-    const defaultWeeklyPrice = villa.numericPrice || 15000;
+    const defaultWeeklyPrice = villa.numericPrice || 0;
 
     for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
       const monthIdx = d.getMonth();
@@ -1054,7 +1059,7 @@ const handlePdfPasswordSubmit = async () => {
           </div>
           <div className="flex justify-between items-center mb-4">
             <span className="text-white text-sm font-medium">Total</span>
-            {isInvenioVilla ? (
+            {isInvenioVilla || (calculatePriceBreakdown() as any)?.noPricing || !calculatePriceBreakdown()?.total ? (
               <span className="text-lg font-serif text-luxury-gold">Price on Request</span>
             ) : (
               <span className="text-lg font-serif text-luxury-gold">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
