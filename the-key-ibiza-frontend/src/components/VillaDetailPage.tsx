@@ -711,8 +711,8 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       // Draw page watermark FIRST (in background) - positioned lower to not overlap with image
       drawPageWatermark(pageHeight - 70, 55);
 
-      const headerImages = villa.headerImages || [villa.imageUrl];
-      const mainImage = headerImages[0];
+      const pdfHeaderImages = slideshowImages.length > 0 ? slideshowImages : (villa.headerImages || [villa.imageUrl]);
+      const mainImage = pdfHeaderImages[0];
 
       if (mainImage) {
         try {
@@ -822,7 +822,7 @@ const VillaDetailPage: React.FC<VillaDetailPageProps> = ({ villa, lang, initialC
       }
 
       // ===== GALLERY PAGES: All photos, 6 per page (2 columns x 3 rows) =====
-      const allImages = villa.gallery || [];
+      const allImages = allGalleryImages.length > 0 ? allGalleryImages : (villa.gallery || []);
       const imagesPerPage = 6;
       const cols = 2;
       const rows = 3;
