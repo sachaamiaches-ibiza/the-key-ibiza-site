@@ -120,14 +120,10 @@ function main() {
     }
   }
 
-  // Copy the home page (prerendered/index.html → dist/index.html)
-  const homePageSrc = path.join(PRERENDERED_DIR, 'index.html');
-  if (fs.existsSync(homePageSrc)) {
-    let html = fs.readFileSync(homePageSrc, 'utf-8');
-    html = updateAssetReferences(html, oldHashes, newHashes);
-    fs.writeFileSync(path.join(DIST_DIR, 'index.html'), html);
-    console.log('Copied pre-rendered home page (index.html)');
-  }
+  // Home page: keep Vite's original index.html (has correct OG tags)
+  // Home content loads dynamically via React (blog, signature villas, etc.)
+  // Pre-rendering the home causes hash mismatches and missing async content
+  console.log('Skipping home page pre-render (uses Vite original with React hydration)');
 
   // Process all pre-rendered directories
   let copied = 0;
