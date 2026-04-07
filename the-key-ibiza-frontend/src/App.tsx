@@ -1012,7 +1012,7 @@ const App: React.FC = () => {
                     href="https://wa.me/34660153207"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="fixed bottom-28 right-8 lg:bottom-36 lg:right-12 z-[100] w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 group border border-luxury-gold/30 hover:border-luxury-gold/60 hover:scale-105 shadow-xl"
+                    className="fixed bottom-28 right-8 lg:bottom-36 lg:right-12 z-[90] w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 group border border-luxury-gold/30 hover:border-luxury-gold/60 hover:scale-105 shadow-xl"
                     style={{ backgroundColor: 'rgba(8, 20, 28, 0.95)' }}
                     aria-label="Contact us on WhatsApp"
                 >
