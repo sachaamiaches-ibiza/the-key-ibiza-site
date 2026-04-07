@@ -935,7 +935,7 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
 
         {/* ===== BOOKING MODAL ===== */}
         {bookingModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(11,28,38,0.95)' }}>
+          <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(11,28,38,0.95)' }}>
             <div
               className="relative w-full max-w-lg p-6 md:p-8 rounded-[24px] border border-white/10"
               style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)' }}

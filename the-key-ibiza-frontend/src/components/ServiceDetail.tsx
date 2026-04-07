@@ -538,7 +538,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ serviceId, onNavigate, la
 
       {/* Contact Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
           <div
             className="relative w-full max-w-lg p-6 md:p-8 rounded-[24px] border border-luxury-gold/20 max-h-[90vh] overflow-y-auto"
             style={{ background: 'linear-gradient(145deg, #0B1C26 0%, #0A0E14 100%)' }}
