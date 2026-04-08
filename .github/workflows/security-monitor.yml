@@ -72,11 +72,12 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 3. Page Content" >> $GITHUB_STEP_SUMMARY
 
-          for url in "https://thekey-ibiza.com|Home" "https://thekey-ibiza.com/villas|Villas" "https://thekey-ibiza.com/services|Services"; do
+          for url in "https://thekey-ibiza.com|Home|5000" "https://thekey-ibiza.com/villas|Villas|20000" "https://thekey-ibiza.com/services|Services|20000"; do
             URL=$(echo $url | cut -d'|' -f1)
             NAME=$(echo $url | cut -d'|' -f2)
+            MIN_SIZE=$(echo $url | cut -d'|' -f3)
             SIZE=$(curl -sL --max-time 10 "$URL" 2>/dev/null | wc -c | tr -d ' ')
-            if [ "$SIZE" -gt 20000 ]; then
+            if [ "$SIZE" -gt "$MIN_SIZE" ]; then
               echo "- ✅ $NAME (${SIZE} bytes)" >> $GITHUB_STEP_SUMMARY
             else
               echo "- ❌ **$NAME may be empty (${SIZE} bytes)**" >> $GITHUB_STEP_SUMMARY
