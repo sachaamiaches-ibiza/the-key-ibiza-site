@@ -1047,17 +1047,13 @@ const handlePdfPasswordSubmit = async () => {
         </div>
       )}
 
-      {!checkIn || !checkOut ? (
-        <p className="text-white/40 text-xs text-center italic">
-          Select dates to calculate your stay.
-        </p>
-      ) : calculatePriceBreakdown() && isRangeAvailable() ? (
-        <div className="border-t border-white/8 pt-5">
+      {checkIn && checkOut && calculatePriceBreakdown() && isRangeAvailable() && (
+        <div className="border-t border-white/8 pt-5 mb-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-white/60 text-xs">Nights</span>
             <span className="text-white text-xs font-medium">{calculatePriceBreakdown()?.totalNights}</span>
           </div>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center">
             <span className="text-white text-sm font-medium">Total</span>
             {isInvenioVilla || (calculatePriceBreakdown() as any)?.noPricing || !calculatePriceBreakdown()?.total ? (
               <span className="text-lg font-serif text-luxury-gold">Price on Request</span>
@@ -1065,14 +1061,21 @@ const handlePdfPasswordSubmit = async () => {
               <span className="text-lg font-serif text-luxury-gold">€{calculatePriceBreakdown()?.total.toLocaleString()}</span>
             )}
           </div>
-          <button
-            onClick={() => setBookingModalOpen(true)}
-            className="w-full py-3 rounded-xl font-semibold uppercase tracking-[0.15em] text-[10px] transition-all duration-300 bg-luxury-gold text-luxury-blue border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold"
-          >
-            Request Booking
-          </button>
         </div>
-      ) : null}
+      )}
+
+      {!checkIn && !checkOut && (
+        <p className="text-white/40 text-xs text-center italic mb-4">
+          Select dates to calculate your stay.
+        </p>
+      )}
+
+      <button
+        onClick={() => setBookingModalOpen(true)}
+        className="w-full py-3 rounded-xl font-semibold uppercase tracking-[0.15em] text-[10px] transition-all duration-300 bg-luxury-gold text-luxury-blue border border-luxury-gold hover:bg-luxury-blue hover:text-luxury-gold"
+      >
+        Enquiry
+      </button>
 
       {/* Date Picker Modal */}
       <MobileDatePickerModal
