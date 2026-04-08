@@ -16,6 +16,13 @@ body {
   background-attachment: fixed;
 }
 
+/* Scale down on desktop to match original 75% design */
+@media (min-width: 1024px) {
+  html {
+    zoom: 0.75;
+  }
+}
+
 /* ============================================
    GLOBAL TEXT COLOR FIXES - Luxury Gold Theme
    ============================================ */
