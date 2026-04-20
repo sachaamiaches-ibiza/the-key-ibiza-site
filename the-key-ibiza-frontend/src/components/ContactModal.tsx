@@ -41,12 +41,32 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
+  const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://the-key-ibiza-backend.vercel.app';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
 
-    // Simulate sending (you can integrate with your backend here)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch(`${BACKEND_URL}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message || 'No message provided',
+          source: 'contact'
+        }),
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error('Failed');
+    } catch {
+      // Fallback: open mailto
+      const subject = encodeURIComponent('Contact Request - The Key Ibiza');
+      const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message || 'No message'}`);
+      window.open(`mailto:hello@thekey-ibiza.com?subject=${subject}&body=${body}`, '_blank');
+    }
 
     setSending(false);
     setSent(true);
