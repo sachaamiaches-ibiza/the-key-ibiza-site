@@ -4,6 +4,8 @@ import { Message, Language } from '../types';
 import { LogoTheKey } from './Navbar';
 import { translations } from '../translations';
 
+const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://the-key-ibiza-backend.vercel.app';
+
 interface AIConciergeProps {
   lang: Language;
 }
@@ -292,19 +294,17 @@ const AIConcierge: React.FC<AIConciergeProps> = ({ lang }) => {
       }
     });
 
-    const formData = new FormData();
-    formData.append('name', data.fullName || '');
-    formData.append('email', data.email || '');
-    formData.append('phone', data.phone || '');
-    formData.append('_subject', `🔑 ${typeLabel} Request - ${data.fullName}`);
-    formData.append('message', messageContent);
-    formData.append('_captcha', 'false');
-    formData.append('_template', 'table');
-
     try {
-      await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
+      await fetch(`${BACKEND_URL}/contact`, {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.fullName || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          message: messageContent,
+          source: 'ai-concierge',
+        }),
       });
     } catch {
       const subject = encodeURIComponent(`${typeLabel} Request`);

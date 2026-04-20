@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { Language } from '../types';
 
+const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://the-key-ibiza-backend.vercel.app';
+
 interface FrancescaDetailProps {
   onNavigate: (view: any) => void;
   lang: Language;
@@ -50,23 +52,20 @@ const FrancescaDetail: React.FC<FrancescaDetailProps> = ({ onNavigate, lang }) =
     e.preventDefault();
     setFormStatus('submitting');
 
-    const formPayload = new FormData();
-    formPayload.append('name', formData.name);
-    formPayload.append('email', formData.email);
-    formPayload.append('phone', formData.phone);
-    formPayload.append('service', `Francesca - ${selectedService}`);
-    formPayload.append('details', formData.details || 'No details provided');
-    formPayload.append('_subject', `Yoga & Wellness Inquiry: ${selectedService} – The Key Ibiza`);
-    formPayload.append('_captcha', 'false');
-    formPayload.append('_template', 'table');
-
     try {
-      const response = await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
+      const response = await fetch(`${BACKEND_URL}/contact`, {
         method: 'POST',
-        body: formPayload,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.details || 'No details provided',
+          source: 'francesca',
+        }),
       });
       const result = await response.json();
-      if (result.success) {
+      if (result.success || response.ok) {
         setFormStatus('success');
         setFormData({ name: '', email: '', phone: '', details: '' });
         setTimeout(() => {

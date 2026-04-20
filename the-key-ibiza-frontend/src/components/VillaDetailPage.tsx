@@ -9,6 +9,8 @@ import jsPDF from 'jspdf';
 import { getHeaderImageUrl, getGalleryImageUrl } from '../utils/cloudinaryUrl';
 import VillaDetailSkeleton from './VillaDetailSkeleton';
 
+const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://the-key-ibiza-backend.vercel.app';
+
 interface VillaDetailPageProps {
   villa: Villa;
   onNavigate: (view: any) => void;
@@ -963,27 +965,23 @@ const handlePdfPasswordSubmit = async () => {
     setBookingStatus('submitting');
     const calculatedTotal = calculatePriceBreakdown()?.total || 0;
 
-    // Prepare form data for email
-    const formDataToSend = new FormData();
-    formDataToSend.append('name', bookingForm.name);
-    formDataToSend.append('email', bookingForm.email);
-    formDataToSend.append('phone', bookingForm.phone);
-    formDataToSend.append('message', bookingForm.message || 'No additional message');
-    formDataToSend.append('villa', villa.name);
-    formDataToSend.append('check_in', checkIn);
-    formDataToSend.append('check_out', checkOut);
-    formDataToSend.append('total_price', `€${calculatedTotal.toLocaleString()}`);
-    formDataToSend.append('_subject', `Booking Request: ${villa.name} – The Key Ibiza`);
-    formDataToSend.append('_captcha', 'false');
-    formDataToSend.append('_template', 'table');
-
     try {
-      const response = await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
+      const response = await fetch(`${BACKEND_URL}/contact`, {
         method: 'POST',
-        body: formDataToSend,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: bookingForm.name,
+          email: bookingForm.email,
+          phone: bookingForm.phone,
+          message: bookingForm.message || 'No additional message',
+          source: 'villa-booking',
+          villa: villa.name,
+          checkIn,
+          checkOut,
+        }),
       });
       const result = await response.json();
-      if (result.success) {
+      if (result.success || response.ok) {
         setBookingStatus('success');
         setBookingForm({ name: '', email: '', phone: '', message: '' });
       } else {

@@ -9,7 +9,7 @@ import { getHeaderImageUrl, getGalleryImageUrl, getThumbnailUrl } from '../utils
 // Watermarks are embedded via Cloudinary transformations
 
 // Backend URL for Cloudinary API
-const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
+const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://the-key-ibiza-backend.vercel.app';
 
 // Video file extensions
 const VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov', '.avi', '.m4v'];
@@ -439,24 +439,22 @@ const YachtDetailPage: React.FC<YachtDetailPageProps> = ({ yacht, onNavigate, la
 
     setBookingStatus('submitting');
 
-    const formData = new FormData();
-    formData.append('name', bookingForm.name);
-    formData.append('email', bookingForm.email);
-    formData.append('phone', bookingForm.phone);
-    formData.append('yacht', yacht.nombre);
-    formData.append('date', charterDate || 'Not specified');
-    formData.append('message', bookingForm.message || 'No message');
-    formData.append('_subject', `Yacht Charter Request: ${yacht.nombre} – The Key Ibiza`);
-    formData.append('_captcha', 'false');
-    formData.append('_template', 'table');
-
     try {
-      const response = await fetch('https://formsubmit.co/ajax/hello@thekey-ibiza.com', {
+      const response = await fetch(`${BACKEND_URL}/contact`, {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: bookingForm.name,
+          email: bookingForm.email,
+          phone: bookingForm.phone,
+          message: bookingForm.message || 'No message',
+          source: 'yacht-booking',
+          yacht: yacht.nombre,
+          checkIn: charterDate || 'Not specified',
+        }),
       });
       const result = await response.json();
-      if (result.success) {
+      if (result.success || response.ok) {
         setBookingStatus('success');
         setBookingForm({ name: '', email: '', phone: '', message: '' });
       } else {
