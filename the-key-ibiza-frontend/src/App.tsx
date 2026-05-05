@@ -270,6 +270,9 @@ const App: React.FC = () => {
         window.location.hostname.includes('elegantcollection')
     );
 
+    // Photo-only routes for collaborators - hide all chrome
+    const isPhotoOnly = pathWithoutLang.startsWith('/fotos/');
+
     // White label: Change title and favicon
     useEffect(() => {
         if (isWhiteLabelDomain) {
@@ -588,7 +591,7 @@ const App: React.FC = () => {
     return (
         <div className="min-h-screen selection:bg-luxury-gold selection:text-white overflow-x-hidden">
             {/* Golden Top Bar - visible on all pages EXCEPT white label domain */}
-            {!isWhiteLabelDomain && (
+            {!isWhiteLabelDomain && !isPhotoOnly &&(
                 <div data-navbar="true" className="fixed top-0 left-0 right-0 z-[100]"
                      style={{backgroundColor: '#C9B27C'}}>
                     <div className="container mx-auto px-6 py-1.5 flex justify-between items-center">
@@ -651,14 +654,14 @@ const App: React.FC = () => {
                     </div>
                 </div>
             )}
-            {!isWhiteLabelDomain && <Navbar currentView={currentView} onNavigate={onNavigate} lang={lang}
+            {!isWhiteLabelDomain && !isPhotoOnly &&<Navbar currentView={currentView} onNavigate={onNavigate} lang={lang}
                                             onLanguageChange={handleLanguageChange} onOpenContact={handleOpenContact}/>}
 
             <main className="animate-fade-in relative z-[1]">
                 <AppRouter {...routerProps} />
             </main>
 
-            {!isWhiteLabelDomain && (
+            {!isWhiteLabelDomain && !isPhotoOnly &&(
                 <>
                     <section id="contact" className="py-20 md:py-28 lg:py-32 relative overflow-hidden"
                              style={{backgroundColor: '#0B1C26'}}>
@@ -937,7 +940,7 @@ const App: React.FC = () => {
                 </div>
             )}
 
-            {!isWhiteLabelDomain && <AIConcierge lang={lang}/>}
+            {!isWhiteLabelDomain && !isPhotoOnly &&<AIConcierge lang={lang}/>}
 
             {/* Contact Modal - Shareable via URL */}
             <ContactModal
@@ -1004,7 +1007,7 @@ const App: React.FC = () => {
             <ScrollToTop/>
 
             {/* WhatsApp Floating Button - positioned above AI Concierge */}
-            {!isWhiteLabelDomain && (
+            {!isWhiteLabelDomain && !isPhotoOnly &&(
                 <a
                     href="https://wa.me/34660153207"
                     target="_blank"

@@ -27,6 +27,7 @@ const YachtDetailPage = React.lazy(() => import('./components/YachtDetailPage'))
 const CatamaransPage = React.lazy(() => import('./components/CatamaransPage'));
 const ServiceDetail = React.lazy(() => import('./components/ServiceDetail'));
 const WishlistPage = React.lazy(() => import('./components/WishlistPage'));
+const CollaboratorGallery = React.lazy(() => import('./components/CollaboratorGallery'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -297,6 +298,7 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
             <Route path="/yacht/:id" element={<YachtDetailRoute {...props} />}/>
             <Route path="/blog/:slug" element={<BlogDetailRoute {...props} />}/>
             <Route path="/wishlist/:code" element={<WishlistRoute onNavigate={onNavigate} lang={lang}/>}/>
+            <Route path="/fotos/:slug" element={<CollaboratorGallery />}/>
 
             {/* --- Generic Services --- */}
             {['security', 'wellness', 'nightlife', 'events', 'catering', 'furniture', 'health', 'yoga', 'cleaning', 'driver', 'deliveries', 'babysitting'].map(s => (
@@ -335,6 +337,7 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
             <Route path="/:lang/villa/:slug" element={<LangWrapper component={VillaDetailRoute} {...props} />}/>
             <Route path="/:lang/yacht/:id" element={<LangWrapper component={YachtDetailRoute} {...props} />}/>
             <Route path="/:lang/blog/:slug" element={<LangWrapper component={BlogDetailRoute} {...props} />}/>
+            <Route path="/:lang/fotos/:slug" element={<CollaboratorGallery />}/>
 
             {/* Generic Services with Lang */}
             {['security', 'wellness', 'nightlife', 'events', 'catering', 'furniture', 'health', 'yoga', 'cleaning', 'driver', 'deliveries', 'babysitting'].map(s => (
