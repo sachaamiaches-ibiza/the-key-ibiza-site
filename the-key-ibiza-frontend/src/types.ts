@@ -102,6 +102,13 @@ export interface Villa {
   servicesIncluded?: string;
   visibility?: 'public' | 'private';
   icalUrl?: string;
+  // Catalog-mode villas: lightweight publishing with a single PDF.
+  // When catalogPdfUrl is set, VillaDetailPage renders CatalogView instead
+  // of the full detail layout. blockedDates is a manual JSONB array
+  // ([{from, to}]) that augments the regular calendar.
+  catalogPdfUrl?: string;
+  catalogCoverUrl?: string; // derived from PDF page 1 via Cloudinary transform
+  blockedDates?: { from: string; to: string }[];
 }
 
 // ============================================

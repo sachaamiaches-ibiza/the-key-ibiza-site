@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 // Watermarks are now embedded via Cloudinary URL transformations
 import { getHeaderImageUrl, getGalleryImageUrl } from '../utils/cloudinaryUrl';
 import VillaDetailSkeleton from './VillaDetailSkeleton';
+import CatalogView from './CatalogView';
 
 const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://the-key-ibiza-backend.vercel.app';
 
@@ -2290,4 +2291,17 @@ const handlePdfPasswordSubmit = async () => {
   );
 };
 
-export default VillaDetailPage;
+// ─────────── CATALOG MODE ROUTER ───────────
+// Villas published as a "catalogue" (a PDF + a few structured fields) render
+// a simpler layout. We wrap the original VillaDetailPage so the choice
+// happens BEFORE any hooks run — keeping VillaDetailPage's internals
+// completely untouched and avoiding Rules-of-Hooks issues when navigating
+// between catalog and full villas without unmount.
+const VillaDetailPageWithCatalog: React.FC<VillaDetailPageProps> = (props) => {
+  if (props.villa.catalogPdfUrl) {
+    return <CatalogView villa={props.villa} lang={props.lang} />;
+  }
+  return <VillaDetailPage {...props} />;
+};
+
+export default VillaDetailPageWithCatalog;

@@ -106,6 +106,36 @@ function parseWeeklyRatesField(value: any): SeasonalPrice[] {
 }
 
 // ---------- MAPEO API RESPONSE -> VILLA ----------
+/**
+ * Derive a thumbnail / cover image URL from a PDF uploaded to Cloudinary.
+ * Cloudinary can render page 1 of any PDF as an image when uploaded with
+ * resource_type=image — we just inject the `pg_1,f_jpg,...` transform.
+ * Falls back to the original URL if it isn't a Cloudinary /upload/ URL.
+ */
+function pdfPageOneAsImage(pdfUrl: string, width: number = 1200): string {
+  if (!pdfUrl) return '';
+  const uploadIdx = pdfUrl.indexOf('/upload/');
+  if (uploadIdx === -1 || !pdfUrl.includes('cloudinary.com')) return pdfUrl;
+  const before = pdfUrl.substring(0, uploadIdx + 8);
+  const after = pdfUrl.substring(uploadIdx + 8);
+  const transform = `pg_1,f_jpg,q_auto,w_${width}`;
+  return `${before}${transform}/${after}`;
+}
+
+function parseBlockedDatesField(value: unknown): { from: string; to: string }[] {
+  if (!value) return [];
+  if (typeof value === 'string') {
+    try {
+      const p = JSON.parse(value);
+      if (Array.isArray(p)) return p as { from: string; to: string }[];
+    } catch {
+      return [];
+    }
+  }
+  if (Array.isArray(value)) return value as { from: string; to: string }[];
+  return [];
+}
+
 function apiRowToVilla(row: any): Villa {
   const minPrice = parsePrice(row.price_min_week);
   const maxPrice = parsePrice(row.price_max_week) || minPrice;
@@ -125,6 +155,23 @@ function apiRowToVilla(row: any): Villa {
     ? row.description.split(/\n\n+/).filter(Boolean)
     : [];
 
+  // ---- Catalog mode ----
+  const catalogPdfUrl: string | undefined = row.catalog_pdf_url || undefined;
+  const catalogCoverUrl = catalogPdfUrl
+    ? pdfPageOneAsImage(catalogPdfUrl, 1200)
+    : undefined;
+  const blockedDates = parseBlockedDatesField(row.blocked_dates);
+
+  // For catalog villas without uploaded header images, use the PDF cover
+  // so the listing card has a thumbnail without any extra work.
+  const effectiveHeaderImages =
+    headerImagesArray.length > 0
+      ? headerImagesArray
+      : catalogCoverUrl
+        ? [catalogCoverUrl]
+        : [];
+  const effectiveImageUrl = effectiveHeaderImages[0] || '';
+
   return {
     id: row.slug || '',
     name: row.villa_name || '',
@@ -136,9 +183,13 @@ function apiRowToVilla(row: any): Villa {
     bedrooms: parseInt(row.bedrooms) || 0,
     bathrooms: parseInt(row.bathrooms) || 0,
     maxGuests: parseInt(row.max_persons) || 0,
-    imageUrl: headerImagesArray[0] || '',
-    headerImages: headerImagesArray,
-    thumbnailImages: thumbnailImagesArray,
+    imageUrl: effectiveImageUrl,
+    headerImages: effectiveHeaderImages,
+    thumbnailImages: thumbnailImagesArray.length > 0
+      ? thumbnailImagesArray
+      : catalogCoverUrl
+        ? [catalogCoverUrl]
+        : [],
     district: row.district || '',
     listingType: 'holiday',
     fullDescription: descriptionParagraphs,
@@ -168,11 +219,21 @@ function apiRowToVilla(row: any): Villa {
     finalCleaning: row.final_cleaning || 'Included',
     conciergeNote: row.concierge_note || undefined,
     icalUrl: row.ical_url || undefined,
+    // Catalog mode
+    catalogPdfUrl,
+    catalogCoverUrl,
+    blockedDates,
   };
 }
 
 // ---------- LOAD CLOUDINARY IMAGES FOR MANUAL VILLAS ----------
 async function loadCloudinaryImagesForVilla(villa: Villa, rawRow: any): Promise<Villa> {
+  // Catalog mode: the cover is derived from the PDF page 1 by Cloudinary,
+  // no folder fetch is needed (and the folder doesn't exist anyway).
+  if (rawRow.catalog_pdf_url) {
+    return villa;
+  }
+
   // Only load from Cloudinary if:
   // 1. Villa is NOT from Invenio (source !== 'invenio')
   // 2. Header images are empty or villa has cloudinary_folder set
