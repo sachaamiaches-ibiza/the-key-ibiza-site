@@ -3,6 +3,32 @@ import { Villa, Language } from '../types';
 import { LogoTheKey } from './Navbar';
 import ContactModal from './ContactModal';
 
+const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
+
+/**
+ * Extract the Cloudinary public_id from a stored value. Accepts either:
+ *  - a full Cloudinary URL like
+ *    https://res.cloudinary.com/.../image/upload/v123/Can_Salinas_q0wskl.pdf
+ *  - or just the bare public_id like "Can_Salinas_q0wskl"
+ */
+function extractPublicId(value: string): string {
+  const m = value.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/);
+  if (m) return m[1];
+  return value.replace(/\.\w+$/, '');
+}
+
+/**
+ * Some Cloudinary accounts refuse direct PDF delivery even when the asset is
+ * type=upload, so we route the download through our backend, which signs the
+ * URL on demand and 302-redirects. The user only stores the Cloudinary URL or
+ * the public_id in Supabase — the rest is automatic.
+ */
+function buildCatalogDownloadUrl(rawUrl?: string): string {
+  if (!rawUrl) return '#';
+  const publicId = extractPublicId(rawUrl);
+  return `${BACKEND_URL}/catalog-pdf?public_id=${encodeURIComponent(publicId)}`;
+}
+
 interface CatalogViewProps {
   villa: Villa;
   lang: Language;
@@ -79,7 +105,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ villa, lang }) => {
           {/* Download button */}
           <div className="md:col-span-2">
             <a
-              href={villa.catalogPdfUrl}
+              href={buildCatalogDownloadUrl(villa.catalogPdfUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center justify-between gap-4 rounded-2xl border border-luxury-gold/40 bg-gradient-to-br from-luxury-gold/15 to-luxury-gold/5 px-5 py-5 transition-all hover:-translate-y-0.5 hover:border-luxury-gold hover:from-luxury-gold/25"
