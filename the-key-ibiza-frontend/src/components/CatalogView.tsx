@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Villa, Language } from '../types';
 import { LogoTheKey } from './Navbar';
 import ContactModal from './ContactModal';
+import { pdfPageAsImage } from '../services/villaService';
 
 const BACKEND_URL = 'https://the-key-ibiza-backend.vercel.app';
 
@@ -43,6 +44,7 @@ interface CatalogViewProps {
  */
 const CatalogView: React.FC<CatalogViewProps> = ({ villa, lang }) => {
   const [contactOpen, setContactOpen] = useState(false);
+  const [pageCount, setPageCount] = useState<number>(1);
 
   const cover =
     villa.catalogCoverUrl ||
@@ -51,6 +53,35 @@ const CatalogView: React.FC<CatalogViewProps> = ({ villa, lang }) => {
     '';
 
   const fullDescription = villa.fullDescription ?? [];
+
+  // Fetch the PDF page count once so we can render a magazine-style preview.
+  useEffect(() => {
+    if (!villa.catalogPdfUrl) return;
+    const publicId = extractPublicId(villa.catalogPdfUrl);
+    let alive = true;
+    fetch(`${BACKEND_URL}/catalog-pdf?public_id=${encodeURIComponent(publicId)}&info=1`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((meta) => {
+        if (!alive || !meta) return;
+        const n = Number(meta.pages);
+        if (Number.isFinite(n) && n > 0) setPageCount(n);
+      })
+      .catch(() => {
+        /* fall back to single page preview */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [villa.catalogPdfUrl]);
+
+  const previewPages = useMemo(() => {
+    if (!villa.catalogPdfUrl) return [];
+    const out: string[] = [];
+    for (let i = 1; i <= pageCount; i++) {
+      out.push(pdfPageAsImage(villa.catalogPdfUrl, i, 1400));
+    }
+    return out;
+  }, [villa.catalogPdfUrl, pageCount]);
 
   const stats: { label: string; value: string | number }[] = [
     { label: T(lang, 'bedrooms'), value: villa.bedrooms || '—' },
@@ -100,72 +131,98 @@ const CatalogView: React.FC<CatalogViewProps> = ({ villa, lang }) => {
 
       {/* ───────────── BODY ───────────── */}
       <main className="mx-auto max-w-6xl px-5 py-10 sm:px-10 sm:py-14">
-        {/* Download CTA + Stats */}
-        <section className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {/* Download button */}
-          <div className="md:col-span-2">
-            <a
-              href={buildCatalogDownloadUrl(villa.catalogPdfUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center justify-between gap-4 rounded-2xl border border-luxury-gold/40 bg-gradient-to-br from-luxury-gold/15 to-luxury-gold/5 px-5 py-5 transition-all hover:-translate-y-0.5 hover:border-luxury-gold hover:from-luxury-gold/25"
-            >
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.28em] text-luxury-gold">
-                  {T(lang, 'eyebrow')}
-                </div>
-                <div
-                  className="mt-1 text-2xl leading-tight text-white sm:text-3xl"
+        {/* Stats only — full width, magazine-style */}
+        <section className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
+          <div className="grid grid-cols-3 gap-3 text-center">
+            {stats.map((s) => (
+              <div key={s.label} className="flex flex-col items-center">
+                <span className="text-[9px] uppercase tracking-[0.18em] text-white/45 sm:text-[10px]">
+                  {s.label}
+                </span>
+                <span
+                  className="mt-1 text-2xl text-white sm:text-3xl"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
-                  {T(lang, 'downloadCta')}
-                </div>
-                <div className="mt-1 text-xs text-white/55">
-                  {T(lang, 'downloadHint')}
-                </div>
+                  {s.value}
+                </span>
               </div>
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-luxury-gold text-[#0B1C26] shadow-lg transition-transform group-hover:scale-110">
-                <DownloadIcon />
-              </div>
-            </a>
-          </div>
-
-          {/* Stats card */}
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              {stats.map((s) => (
-                <div key={s.label} className="flex flex-col items-center">
-                  <span className="text-[9px] uppercase tracking-[0.18em] text-white/45">
-                    {s.label}
-                  </span>
-                  <span
-                    className="mt-1 text-2xl text-white"
-                    style={{ fontFamily: 'Playfair Display, serif' }}
-                  >
-                    {s.value}
-                  </span>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* Description */}
-        {(villa.shortDescription || fullDescription.length > 0) && (
+        {/* Short description (kept brief — full PDF preview follows) */}
+        {villa.shortDescription && (
+          <p className="mt-8 text-center text-base leading-relaxed text-white/75 sm:text-lg max-w-3xl mx-auto">
+            {villa.shortDescription}
+          </p>
+        )}
+
+        {/* ───────── PDF PREVIEW (magazine) ───────── */}
+        {previewPages.length > 0 && (
+          <section className="mt-14">
+            <div className="mb-6 flex items-baseline justify-between gap-4">
+              <SectionTitle>{T(lang, 'previewTitle')}</SectionTitle>
+              <span className="text-[11px] uppercase tracking-[0.18em] text-white/40">
+                {previewPages.length} {T(lang, 'pages')}
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-4 sm:gap-6">
+              {previewPages.map((src, i) => (
+                <figure
+                  key={src}
+                  className="w-full overflow-hidden rounded-md bg-white shadow-[0_18px_42px_-18px_rgba(0,0,0,0.7)] sm:rounded-lg"
+                >
+                  <img
+                    src={src}
+                    alt={`${villa.name} — page ${i + 1}`}
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    className="block w-full h-auto"
+                  />
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Download CTA — AFTER the preview so agents see the content first */}
+        <section className="mt-12">
+          <a
+            href={buildCatalogDownloadUrl(villa.catalogPdfUrl)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center justify-between gap-4 rounded-2xl border border-luxury-gold/40 bg-gradient-to-br from-luxury-gold/15 to-luxury-gold/5 px-5 py-5 transition-all hover:-translate-y-0.5 hover:border-luxury-gold hover:from-luxury-gold/25"
+          >
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.28em] text-luxury-gold">
+                {T(lang, 'eyebrow')}
+              </div>
+              <div
+                className="mt-1 text-2xl leading-tight text-white sm:text-3xl"
+                style={{ fontFamily: 'Playfair Display, serif' }}
+              >
+                {T(lang, 'downloadCta')}
+              </div>
+              <div className="mt-1 text-xs text-white/55">
+                {T(lang, 'downloadHint')}
+              </div>
+            </div>
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-luxury-gold text-[#0B1C26] shadow-lg transition-transform group-hover:scale-110">
+              <DownloadIcon />
+            </div>
+          </a>
+        </section>
+
+        {/* Full description — only the structured prose; the short
+            description already appears above the preview as a teaser. */}
+        {fullDescription.length > 0 && (
           <section className="mt-12">
             <SectionTitle>{T(lang, 'about')}</SectionTitle>
-            {villa.shortDescription && (
-              <p className="text-base leading-relaxed text-white/80 sm:text-lg">
-                {villa.shortDescription}
-              </p>
-            )}
-            {fullDescription.length > 0 && (
-              <div className="mt-4 space-y-4 text-sm leading-relaxed text-white/65 sm:text-[15px]">
-                {fullDescription.map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
-            )}
+            <div className="space-y-4 text-sm leading-relaxed text-white/65 sm:text-[15px]">
+              {fullDescription.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
           </section>
         )}
 
@@ -473,6 +530,18 @@ const STRINGS: Record<string, Record<Language, string>> = {
     es: 'Sobre la villa',
     fr: 'À propos',
     de: 'Über die Villa',
+  },
+  previewTitle: {
+    en: 'Catalogue preview',
+    es: 'Vista previa del catálogo',
+    fr: 'Aperçu du catalogue',
+    de: 'Katalog-Vorschau',
+  },
+  pages: {
+    en: 'pages',
+    es: 'páginas',
+    fr: 'pages',
+    de: 'Seiten',
   },
   amenities: {
     en: 'Amenities',

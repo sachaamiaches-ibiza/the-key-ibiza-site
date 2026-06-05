@@ -106,20 +106,44 @@ function parseWeeklyRatesField(value: any): SeasonalPrice[] {
 }
 
 // ---------- MAPEO API RESPONSE -> VILLA ----------
+const CLOUDINARY_CLOUD_NAME = 'drxf80sho';
+
 /**
- * Derive a thumbnail / cover image URL from a PDF uploaded to Cloudinary.
- * Cloudinary can render page 1 of any PDF as an image when uploaded with
- * resource_type=image — we just inject the `pg_1,f_jpg,...` transform.
- * Falls back to the original URL if it isn't a Cloudinary /upload/ URL.
+ * Derive a JPG image URL from a specific page of a PDF uploaded to
+ * Cloudinary. Accepts either a full Cloudinary URL or a bare public_id.
+ * Default page is 1 (used as the cover in the listing card and hero).
+ * The page-1 helper at the bottom of the file just wraps page=1.
  */
-function pdfPageOneAsImage(pdfUrl: string, width: number = 1200): string {
+export function pdfPageAsImage(
+  pdfUrl: string,
+  page: number = 1,
+  width: number = 1200
+): string {
   if (!pdfUrl) return '';
-  const uploadIdx = pdfUrl.indexOf('/upload/');
-  if (uploadIdx === -1 || !pdfUrl.includes('cloudinary.com')) return pdfUrl;
-  const before = pdfUrl.substring(0, uploadIdx + 8);
-  const after = pdfUrl.substring(uploadIdx + 8);
-  const transform = `pg_1,f_jpg,q_auto,w_${width}`;
-  return `${before}${transform}/${after}`;
+  const transform = `pg_${page},f_jpg,q_auto,w_${width}`;
+
+  // Full Cloudinary URL → inject the transform after /upload/
+  if (pdfUrl.includes('cloudinary.com') && pdfUrl.includes('/upload/')) {
+    const uploadIdx = pdfUrl.indexOf('/upload/');
+    const before = pdfUrl.substring(0, uploadIdx + 8);
+    const after = pdfUrl.substring(uploadIdx + 8);
+    return `${before}${transform}/${after}`;
+  }
+
+  // Looks like a bare Cloudinary public_id → build the full URL.
+  const looksLikePublicId =
+    !pdfUrl.startsWith('http') && !pdfUrl.startsWith('//');
+  if (looksLikePublicId) {
+    const cleanId = pdfUrl.replace(/\.\w+$/, '');
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${transform}/${cleanId}.pdf`;
+  }
+
+  // Anything else: return as-is
+  return pdfUrl;
+}
+
+function pdfPageOneAsImage(pdfUrl: string, width: number = 1200): string {
+  return pdfPageAsImage(pdfUrl, 1, width);
 }
 
 function parseBlockedDatesField(value: unknown): { from: string; to: string }[] {
