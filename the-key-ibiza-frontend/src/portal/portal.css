@@ -1,0 +1,142 @@
+/* =====================================================================
+   The Key Ibiza · Owner Portal · Design tokens (scoped to .portal)
+   A refined luxury system with full light + dark. Deliberately isolated
+   from the main site so global dark-only rules never leak in.
+   ===================================================================== */
+
+.portal {
+  /* Light (default) — warm limestone & ink */
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface-2: #F1EDE4;
+  --text: #1A1712;
+  --text-muted: #7A7264;
+  --text-faint: #A9A192;
+  --border: #E8E2D6;
+  --border-strong: #DAD2C2;
+  --gold: #A9863F;
+  --gold-soft: #C4A461;
+  --navy: #0B1C26;
+  --accent-bg: rgba(169, 134, 63, 0.10);
+
+  --avail: #3C9A6A;   /* green  · available   */
+  --blocked: #CF5147; /* red    · blocked     */
+  --tentative: #DE9235;/* orange · tentative   */
+  --maint: #9A958C;   /* grey   · maintenance */
+  --personal: #5B84C4;/* blue   · personal    */
+
+  --avail-bg: rgba(60, 154, 106, 0.12);
+  --blocked-bg: rgba(207, 81, 71, 0.12);
+  --tentative-bg: rgba(222, 146, 53, 0.14);
+  --maint-bg: rgba(154, 149, 140, 0.16);
+  --personal-bg: rgba(91, 132, 196, 0.14);
+
+  --shadow-sm: 0 1px 2px rgba(26, 23, 18, 0.05);
+  --shadow: 0 1px 2px rgba(26, 23, 18, 0.04), 0 10px 30px rgba(26, 23, 18, 0.07);
+  --shadow-lg: 0 1px 2px rgba(26, 23, 18, 0.05), 0 24px 60px rgba(26, 23, 18, 0.14);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-lg: 26px;
+
+  --font-serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+
+  color: var(--text);
+  background: var(--bg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.portal.dark {
+  --bg: #090C11;
+  --surface: #121A23;
+  --surface-2: #0E151D;
+  --text: #F2EEE6;
+  --text-muted: #97A0AB;
+  --text-faint: #5F6871;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --gold: #C4A461;
+  --gold-soft: #D8BC84;
+  --navy: #0B1C26;
+  --accent-bg: rgba(196, 164, 97, 0.12);
+
+  --avail: #4FB587;
+  --blocked: #E06B60;
+  --tentative: #E7A24E;
+  --maint: #6C7580;
+  --personal: #6E9BE0;
+
+  --avail-bg: rgba(79, 181, 135, 0.15);
+  --blocked-bg: rgba(224, 107, 96, 0.16);
+  --tentative-bg: rgba(231, 162, 78, 0.16);
+  --maint-bg: rgba(108, 117, 128, 0.20);
+  --personal-bg: rgba(110, 155, 224, 0.18);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 14px 40px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.4), 0 30px 70px rgba(0, 0, 0, 0.55);
+}
+
+/* Neutralise the site-wide dark input overrides inside the portal */
+.portal input,
+.portal select,
+.portal textarea {
+  color: var(--text) !important;
+  caret-color: var(--gold);
+  background: transparent;
+}
+.portal input::placeholder,
+.portal textarea::placeholder {
+  color: var(--text-faint) !important;
+}
+.portal.light input[type="date"] { color-scheme: light; }
+.portal option { background-color: var(--surface) !important; color: var(--text) !important; }
+
+/* Typography helpers */
+.portal .serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
+.portal h1, .portal h2, .portal h3 { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
+
+/* Card */
+.pl-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* Buttons */
+.pl-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  font-weight: 600; font-size: 0.9rem; border-radius: 999px;
+  padding: 0.6rem 1.15rem; cursor: pointer; transition: all 0.18s ease;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.pl-btn-primary { background: var(--gold); color: #fff; box-shadow: var(--shadow-sm); }
+.pl-btn-primary:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.pl-btn-ghost { background: transparent; color: var(--text); border-color: var(--border-strong); }
+.pl-btn-ghost:hover { background: var(--surface-2); }
+.pl-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.pl-input {
+  width: 100%; background: var(--surface) !important; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 0.7rem 0.9rem; font-size: 0.95rem;
+  color: var(--text) !important; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pl-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-bg); }
+
+/* Animations */
+@keyframes pl-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes pl-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pl-pop { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+.pl-animate { animation: pl-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pl-overlay { animation: pl-fade 0.2s ease both; }
+.pl-modal { animation: pl-pop 0.24s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+.portal ::selection { background: var(--accent-bg); }
+.portal *::-webkit-scrollbar { width: 10px; height: 10px; }
+.portal *::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; border: 3px solid transparent; background-clip: padding-box; }
+
+/* Prevent the site's date-input dark scheme forcing on light calendar cells */
+.portal.light input[type="date"]::-webkit-calendar-picker-indicator { filter: none; }

@@ -28,6 +28,7 @@ const CatamaransPage = React.lazy(() => import('./components/CatamaransPage'));
 const ServiceDetail = React.lazy(() => import('./components/ServiceDetail'));
 const WishlistPage = React.lazy(() => import('./components/WishlistPage'));
 const CollaboratorGallery = React.lazy(() => import('./components/CollaboratorGallery'));
+const OwnerApp = React.lazy(() => import('./portal/OwnerApp'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -299,6 +300,9 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
             <Route path="/blog/:slug" element={<BlogDetailRoute {...props} />}/>
             <Route path="/wishlist/:code" element={<WishlistRoute onNavigate={onNavigate} lang={lang}/>}/>
             <Route path="/fotos/:slug" element={<CollaboratorGallery />}/>
+
+            {/* --- Owner Portal (self-contained app, own layout) --- */}
+            <Route path="/owner/*" element={<OwnerApp />}/>
 
             {/* --- Generic Services --- */}
             {['security', 'wellness', 'nightlife', 'events', 'catering', 'furniture', 'health', 'yoga', 'cleaning', 'driver', 'deliveries', 'babysitting'].map(s => (

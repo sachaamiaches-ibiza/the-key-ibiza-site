@@ -118,7 +118,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'google' | 'advanced' | 'sessions' | 'actions' | 'vip' | 'reviews' | 'indexing'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'google' | 'advanced' | 'sessions' | 'actions' | 'vip' | 'reviews' | 'requests' | 'indexing'>('overview');
+  const [changeRequests, setChangeRequests] = useState<any[]>([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
   const [period, setPeriod] = useState('30d');
   const [vipUsers, setVipUsers] = useState<VipUser[]>([]);
   const [selectedVip, setSelectedVip] = useState<string | null>(null);
@@ -253,7 +255,54 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       };
       fetchPendingReviews();
     }
+    if (activeTab === 'requests') {
+      const fetchChangeRequests = async () => {
+        setRequestsLoading(true);
+        try {
+          const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+          const res = await fetch(`${BACKEND_URL}/owner/admin/change-requests?status=pending`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setChangeRequests(data.requests || []);
+          }
+        } catch (err) {
+          console.error('Failed to fetch change requests:', err);
+        }
+        setRequestsLoading(false);
+      };
+      fetchChangeRequests();
+    }
   }, [activeTab]);
+
+  const approveChangeRequest = async (id: string) => {
+    try {
+      const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+      const res = await fetch(`${BACKEND_URL}/owner/admin/change-requests/${id}/approve`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) setChangeRequests(prev => prev.filter(r => r.id !== id));
+    } catch (err) {
+      console.error('Failed to approve change request:', err);
+    }
+  };
+
+  const rejectChangeRequest = async (id: string) => {
+    try {
+      const note = window.prompt('Reason for rejection (optional):') || '';
+      const token = localStorage.getItem('vip_token') || sessionStorage.getItem('vip_token');
+      const res = await fetch(`${BACKEND_URL}/owner/admin/change-requests/${id}/reject`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note })
+      });
+      if (res.ok) setChangeRequests(prev => prev.filter(r => r.id !== id));
+    } catch (err) {
+      console.error('Failed to reject change request:', err);
+    }
+  };
 
   const approveReview = async (id: string) => {
     try {
@@ -442,7 +491,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {(['overview', 'google', 'advanced', 'sessions', 'actions', 'vip', 'reviews', 'indexing'] as const).map((tab) => (
+          {(['overview', 'google', 'advanced', 'sessions', 'actions', 'vip', 'reviews', 'requests', 'indexing'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -452,7 +501,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   : 'bg-transparent border border-white/20 text-white/60 hover:border-luxury-gold/50'
               }`}
             >
-              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab === 'google' ? 'Google Analytics' : tab === 'reviews' ? 'Reviews' : tab === 'indexing' ? 'SEO Index' : tab}
+              {tab === 'vip' ? 'VIP Tracking' : tab === 'advanced' ? 'Advanced' : tab === 'google' ? 'Google Analytics' : tab === 'reviews' ? 'Reviews' : tab === 'requests' ? `Owner Requests${changeRequests.length ? ` (${changeRequests.length})` : ''}` : tab === 'indexing' ? 'SEO Index' : tab}
             </button>
           ))}
         </div>
@@ -1099,6 +1148,64 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                       </button>
                       <button
                         onClick={() => deleteReview(review.id)}
+                        className="px-4 py-2 rounded-full bg-red-500/20 text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/30 transition-all"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Owner Change Requests Tab */}
+        {activeTab === 'requests' && (
+          <div className="bg-luxury-slate/30 rounded-2xl p-6 border border-white/10">
+            <h3 className="text-white text-lg font-serif mb-2">Owner Change Requests</h3>
+            <p className="text-white/40 text-sm mb-6">Content edits proposed by owners. Approving applies them to the live villa immediately.</p>
+            {requestsLoading ? (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-2 border-luxury-gold/30 border-t-luxury-gold rounded-full animate-spin mx-auto"></div>
+              </div>
+            ) : changeRequests.length === 0 ? (
+              <p className="text-white/40 text-sm text-center py-8">No pending requests</p>
+            ) : (
+              <div className="space-y-4">
+                {changeRequests.map((cr) => (
+                  <div key={cr.id} className="bg-white/5 rounded-xl p-6 border border-white/10">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-white font-medium">{cr.villa_name}</p>
+                        <p className="text-white/40 text-sm">{cr.owner_name || 'Owner'}{cr.owner_email ? ` · ${cr.owner_email}` : ''}</p>
+                      </div>
+                      <p className="text-white/30 text-xs">{formatDate(cr.created_at)}</p>
+                    </div>
+                    <div className="space-y-2 mb-4">
+                      {Object.keys(cr.patch || {}).map((field) => (
+                        <div key={field} className="text-sm">
+                          <span className="text-luxury-gold uppercase tracking-wider text-xs">{field.replace(/_/g, ' ')}</span>
+                          <div className="grid md:grid-cols-2 gap-2 mt-1">
+                            <div className="bg-red-500/5 border border-red-500/20 rounded-lg px-3 py-2 text-white/50 line-through break-words">
+                              {String(cr.before?.[field] ?? '—') || '—'}
+                            </div>
+                            <div className="bg-green-500/5 border border-green-500/20 rounded-lg px-3 py-2 text-white break-words">
+                              {String(cr.patch[field] ?? '—') || '—'}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => approveChangeRequest(cr.id)}
+                        className="px-4 py-2 rounded-full bg-green-500/20 text-green-400 text-xs uppercase tracking-wider hover:bg-green-500/30 transition-all"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => rejectChangeRequest(cr.id)}
                         className="px-4 py-2 rounded-full bg-red-500/20 text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/30 transition-all"
                       >
                         Reject
