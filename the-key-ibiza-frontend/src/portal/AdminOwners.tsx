@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { usePortal } from './PortalContext';
 import { ownerApi, AdminOwner, AdminStats, CatalogVilla } from './ownerApi';
 import { PORTAL_LANGS } from './i18n';
@@ -243,13 +244,14 @@ export const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ 
 );
 
 export const ModalSheet: React.FC<{ title: string; subtitle?: string; onClose: () => void; children: React.ReactNode; footer?: React.ReactNode; wide?: boolean }> = ({ title, subtitle, onClose, children, footer, wide }) => {
+  const { theme } = usePortal();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
-  return (
-    <div className="pl-overlay" onMouseDown={onClose} style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(10,12,17,0.55)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+  const node = (
+    <div className="pl-overlay" onMouseDown={onClose} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(10,12,17,0.55)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
       <div className="pl-modal pl-modal-sheet" onMouseDown={(e) => e.stopPropagation()}
         style={{ background: 'var(--surface)', width: '100%', maxWidth: wide ? 620 : 480, maxHeight: '92vh', overflowY: 'auto', borderRadius: '22px 22px 0 0', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}>
         <div style={{ position: 'sticky', top: 0, background: 'var(--surface)', padding: '1.1rem 1.3rem', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10, zIndex: 2 }}>
@@ -264,6 +266,13 @@ export const ModalSheet: React.FC<{ title: string; subtitle?: string; onClose: (
         <style>{`@media (min-width:640px){ .pl-modal-sheet { border-radius: 22px !important; align-self: center; margin: 5vh 0; } }`}</style>
       </div>
     </div>
+  );
+  if (typeof document === 'undefined') return node;
+  // Render at <body> in a theme-carrying wrapper so nested modals position
+  // against the viewport (not trapped by an ancestor's backdrop-filter).
+  return createPortal(
+    <div className={`portal ${theme}`} style={{ minHeight: 0, background: 'transparent' }}>{node}</div>,
+    document.body
   );
 };
 
