@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
+// @ts-ignore - @types/react-dom isn't installed; createPortal exists at runtime
 import { createPortal } from 'react-dom';
 import { usePortal } from './PortalContext';
 import { ownerApi, AdminOwner, AdminStats, CatalogVilla } from './ownerApi';
 import { PORTAL_LANGS } from './i18n';
-import { IconUsers, IconPlus, IconX, IconTrash, IconPin, IconCheck, IconChevronRight } from './icons';
+import { IconUsers, IconPlus, IconX, IconTrash, IconPin, IconCheck, IconChevronRight, IconCopy } from './icons';
 
 const Stat: React.FC<{ label: string; value: number | string; accent?: boolean }> = ({ label, value, accent }) => (
   <div className="pl-card" style={{ padding: '1rem 1.2rem' }}>
@@ -13,23 +14,65 @@ const Stat: React.FC<{ label: string; value: number | string; accent?: boolean }
 );
 
 // ---------- Add owner modal ----------
+type Welcome = { message: string; loginUrl: string; email: string; password: string; emailSent: boolean };
+
 const AddOwnerModal: React.FC<{ onClose: () => void; onCreated: () => void }> = ({ onClose, onCreated }) => {
-  const { t, toast } = usePortal();
+  const { t } = usePortal();
   const [f, setF] = useState({ name: '', email: '', password: '', preferred_lang: 'es' });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [welcome, setWelcome] = useState<Welcome | null>(null);
+  const [copied, setCopied] = useState(false);
+
   const submit = async () => {
     setErr('');
     if (!f.name.trim() || !f.email.trim() || !f.password) { setErr(t('fillAllFields')); return; }
     if (!/\S+@\S+\.\S+/.test(f.email)) { setErr(t('invalidEmail')); return; }
     setBusy(true);
-    try { await ownerApi.adminCreateOwner({ ...f, email: f.email.trim(), name: f.name.trim() }); toast(t('ownerCreated')); onCreated(); }
-    catch (e: any) {
+    try {
+      const { welcome } = await ownerApi.adminCreateOwner({ ...f, email: f.email.trim(), name: f.name.trim() });
+      setWelcome(welcome); // show the shareable message screen
+    } catch (e: any) {
       const msg = String(e?.message || '');
       setErr(/already exists/i.test(msg) ? t('emailExists') : t('errorGeneric'));
       setBusy(false);
     }
   };
+
+  const copy = async () => {
+    if (!welcome) return;
+    try { await navigator.clipboard.writeText(welcome.message); setCopied(true); setTimeout(() => setCopied(false), 2200); } catch { /* */ }
+  };
+
+  // ---- Success screen ----
+  if (welcome) {
+    return (
+      <ModalSheet title={t('ownerCreatedTitle')} onClose={onCreated} footer={
+        <button className="pl-btn pl-btn-primary" onClick={onCreated} style={{ padding: '0.7rem 1.4rem', marginLeft: 'auto' }}>{t('done')}</button>
+      }>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 999, background: 'var(--avail-bg)', color: 'var(--avail)', display: 'grid', placeItems: 'center', flexShrink: 0 }}><IconCheck size={22} /></div>
+          <div>
+            <div style={{ fontSize: '1rem', fontWeight: 600 }}>{f.name.trim()}</div>
+            <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{welcome.email}</div>
+          </div>
+        </div>
+
+        {welcome.emailSent && (
+          <div style={{ fontSize: '0.85rem', color: 'var(--avail)', background: 'var(--avail-bg)', borderRadius: 10, padding: '0.55rem 0.75rem', fontWeight: 600 }}>{t('emailAutoSent')}</div>
+        )}
+
+        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{t('shareAccess')}</div>
+        <textarea readOnly value={welcome.message} onFocus={(e) => e.currentTarget.select()}
+          style={{ width: '100%', minHeight: 240, resize: 'vertical', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 12, padding: '0.85rem 1rem', fontSize: '0.85rem', lineHeight: 1.5, color: 'var(--text)', fontFamily: 'inherit' }} />
+        <button className="pl-btn pl-btn-primary" onClick={copy} style={{ padding: '0.7rem 1.2rem', alignSelf: 'flex-start' }}>
+          {copied ? <IconCheck size={16} /> : <IconCopy size={16} />}{copied ? t('copiedMsg') : t('copyMessage')}
+        </button>
+      </ModalSheet>
+    );
+  }
+
+  // ---- Form screen ----
   return (
     <ModalSheet title={t('addOwner')} onClose={onClose} footer={
       <>

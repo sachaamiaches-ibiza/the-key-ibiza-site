@@ -238,7 +238,7 @@ export const ownerApi = {
   adminStats: () => req<AdminStats>('/admin/stats'),
   adminOwners: () => req<{ owners: AdminOwner[] }>('/admin/owners'),
   adminCreateOwner: (o: { email: string; name: string; password: string; preferred_lang?: string; phone?: string }) =>
-    req<{ owner: AdminOwner }>('/admin/owners', { method: 'POST', body: JSON.stringify(o) }),
+    req<{ owner: AdminOwner; welcome: { message: string; loginUrl: string; email: string; password: string; emailSent: boolean } }>('/admin/owners', { method: 'POST', body: JSON.stringify(o) }),
   adminUpdateOwner: (id: string, patch: Record<string, any>) =>
     req<{ owner: AdminOwner }>(`/admin/owners/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
   adminDeleteOwner: (id: string) => req<{ ok: boolean }>(`/admin/owners/${id}`, { method: 'DELETE' }),

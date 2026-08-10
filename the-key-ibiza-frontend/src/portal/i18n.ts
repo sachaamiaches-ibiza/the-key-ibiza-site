@@ -242,6 +242,12 @@ const en: Dict = {
   fillAllFields: 'Please fill in name, email and password',
   invalidEmail: 'Enter a valid email address',
   emailExists: 'An owner with that email already exists',
+  ownerCreatedTitle: 'Owner created',
+  shareAccess: 'Send them this message with their access:',
+  copyMessage: 'Copy message',
+  copiedMsg: 'Copied ✓',
+  emailAutoSent: 'We also emailed it to them automatically ✓',
+  done: 'Done',
 };
 
 const es: Dict = {
@@ -443,6 +449,12 @@ const es: Dict = {
   fillAllFields: 'Rellena nombre, correo y contraseña',
   invalidEmail: 'Introduce un correo válido',
   emailExists: 'Ya existe un propietario con ese correo',
+  ownerCreatedTitle: 'Propietario creado',
+  shareAccess: 'Envíale este mensaje con su acceso:',
+  copyMessage: 'Copiar mensaje',
+  copiedMsg: 'Copiado ✓',
+  emailAutoSent: 'También se lo enviamos por email automáticamente ✓',
+  done: 'Hecho',
 };
 
 const fr: Dict = {
