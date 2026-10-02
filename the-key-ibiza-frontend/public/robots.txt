@@ -31,7 +31,9 @@ Allow: /
 User-agent: YandexBot
 Allow: /
 
-# Block bad bots
+# Block aggressive commercial SEO crawlers (they bring zero real traffic and
+# burn bandwidth / API quotas — Sep 2026 incident with MeirraSEOBot exhausted
+# Cloudinary's 2000 ops/hour limit, taking villa photos down for real users).
 User-agent: AhrefsBot
 Disallow: /
 
@@ -39,4 +41,56 @@ User-agent: SemrushBot
 Disallow: /
 
 User-agent: MJ12bot
+Disallow: /
+
+User-agent: MeirraSEOBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: MegaIndex
+Disallow: /
+
+User-agent: SerpstatBot
+Disallow: /
+
+User-agent: SeekportBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: ZoominfoBot
+Disallow: /
+
+User-agent: Barkrowler
+Disallow: /
+
+# AI scrapers that train models on your content without permission
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Bytespider
 Disallow: /
