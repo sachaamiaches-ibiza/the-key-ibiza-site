@@ -28,6 +28,7 @@ const CatamaransPage = React.lazy(() => import('./components/CatamaransPage'));
 const ServiceDetail = React.lazy(() => import('./components/ServiceDetail'));
 const WishlistPage = React.lazy(() => import('./components/WishlistPage'));
 const CollaboratorGallery = React.lazy(() => import('./components/CollaboratorGallery'));
+const LeaveReviewPage = React.lazy(() => import('./components/LeaveReviewPage'));
 const OwnerApp = React.lazy(() => import('./portal/OwnerApp'));
 
 // Loading fallback
@@ -300,6 +301,8 @@ const AppRouter: React.FC<AppRouterProps> = (props) => {
             <Route path="/blog/:slug" element={<BlogDetailRoute {...props} />}/>
             <Route path="/wishlist/:code" element={<WishlistRoute onNavigate={onNavigate} lang={lang}/>}/>
             <Route path="/fotos/:slug" element={<CollaboratorGallery />}/>
+            <Route path="/review" element={<LeaveReviewPage />}/>
+            <Route path="/leave-review" element={<LeaveReviewPage />}/>
 
             {/* --- Owner Portal (self-contained app, own layout) --- */}
             <Route path="/owner/*" element={<OwnerApp />}/>
