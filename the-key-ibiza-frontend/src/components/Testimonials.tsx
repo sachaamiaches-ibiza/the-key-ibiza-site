@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 const BACKEND_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001'
@@ -205,17 +206,19 @@ const Testimonials: React.FC = () => {
             </button>
           </div>
 
-          {/* Leave a Review Button */}
+          {/* Leave a Review Button — navigates to the dedicated /review
+              page instead of opening the inline modal, so the same URL
+              can also be shared directly with clients after their stay. */}
           <div className="text-center mt-10">
-            <button
-              onClick={() => setShowModal(true)}
+            <Link
+              to="/review"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-luxury-gold/30 text-luxury-gold text-xs uppercase tracking-widest hover:bg-luxury-gold/10 transition-all"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
               Leave a Review
-            </button>
+            </Link>
           </div>
         </div>
       </div>
